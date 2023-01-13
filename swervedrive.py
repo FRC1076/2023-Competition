@@ -1,3 +1,4 @@
+from navx import AHRS
 import math
 from util import clamp
 
@@ -115,6 +116,21 @@ class SwerveDrive:
         angle = (self.gyro.getAngle() - self.gyro_zero) % 360
 
         return angle
+
+    def getGyroYaw(self):
+        yaw = (self.gyro.getYaw()- self.gyro_zero) % 360
+
+        return yaw
+
+    def getGyroPitch(self):
+        pitch = (self.gyro.getPitch() - self.gyro_zero) % 360
+
+        return pitch
+
+    def getGyroRoll(self):
+        roll = (self.gyro.getRoll() - self.gyro_zero) % 360
+
+        return roll
 
     def resetGyro(self):
         self.gyro.reset()
