@@ -59,8 +59,8 @@ class SwerveDrive:
         }
 
         # Variables that allow enabling and disabling of features in code
-        self.squared_inputs = True
-        self.threshold_input_vectors = True
+        self.squared_inputs = False
+        self.threshold_input_vectors = False
 
         self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
         self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
@@ -242,6 +242,7 @@ class SwerveDrive:
         chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
 
         #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
+        self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
 
         self.set_fwd(chassis_fwd)
         self.set_strafe(chassis_strafe)
