@@ -6,6 +6,9 @@ import swervemodule
 
 from networktables import NetworkTables
 from networktables.util import ntproperty
+from collections import namedtuple
+
+LevelConfig = namedtuple('LevelConfig', ['sd_prefix', 'level_kP', 'level_kI', 'level_kD'])
 
 class SwerveDrive:
 

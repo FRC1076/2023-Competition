@@ -12,7 +12,7 @@ from wpimath.controller import PIDController
 from collections import namedtuple
 
 # Create the structure of the config: SmartDashboard prefix, Encoder's zero point, Drive motor inverted, Allow reverse
-ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse'])
+ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse', 'heading_kP', 'heading_kI', 'heading_kD'])
 
 MAX_VOLTAGE = 5 # Absolute encoder measures from 0V to 5V
 
@@ -44,15 +44,15 @@ class SwerveModule:
         self._requested_angle = 0 # change this to something like 'requested angle' or 'requested encoder value', whatever makes more sense
         self._requested_speed = 0 #class variable which execute() passes to the drive motor at the end of the robot loop
 
-        # PID Controller
+        # Heading PID Controller
         # kP = 1.5, kI = 0.0, kD = 0.0
-        self._pid_controller = PIDController(0.005, 0.00001, 0.00001) #swap this stuff for CANSparkMax pid controller -- see example from last year shooter
-        self._pid_controller.enableContinuousInput(0, 360)
-        self._pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
+        self.heading_pid_controller = PIDController(0.005, 0.00001, 0.00001) #swap this stuff for CANSparkMax pid controller -- see example from last year shooter
+        self.heading_pid_controller.enableContinuousInput(0, 360)
+        self.heading_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
 
-        self.sd.putNumber('kP', self._pid_controller.getP())
-        self.sd.putNumber('kI', self._pid_controller.getI())
-        self.sd.putNumber('kD', self._pid_controller.getD())
+        self.sd.putNumber('Heading kP', self.heading_pid_controller.getP())
+        self.sd.putNumber('Heading kI', self.heading_pid_controller.getI())
+        self.sd.putNumber('Heading kD', self.heading_pid_controller.getD())
         
 
     def get_current_angle(self):
@@ -73,7 +73,7 @@ class SwerveModule:
         """
         self._requested_angle = 0
         self._requested_speed = 0
-        self._pid_controller.reset()
+        self.heading_pid_controller.reset()
 
     
     @staticmethod
@@ -157,20 +157,20 @@ class SwerveModule:
         Called every robot iteration/loop.
         """
 
-        self._pid_controller.setP(self.sd.getNumber('kP', 0))
-        self._pid_controller.setI(self.sd.getNumber('kI', 0))
-        self._pid_controller.setD(self.sd.getNumber('kD', 0))
+        self.heading_pid_controller.setP(self.sd.getNumber('Heading kP', 0))
+        self.heading_pid_controller.setI(self.sd.getNumber('Heading kI', 0))
+        self.heading_pid_controller.setD(self.sd.getNumber('Heading kD', 0))
 
         # Calculate the error using the current voltage and the requested voltage.
         # DO NOT use the #self.get_voltage function here. It has to be the raw voltage.
-        error = self._pid_controller.calculate(self.get_current_angle(), self._requested_angle) #Make this an error in ticks instead of voltage
+        error = self.heading_pid_controller.calculate(self.get_current_angle(), self._requested_angle) #Make this an error in ticks instead of voltage
 
         # Set the output 0 as the default value
         output = 0
         # If the error is not tolerable, set the output to the error.
 
         # Else, the output will stay at zero.
-        if not self._pid_controller.atSetpoint():
+        if not self.heading_pid_controller.atSetpoint():
             # Use max-min to clamped the output between -1 and 1. The CANSparkMax PID controller does this automatically, so idk if this is necessary
             output = clamp(error)
 
@@ -203,8 +203,8 @@ class SwerveModule:
             self.sd.putNumber('drive/%s/encoder position' % self.sd_prefix, self.encoder.getAbsolutePosition())
             self.sd.putNumber('drive/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
 
-            self.sd.putNumber('drive/%s/PID Setpoint' % self.sd_prefix, self._pid_controller.getSetpoint())
-            self.sd.putNumber('drive/%s/PID Error' % self.sd_prefix, self._pid_controller.getPositionError())
-            self.sd.putBoolean('drive/%s/PID isAligned' % self.sd_prefix, self._pid_controller.atSetpoint())
+            self.sd.putNumber('drive/%s/Heading PID Setpoint' % self.sd_prefix, self.heading_pid_controller.getSetpoint())
+            self.sd.putNumber('drive/%s/Heading PID Error' % self.sd_prefix, self.heading_pid_controller.getPositionError())
+            self.sd.putBoolean('drive/%s/Heading PID isAligned' % self.sd_prefix, self.heading_pid_controller.atSetpoint())
 
             self.sd.putBoolean('drive/%s/allow_reverse' % self.sd_prefix, self.allow_reverse)
