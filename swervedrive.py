@@ -1,3 +1,4 @@
+from navx import AHRS
 import math
 from util import clamp
 
@@ -122,7 +123,7 @@ class SwerveDrive:
         angle = (self.gyro.getAngle() - self.gyro_angle_zero) % 360
 
         return angle
-
+        
     def getGyroLevel(self):
         level = (self.gyro.getPitch() - self.gyro_level_zero)
 
