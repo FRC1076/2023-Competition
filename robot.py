@@ -224,10 +224,10 @@ class MyRobot(wpilib.TimedRobot):
             print(self.drivetrain.getGyroLevel())
             if (self.drivetrain.getGyroLevel() > LEVEL_TOLERANCE):
                 print("big positive")
-                self.move(0.3, 0.0, 0.0)
+                self.move(0.0, 0.3, 0.0)
             elif (self.drivetrain.getGyroLevel() < -LEVEL_TOLERANCE):
                 print("big negative")
-                self.move(-0.3, 0.0, 0.0)
+                self.move(0.0, -0.3, 0.0)
             else:
                 self.move(0.0, 0.0, 0.0)
         else:
