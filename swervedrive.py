@@ -9,7 +9,7 @@ from networktables import NetworkTables
 from networktables.util import ntproperty
 from collections import namedtuple
 
-LevelConfig = namedtuple('LevelConfig', ['sd_prefix', 'level_kP', 'level_kI', 'level_kD'])
+BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_kP', 'balance_kI', 'balance_kD'])
 
 class SwerveDrive:
 
@@ -36,9 +36,9 @@ class SwerveDrive:
 
         self.gyro = _gyro
         self.gyro_angle_zero = 0.0
-        #assuming level at initialization
-        #self.gyro_level_zero = self.getGyroRoll()
-        self.gyro_level_zero = 0.0
+        #assuming balanced at initialization
+        #self.gyro_balance_zero = self.getGyroRoll()
+        self.gyro_balance_zero = 0.0
 
         # Get Smart Dashboard
         self.sd = NetworkTables.getTable('SmartDashboard')
@@ -124,10 +124,10 @@ class SwerveDrive:
 
         return angle
         
-    def getGyroLevel(self):
-        level = (self.gyro.getPitch() - self.gyro_level_zero)
+    def getGyroBalance(self):
+        balance = (self.gyro.getRoll() - self.gyro_balance_zero)
 
-        return level
+        return balance
 
     #raw level side to side
     def getGyroPitch(self):
@@ -237,6 +237,23 @@ class SwerveDrive:
         rcw *= self.rotation_multiplier
 
         self._requested_vectors['rcw'] = rcw
+
+    def balance(self):
+        
+        self.printGyro()
+
+        BALANCE_TOLERANCE = 0.01
+
+        if (self.getGyroBalance() > BALANCE_TOLERANCE):
+            print("big positive")
+            self.move(0.0, 0.3, 0.0)
+        elif (self.getGyroBalance() < -BALANCE_TOLERANCE):
+            print("big negative")
+            self.move(0.0, -0.3, 0.0)
+        else:
+            self.move(0.0, 0.0, 0.0)
+
+        self.execute()
 
     def move(self, fwd, strafe, rcw):
         """

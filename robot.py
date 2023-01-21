@@ -15,7 +15,7 @@ from controller import Controller
 from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
 from swervemodule import ModuleConfig
-from swervedrive import LevelConfig
+from swervedrive import BalanceConfig
 from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
@@ -104,7 +104,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.rotationCorrection = config['ROTATION_CORRECTION']
 
-        level_cfg = LevelConfig(sd_prefix='Level_Module', level_kP=config['LEVEL_KP'], level_kI=config['LEVEL_KI'], level_kD=config['LEVEL_KD'])
+        balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_kP=config['BALANCE_KP'], balance_kI=config['BALANCE_KI'], balance_kD=config['BALANCE_KD'])
 
         flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
         frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
@@ -206,7 +206,7 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard.putNumber('ctrl right x', driver.getRightX())
         self.dashboard.putNumber('ctrl right y', driver.getRightY())
         
-        self.drivetrain.printGyro()
+        #self.drivetrain.printGyro()
 
         if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
             self.drivetrain.resetGyro()
@@ -219,17 +219,9 @@ class MyRobot(wpilib.TimedRobot):
         if (driver.getLeftBumper()):
             self.request_wheel_lock = True
         
-        LEVEL_TOLERANCE = 0.001 
+        
         if(driver.getAButton()):
-            print(self.drivetrain.getGyroLevel())
-            if (self.drivetrain.getGyroLevel() > LEVEL_TOLERANCE):
-                print("big positive")
-                self.move(0.3, 0.0, 0.0)
-            elif (self.drivetrain.getGyroLevel() < -LEVEL_TOLERANCE):
-                print("big negative")
-                self.move(-0.3, 0.0, 0.0)
-            else:
-                self.move(0.0, 0.0, 0.0)
+            self.drivetrain.balance()
         else:
             self.move(self.deadzoneCorrection(-driver.getRightX(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getRightY(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getLeftX(), 0.2 * speedMulti))
             #print("Driver right x", driver.getRightX())
