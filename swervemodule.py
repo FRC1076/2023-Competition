@@ -164,7 +164,7 @@ class SwerveModule:
         # Calculate the error using the current voltage and the requested voltage.
         # DO NOT use the #self.get_voltage function here. It has to be the raw voltage.
         error = self.heading_pid_controller.calculate(self.get_current_angle(), self._requested_angle) #Make this an error in ticks instead of voltage
-
+ 
         # Set the output 0 as the default value
         output = 0
         # If the error is not tolerable, set the output to the error.

@@ -179,6 +179,7 @@ class MyRobot(wpilib.TimedRobot):
         :param rcw: Velocity in z axis [-1, 1]
         """
 
+        #print("move: x: ", x, "y: ", y, "rcw: ", rcw)
         # if self.driver.getLeftBumper():
         #     # If the button is pressed, lower the rotate speed.
         #     rcw *= 0.7

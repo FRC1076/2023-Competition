@@ -8,6 +8,7 @@ import swervemodule
 from networktables import NetworkTables
 from networktables.util import ntproperty
 from collections import namedtuple
+from wpimath.controller import PIDController
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_kP', 'balance_kI', 'balance_kD'])
 
@@ -35,10 +36,6 @@ class SwerveDrive:
         }
 
         self.gyro = _gyro
-        self.balance_config = _balance_cfg
-        self.balance_kP = self.balance_config.balance_kP
-        self.balance_kI = self.balance_config.balance_kI
-        self.balance_kD = self.balance_config.balance_kD
         self.gyro_angle_zero = 0.0
         #assuming balanced at initialization
         #self.gyro_balance_zero = self.getGyroRoll()
@@ -76,6 +73,19 @@ class SwerveDrive:
         self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
 
         self.request_wheel_lock = False
+        
+        self.balance_config = _balance_cfg
+        self.balance_kP = self.balance_config.balance_kP
+        self.balance_kI = self.balance_config.balance_kI
+        self.balance_kD = self.balance_config.balance_kD
+
+        self.balance_pid_controller = PIDController(self.balance_config.balance_kP, self.balance_config.balance_kI, self.balance_config.balance_kD)
+        self.balance_pid_controller.enableContinuousInput(-180, 180)
+        self.balance_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
+
+        self.sd.putNumber('Balance kP', self.balance_pid_controller.getP())
+        self.sd.putNumber('Balance kI', self.balance_pid_controller.getI())
+        self.sd.putNumber('Balance kD', self.balance_pid_controller.getD())
 
     @property
     def chassis_dimension(self):
@@ -244,19 +254,48 @@ class SwerveDrive:
 
     def balance(self):
         
-        print("kP = ", self.balance_kP, ", kI = ", self.balance_kI, ", kD =", self.balance_kD)
+        self.balance_pid_controller.setP(self.sd.getNumber('Balance kP', 0))
+        self.balance_pid_controller.setI(self.sd.getNumber('Balance kI', 0))
+        self.balance_pid_controller.setD(self.sd.getNumber('Balance kD', 0))
+
+        print("kP = ", self.sd.getNumber('Balance kP', 0), ", kI = ", self.sd.getNumber('Balance kI', 0), ", kD =", self.sd.getNumber('Balance kD', 0))
         self.printGyro()
 
-        BALANCE_TOLERANCE = 0.01
+        BALANCED = 0.0
 
-        if (self.getGyroBalance() > BALANCE_TOLERANCE):
-            print("big positive")
-            self.move(0.0, 0.3, 0.0)
-        elif (self.getGyroBalance() < -BALANCE_TOLERANCE):
-            print("big negative")
-            self.move(0.0, -0.3, 0.0)
+        error = self.balance_pid_controller.calculate(self.getGyroBalance(), BALANCED) 
+
+        # Set the output to 0 if at setpoint or to a value between (-1, 1)
+        if self.balance_pid_controller.atSetpoint():
+            output = 0
         else:
-            self.move(0.0, 0.0, 0.0)
+            #output = clamp(error)
+            output = 100 * error
+
+        sign = 1.0
+        if self.getGyroBalance() < 0.0:
+            sign = -sign
+
+        output = sign * output
+
+        print("XXX Setpoint: ", self.balance_pid_controller.getSetpoint(), "output: ", output, " error: ", error)
+
+        # Put the output to the dashboard
+        self.sd.putNumber('Balance output', output)
+        self.move(0.0, -output, 0.0)
+        
+        self.update_smartdash()
+
+        #BALANCE_TOLERANCE = 0.01
+        
+        #if (self.getGyroBalance() > BALANCE_TOLERANCE):
+            #print("big positive")
+            #self.move(0.0, 0.3, 0.0)
+        #elif (self.getGyroBalance() < -BALANCE_TOLERANCE):
+            #print("big negative")
+            #self.move(0.0, -0.3, 0.0)
+        #else:
+            #self.move(0.0, 0.0, 0.0)
 
         self.execute()
 
