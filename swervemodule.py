@@ -46,7 +46,7 @@ class SwerveModule:
 
         # Heading PID Controller
         # kP = 1.5, kI = 0.0, kD = 0.0
-        self.heading_pid_controller = PIDController(0.005, 0.00001, 0.00001) #swap this stuff for CANSparkMax pid controller -- see example from last year shooter
+        self.heading_pid_controller = PIDController(self.cfg.heading_kP, self.cfg.heading_kI, self.cfg.heading_kD) #swap this stuff for CANSparkMax pid controller -- see example from last year shooter
         self.heading_pid_controller.enableContinuousInput(0, 360)
         self.heading_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
 
