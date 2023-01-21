@@ -19,7 +19,7 @@ class SwerveDrive:
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _gyro):
+    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _gyro, _balance_cfg):
         
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
@@ -35,6 +35,10 @@ class SwerveDrive:
         }
 
         self.gyro = _gyro
+        self.balance_config = _balance_cfg
+        self.balance_kP = self.balance_config.balance_kP
+        self.balance_kI = self.balance_config.balance_kI
+        self.balance_kD = self.balance_config.balance_kD
         self.gyro_angle_zero = 0.0
         #assuming balanced at initialization
         #self.gyro_balance_zero = self.getGyroRoll()
@@ -240,6 +244,7 @@ class SwerveDrive:
 
     def balance(self):
         
+        print("kP = ", self.balance_kP, ", kI = ", self.balance_kI, ", kD =", self.balance_kD)
         self.printGyro()
 
         BALANCE_TOLERANCE = 0.01

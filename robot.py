@@ -143,7 +143,7 @@ class MyRobot(wpilib.TimedRobot):
 
         gyro = AHRS.create_spi()
 
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, gyro)
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, gyro, balance_cfg)
 
         return swerve
 
@@ -218,7 +218,6 @@ class MyRobot(wpilib.TimedRobot):
 
         if (driver.getLeftBumper()):
             self.request_wheel_lock = True
-        
         
         if(driver.getAButton()):
             self.drivetrain.balance()
