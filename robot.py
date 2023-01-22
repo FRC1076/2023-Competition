@@ -19,6 +19,7 @@ from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
 from hooks import Hooks
+from vision import Vision, Pipelines
 
 # Drive Types
 ARCADE = 1
@@ -39,6 +40,7 @@ class MyRobot(wpilib.TimedRobot):
         self.tester = None
         self.auton = None
         self.hooks = None
+        self.vision = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -57,12 +59,12 @@ class MyRobot(wpilib.TimedRobot):
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
                 print(self.drivetrain)
-            if key == 'FEEDER':
-                self.feeder = self.initFeeder(config)
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
             if key == 'HOOKS':
                 self.hooks = self.initHooks(config)
+            if key == 'VISION':
+                self.vision = self.initVision(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
@@ -151,12 +153,10 @@ class MyRobot(wpilib.TimedRobot):
 
         #self.testingModule = frontLeftModule
 
-    #EXAMPLE
-    def initFeeder(self, config):
-        # assuming this is a Neo; otherwise it may not be brushless
-        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
-        feeder = rev.CANSparkMax(config['FEEDER_ID'], motor_type)
-        return Feeder(feeder, config['FEEDER_SPEED'])
+    def initVision(self, config):
+        vision = Vision(NetworkTables.getTable('limelight'))
+
+        return vision
 
 
     def robotPeriodic(self):
