@@ -19,6 +19,7 @@ from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
 from hooks import Hooks
+from controlarm import Elevator, ControlArm
 
 # Drive Types
 ARCADE = 1
@@ -39,6 +40,7 @@ class MyRobot(wpilib.TimedRobot):
         self.tester = None
         self.auton = None
         self.hooks = None
+        self.controlarm = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -63,6 +65,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.auton = self.initAuton(config)
             if key == 'HOOKS':
                 self.hooks = self.initHooks(config)
+            if key == 'CONTROLARM':
+                self.controlarm = self.initControlArm(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
@@ -86,6 +90,8 @@ class MyRobot(wpilib.TimedRobot):
             ctrls[controller_id] = Controller(ctrl, dz, lta, rta)
         return ctrls
 
+    def initControlArm(self, config):
+        self.control_arm = ControlArm(Elevator(config['RAISER_RIGHT_ID'], config['RAISER_LEFT_ID']), Elevator(config['EXTENDER_RIGHT_ID'], config['EXTENDER_LEFT_ID']))
 
     def initAuton(self, config):
         self.autonHookUpTime = config['HOOK_UP_TIME']

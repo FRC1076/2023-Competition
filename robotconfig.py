@@ -121,6 +121,13 @@ hooksConfig = {
     'RIGHT_BOTTOM_PORT': 7
 }
 
+controlArmConfig = {
+    'RAISER_RIGHT_ID': -1,
+    'RAISER_LEFT_ID': -1,
+    'EXTENDER_RIGHT_ID': -1,
+    'EXTENDER_LEFT_ID': -1
+}
+
 #######################
 ###  ROBOT CONFIGS  ###
 #######################
@@ -135,7 +142,8 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'VISION': visionConfig,
     'AUTON': autonConfig,
     'CLIMBER': climberConfig,
-    'HOOKS': hooksConfig
+    'HOOKS': hooksConfig,
+    'CONTROLARM': controlArmConfig
 }
 
 gull_lake = {
