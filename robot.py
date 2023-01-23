@@ -15,6 +15,7 @@ from controller import Controller
 from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
 from swervemodule import ModuleConfig
+from swervedrive import BalanceConfig
 from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
@@ -103,15 +104,12 @@ class MyRobot(wpilib.TimedRobot):
 
         self.rotationCorrection = config['ROTATION_CORRECTION']
 
-        flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True)
-        frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True)
-        rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True)
-        rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True)
+        balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_kP=config['BALANCE_KP'], balance_kI=config['BALANCE_KI'], balance_kD=config['BALANCE_KD'])
 
-        # flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=0.0, inverted=True, allow_reverse=True)
-        # frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=0.0, inverted=False, allow_reverse=True)
-        # rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.0, inverted=True, allow_reverse=True)
-        # rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=0.0, inverted=False, allow_reverse=True)
+        flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
 
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
 
@@ -145,7 +143,7 @@ class MyRobot(wpilib.TimedRobot):
 
         gyro = AHRS.create_spi()
 
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, gyro)
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, gyro, balance_cfg)
 
         return swerve
 
@@ -181,6 +179,7 @@ class MyRobot(wpilib.TimedRobot):
         :param rcw: Velocity in z axis [-1, 1]
         """
 
+        #print("move: x: ", x, "y: ", y, "rcw: ", rcw)
         # if self.driver.getLeftBumper():
         #     # If the button is pressed, lower the rotate speed.
         #     rcw *= 0.7
@@ -208,6 +207,7 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard.putNumber('ctrl right x', driver.getRightX())
         self.dashboard.putNumber('ctrl right y', driver.getRightY())
         
+        #self.drivetrain.printGyro()
 
         if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
             self.drivetrain.resetGyro()
@@ -219,8 +219,12 @@ class MyRobot(wpilib.TimedRobot):
 
         if (driver.getLeftBumper()):
             self.request_wheel_lock = True
-
-        self.move(self.deadzoneCorrection(-driver.getRightX(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getRightY(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getLeftX(), 0.2 * speedMulti))
+        
+        if(driver.getAButton()):
+            self.drivetrain.balance()
+        else:
+            self.move(self.deadzoneCorrection(-driver.getRightX(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getRightY(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getLeftX(), 0.2 * speedMulti))
+            #print("Driver right x", driver.getRightX())
 
         # Vectoral Button Drive
         #if self.gamempad.getPOV() == 0:

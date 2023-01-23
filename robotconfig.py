@@ -38,6 +38,12 @@ drivetrainConfig = {
     'REARLEFT_ENCODER': 24,
     'DRIVETYPE': SWERVE,
     'ROTATION_CORRECTION': 0.0,
+    'HEADING_KP': 0.005,
+    'HEADING_KI': 0.00001,
+    'HEADING_KD':  0.00001,
+    'BALANCE_KP': 0.005,
+    'BALANCE_KI': 0.00001,
+    'BALANCE_KD':  0.00175,
 }
 
 shooterConfig = {
