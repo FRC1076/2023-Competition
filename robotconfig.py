@@ -43,7 +43,7 @@ drivetrainConfig = {
     'HEADING_KD':  0.00001,
     'BALANCE_KP': 0.005,
     'BALANCE_KI': 0.00001,
-    'BALANCE_KD':  0.00001,
+    'BALANCE_KD':  0.00175,
 }
 
 shooterConfig = {

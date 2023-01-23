@@ -139,7 +139,7 @@ class SwerveDrive:
         return angle
         
     def getGyroBalance(self):
-        balance = (self.gyro.getRoll() - self.gyro_balance_zero)
+        balance = (self.gyro.getPitch() - self.gyro_balance_zero)
 
         return balance
 
@@ -270,13 +270,13 @@ class SwerveDrive:
             output = 0
         else:
             #output = clamp(error)
-            output = 100 * error
+            output = error
 
-        sign = 1.0
-        if self.getGyroBalance() < 0.0:
-            sign = -sign
+        #sign = 1.0
+        ##if self.getGyroBalance() < 0.0:
+        #    sign = -sign
 
-        output = sign * output
+        #output = sign * output
 
         print("XXX Setpoint: ", self.balance_pid_controller.getSetpoint(), "output: ", output, " error: ", error)
 
