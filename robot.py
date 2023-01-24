@@ -19,7 +19,7 @@ from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
 from hooks import Hooks
-from vision import Vision, Pipelines
+from vision import Vision
 
 # Drive Types
 ARCADE = 1
@@ -180,19 +180,7 @@ class MyRobot(wpilib.TimedRobot):
         :param y: Velocity in y axis [-1, 1]
         :param rcw: Velocity in z axis [-1, 1]
         """
-
-        # if self.driver.getLeftBumper():
-        #     # If the button is pressed, lower the rotate speed.
-        #     rcw *= 0.7
-
-        # degrees = (math.atan2(y, x) * 180 / math.pi) + 180
-
-        # self.testingModule.move(rcw, degrees)
-        # self.testingModule.execute()
-
-        # print('DRIVE_TARGET = ' + str(rcw) + ', PIVOT_TARGET = ' + str(degrees) + ", ENCODER_TICK = " + str(self.testingModule.get_current_angle()))
-        # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
-
+        
         self.drivetrain.move(x, y, rcw)
         self.drivetrain.execute()
 

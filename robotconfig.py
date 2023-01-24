@@ -121,6 +121,10 @@ hooksConfig = {
     'RIGHT_BOTTOM_PORT': 7
 }
 
+visionConfig = {
+    
+}
+
 #######################
 ###  ROBOT CONFIGS  ###
 #######################
@@ -164,6 +168,7 @@ testBot = {
     'CONTROLLERS': controllerConfig,
     'DRIVETRAIN': drivetrainConfig,
     'HOOKS': hooksConfig,
+    'VISION': visionConfig,
     'AUTON': autonConfig
 }
 

@@ -22,9 +22,15 @@ class Vision:
     def hasTargets(self):
         return bool(table.getNumber('tv'))
 
-    def getTargetOffset(self):
+    def getTargetOffsetX(self):
         if self.hasTargets():
-            return (table.getNumber('tx'), table.getNumber('ty')) # returns tuple with x & y offset
+            return table.getNumber('tx')
+        else:
+            print('No vision target.')
+
+    def getTargetOffsetY(self):
+        if self.hasTargets():
+            return table.getNumber('ty')
         else:
             print('No vision target.')
 
