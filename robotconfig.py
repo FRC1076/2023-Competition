@@ -41,9 +41,12 @@ drivetrainConfig = {
     'HEADING_KP': 0.005,
     'HEADING_KI': 0.00001,
     'HEADING_KD':  0.00001,
-    'BALANCE_KP': 0.005,
-    'BALANCE_KI': 0.00001,
-    'BALANCE_KD':  0.00175,
+    'BALANCE_PITCH_KP': 0.005,
+    'BALANCE_PITCH_KI': 0.00001,
+    'BALANCE_PITCH_KD':  0.00175,
+    'BALANCE_YAW_KP': 0.005,
+    'BALANCE_YAW_KI': 0.00001,
+    'BALANCE_YAW_KD': 0.00001,
 }
 
 shooterConfig = {
