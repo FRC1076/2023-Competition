@@ -280,7 +280,10 @@ class SwerveDrive:
         
         self.printGyro()
 
-        BALANCED_PITCH = 0.0
+        if(gyro.get_current_angle() >= -90 and gyro.get_current_angle() <= 90):
+            BALANCED_PITCH = 0.0
+        else:
+            BALANCED_PITCH = 180.0
         BALANCED_YAW = 0.0
 
         pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
