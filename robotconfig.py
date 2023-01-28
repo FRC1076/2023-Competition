@@ -49,6 +49,48 @@ drivetrainConfig = {
     'BALANCE_YAW_KD': 0.00001,
 }
 
+swervometerConfig = { # All positions measured in inches
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (lower left from red start)
+    'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (lower left from red start)
+    'FIELD_RED_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on red team
+    'FIELD_RED_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on red team
+    'FIELD_RED_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on red team
+    'FIELD_RED_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on red team
+    'FIELD_RED_C_START_POSITION_X': 100.0, # X-Coordinate of starting position C when on red team
+    'FIELD_RED_C_START_POSITION_Y': 800.0, # Y-Coordinate of starting postion C when on red team
+    'FIELD_BLU_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on blue team
+    'FIELD_BLU_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on blue team
+    'FIELD_BLU_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on blue team
+    'FIELD_BLU_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on blue team
+    'FIELD_BLU_C_START_POSITION_X': 100.0, # X-Coordinate of starting position C when on blue team
+    'FIELD_BLU_C_START_POSITION_Y': 800.0, # Y-Coordinate of starting postion C when on blue team
+    'FIELD_TAG1_X': 500.0, # X-Coordinate of Tag ID 1
+    'FIELD_TAG1_Y': 500.0, # Y-Coordinate of Tag ID 1
+    'FIELD_TAG2_X': 500.0, # X-Coordinate of Tag ID 2
+    'FIELD_TAG2_Y': 500.0, # Y-Coordinate of Tag ID 2
+    'FIELD_TAG3_X': 500.0, # X-Coordinate of Tag ID 3
+    'FIELD_TAG3_Y': 500.0, # Y-Coordinate of Tag ID 3
+    'FIELD_TAG4_X': 500.0, # X-Coordinate of Tag ID 4
+    'FIELD_TAG4_Y': 500.0, # Y-Coordinate of Tag ID 4
+    'FIELD_TAG5_X': 500.0, # X-Coordinate of Tag ID 5
+    'FIELD_TAG5_Y': 500.0, # Y-Coordinate of Tag ID 5
+    'FIELD_TAG6_X': 500.0, # X-Coordinate of Tag ID 6
+    'FIELD_TAG6_Y': 500.0, # Y-Coordinate of Tag ID 6
+    'FIELD_TAG7_X': 500.0, # X-Coordinate of Tag ID 7
+    'FIELD_TAG7_Y': 500.0, # Y-Coordinate of Tag ID 7
+    'FIELD_TAG8_X': 500.0, # X-Coordinate of Tag ID 8
+    'FIELD_TAG8_Y': 500.0, # Y-Coordinate of Tag ID 8
+    'ROBOT_FRAME_DIMENSION_X': 36.0, # X-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_Y': 36.0, # Y-coordinate length of robot frame
+    'ROBOT_BUMPER_DIMENSION_X': 4.0, # Width of bumper (X-axis)
+    'ROBOT_BUMPER_DIMENSION_Y': 4.0, # Width of bumper (Y-axis)
+    'ROBOT_GYRO_OFFSET_X': 10.0, # X-offset of center of gyro (relative to lower left frame)
+    'ROBOT_GYRO_OFFSET_Y': 5.0, # Y-offset of center of gyro (relative to lower left frame)
+    'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
+}
+
 shooterConfig = {
     'SHOOTER_ID': 10,
     'SHOOTER_RPM': 3500,
