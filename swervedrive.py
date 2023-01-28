@@ -10,7 +10,7 @@ from networktables.util import ntproperty
 from collections import namedtuple
 from wpimath.controller import PIDController
 
-BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_kP', 'balance_kI', 'balance_kD'])
+BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 
 class SwerveDrive:
 
@@ -75,17 +75,29 @@ class SwerveDrive:
         self.request_wheel_lock = False
         
         self.balance_config = _balance_cfg
-        self.balance_kP = self.balance_config.balance_kP
-        self.balance_kI = self.balance_config.balance_kI
-        self.balance_kD = self.balance_config.balance_kD
+        self.balance_pitch_kP = self.balance_config.balance_pitch_kP
+        self.balance_pitch_kI = self.balance_config.balance_pitch_kI
+        self.balance_pitch_kD = self.balance_config.balance_pitch_kD
 
-        self.balance_pid_controller = PIDController(self.balance_config.balance_kP, self.balance_config.balance_kI, self.balance_config.balance_kD)
-        self.balance_pid_controller.enableContinuousInput(-180, 180)
-        self.balance_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
+        self.balance_yaw_kP = self.balance_config.balance_yaw_kP
+        self.balance_yaw_kI = self.balance_config.balance_yaw_kI
+        self.balance_yaw_kD = self.balance_config.balance_yaw_kD
 
-        self.sd.putNumber('Balance kP', self.balance_pid_controller.getP())
-        self.sd.putNumber('Balance kI', self.balance_pid_controller.getI())
-        self.sd.putNumber('Balance kD', self.balance_pid_controller.getD())
+        self.balance_pitch_pid_controller = PIDController(self.balance_config.balance_pitch_kP, self.balance_config.balance_pitch_kI, self.balance_config.balance_pitch_kD)
+        self.balance_pitch_pid_controller.enableContinuousInput(-180, 180)
+        self.balance_pitch_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
+
+        self.sd.putNumber('Balance Pitch kP', self.balance_pitch_pid_controller.getP())
+        self.sd.putNumber('Balance Pitch kI', self.balance_pitch_pid_controller.getI())
+        self.sd.putNumber('Balance Pitch kD', self.balance_pitch_pid_controller.getD())
+
+        self.balance_yaw_pid_controller = PIDController(self.balance_config.balance_yaw_kP, self.balance_config.balance_yaw_kI, self.balance_config.balance_yaw_kD)
+        self.balance_yaw_pid_controller.enableContinuousInput(0, 360)
+        self.balance_yaw_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
+
+        self.sd.putNumber('Balance Yaw kP', self.balance_yaw_pid_controller.getP())
+        self.sd.putNumber('Balance Yaw kI', self.balance_yaw_pid_controller.getI())
+        self.sd.putNumber('Balance Yaw kD', self.balance_yaw_pid_controller.getD())
 
     @property
     def chassis_dimension(self):
@@ -254,48 +266,50 @@ class SwerveDrive:
 
     def balance(self):
         
-        self.balance_pid_controller.setP(self.sd.getNumber('Balance kP', 0))
-        self.balance_pid_controller.setI(self.sd.getNumber('Balance kI', 0))
-        self.balance_pid_controller.setD(self.sd.getNumber('Balance kD', 0))
+        self.balance_pitch_pid_controller.setP(self.sd.getNumber('Balance Pitch kP', 0))
+        self.balance_pitch_pid_controller.setI(self.sd.getNumber('Balance Pitch kI', 0))
+        self.balance_pitch_pid_controller.setD(self.sd.getNumber('Balance Pitch kD', 0))
 
-        print("kP = ", self.sd.getNumber('Balance kP', 0), ", kI = ", self.sd.getNumber('Balance kI', 0), ", kD =", self.sd.getNumber('Balance kD', 0))
+        print("Pitch: kP = ", self.sd.getNumber('Balance Pitch kP', 0), ", kI = ", self.sd.getNumber('Balance Pitch kI', 0), ", kD =", self.sd.getNumber('Balance Pitch kD', 0))
+        
+        self.balance_yaw_pid_controller.setP(self.sd.getNumber('Balance Yaw kP', 0))
+        self.balance_yaw_pid_controller.setI(self.sd.getNumber('Balance Yaw kI', 0))
+        self.balance_yaw_pid_controller.setD(self.sd.getNumber('Balance Yaw kD', 0))
+
+        print("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
+        
         self.printGyro()
 
-        BALANCED = 0.0
+        if(self.getGyroYaw() <= 90 or self.getGyroYaw() >= 270):
+            BALANCED_YAW = 0.0
+        else:
+            BALANCED_YAW = 180.0
+        BALANCED_PITCH = 0.0
 
-        error = self.balance_pid_controller.calculate(self.getGyroBalance(), BALANCED) 
+        pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
+        yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW) 
 
         # Set the output to 0 if at setpoint or to a value between (-1, 1)
-        if self.balance_pid_controller.atSetpoint():
-            output = 0
+        if self.balance_pitch_pid_controller.atSetpoint():
+            pitch_output = 0
         else:
-            #output = clamp(error)
-            output = error
+            #pitch_output = clamp(pitch_error)
+            pitch_output = pitch_error
 
-        #sign = 1.0
-        ##if self.getGyroBalance() < 0.0:
-        #    sign = -sign
-
-        #output = sign * output
-
-        print("XXX Setpoint: ", self.balance_pid_controller.getSetpoint(), "output: ", output, " error: ", error)
+        if self.balance_yaw_pid_controller.atSetpoint():
+            yaw_output = 0
+        else:
+            yaw_output = clamp(yaw_error)
+        
+        print("XXX Setpoint: ", self.balance_pitch_pid_controller.getSetpoint(), "pitch output: ", pitch_output, " pitch error: ", pitch_error)
+        print("XXX Setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
 
         # Put the output to the dashboard
-        self.sd.putNumber('Balance output', output)
-        self.move(0.0, -output, 0.0)
+        self.sd.putNumber('Balance pitch output', pitch_output)
+        self.sd.putNumber('Balance yaw output', yaw_output)
+        self.move(0.0, -pitch_output, yaw_output)
         
         self.update_smartdash()
-
-        #BALANCE_TOLERANCE = 0.01
-        
-        #if (self.getGyroBalance() > BALANCE_TOLERANCE):
-            #print("big positive")
-            #self.move(0.0, 0.3, 0.0)
-        #elif (self.getGyroBalance() < -BALANCE_TOLERANCE):
-            #print("big negative")
-            #self.move(0.0, -0.3, 0.0)
-        #else:
-            #self.move(0.0, 0.0, 0.0)
 
         self.execute()
 

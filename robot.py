@@ -16,6 +16,8 @@ from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
 from swervemodule import ModuleConfig
 from swervedrive import BalanceConfig
+from swervometer import FieldConfig
+from swervometer import RobotPropertyConfig
 from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
@@ -34,6 +36,7 @@ class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
 
         self.drivetrain = None
+        self.swerveometer = None
         self.driver = None
         self.operator = None
         self.feeder = None
@@ -58,6 +61,8 @@ class MyRobot(wpilib.TimedRobot):
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
                 print(self.drivetrain)
+            if key == 'SWERVOMETER':
+                self.swervometer = self.initSwervometer(config)
             if key == 'FEEDER':
                 self.feeder = self.initFeeder(config)
             if key == 'AUTON':
@@ -104,7 +109,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.rotationCorrection = config['ROTATION_CORRECTION']
 
-        balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_kP=config['BALANCE_KP'], balance_kI=config['BALANCE_KI'], balance_kD=config['BALANCE_KD'])
+        balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
 
         flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
         frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
@@ -148,6 +153,70 @@ class MyRobot(wpilib.TimedRobot):
         return swerve
 
         #self.testingModule = frontLeftModule
+
+    def initSwervometer(self, config):
+        
+        if (config['TEAM_IS_RED']):
+            team_is_red = True
+            team_is_blu = False
+        else:
+            team_is_red = False
+            team_is_blu = True
+
+        if (config['FIELD_START_POSITION'] == 'A'):
+            if team_is_red:
+                starting_position_x = config['FIELD_RED_A_START_POSITION_X']
+                starting_position_y = config['FIELD_RED_A_START_POSITION_Y']
+            else: # team_is_blu
+                starting_position_x = config['FIELD_BLU_A_START_POSITION_X']
+                starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
+        if (config['FIELD_START_POSITION'] == 'B'):
+            if team_is_red:
+                starting_position_x = config['FIELD_RED_B_START_POSITION_X']
+                starting_position_y = config['FIELD_RED_B_START_POSITION_Y']
+            else: # team_is_blu
+                starting_position_x = config['FIELD_BLU_B_START_POSITION_X']
+                starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
+        else: # config['FIELD_START_POSITION'] == 'C'
+            if team_is_red:
+                starting_position_x = config['FIELD_RED_C_START_POSITION_X']
+                starting_position_y = config['FIELD_RED_C_START_POSITION_Y']
+            else: # team_is_blu
+                starting_position_x = config['FIELD_BLU_C_START_POSITION_X']
+                starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
+        
+        field_cfg = FieldConfig(sd_prefix='Field_Module',
+                                origin_x=config['FIELD_ORIGIN_X'],
+                                origin_y=config['FIELD_ORIGIN_Y'],
+                                start_position_x= starting_position_x,
+                                start_position_y= starting_position_y,
+                                tag1_x=config['FIELD_TAG1_X'],
+                                tag1_y=config['FIELD_TAG1_Y'],
+                                tag2_x=config['FIELD_TAG2_X'],
+                                tag2_y=config['FIELD_TAG2_Y'],
+                                tag3_x=config['FIELD_TAG3_X'],
+                                tag3_y=config['FIELD_TAG3_Y'],
+                                tag4_x=config['FIELD_TAG4_X'],
+                                tag4_y=config['FIELD_TAG4_Y'],
+                                tag5_x=config['FIELD_TAG5_X'],
+                                tag5_y=config['FIELD_TAG5_Y'],
+                                tag6_x=config['FIELD_TAG6_X'],
+                                tag6_y=config['FIELD_TAG6_Y'],
+                                tag7_x=config['FIELD_TAG7_X'],
+                                tag7_y=config['FIELD_TAG7_Y'],
+                                tag8_x=config['FIELD_TAG8_X'],
+                                tag8_y=config['FIELD_TAG8_Y'])
+        
+        robot_cfg = RobotPropertyConfig(sd_prefix='Robot_Property_Module',
+                                is_red_team=team_is_red,
+                                frame_dimension_x=config['ROBOT_FRAME_DIMENSION_X'],
+                                frame_dimension_y=config['ROBOT_FRAME_DIMENSION_Y'],
+                                bumper_dimension_x=config['ROBOT_BUMPER_DIMENSION_X'],
+                                bumper_dimension_y=config['ROBOT_BUMPER_DIMENSION_Y'],
+                                gyro_offset_x=config['ROBOT_GYRO_OFFSET_X'],
+                                gyro_offset_y=config['ROBOT_GYRO_OFFSET_Y'],
+                                camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],
+                                camera_offset_y=config['ROBOT_CAMERA_OFFSET_Y'])
 
     #EXAMPLE
     def initFeeder(self, config):
