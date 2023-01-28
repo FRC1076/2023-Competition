@@ -21,7 +21,7 @@ class SwerveDrive:
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _gyro, _balance_cfg):
+    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _gyro, _balance_cfg):
         
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
@@ -36,6 +36,7 @@ class SwerveDrive:
             'rear_right': self.rearRightModule
         }
 
+        self.swervometer = _swervometer
         self.gyro = _gyro
         self.gyro_angle_zero = 0.0
         #assuming balanced at initialization
@@ -178,7 +179,8 @@ class SwerveDrive:
         print("Angle: ", self.getGyroAngle(), ", Pitch: ", self.getGyroPitch(), ", Yaw: ", self.getGyroYaw(), ", Roll: ", self.getGyroRoll())
 
     def resetGyro(self):
-        self.gyro.reset()
+        if self.gyro:
+            self.gyro.reset()
 
     def flush(self):
         """
@@ -451,11 +453,12 @@ class SwerveDrive:
         for key in self.modules:
             self.modules[key].execute()
         
-        #x, y, rcw = self.swervometer.getPositionTuple()
-        #print("Original: x: ", x, " y: ", y, " rcw: ", rcw)
-        #x, y, rcw = self.swervometer.updatePositionTupleFromWheels(x, y, self.get_current_angle())
-        #x, y, rcw = self.swervometer.getPositionTuple()
-        #print("Updated: x: ", x, " y: ", y, " rcw: ", rcw)
+        if self.swervometer:
+            x, y, rcw = self.swervometer.getPositionTuple()
+            print("Original: x: ", x, " y: ", y, " rcw: ", rcw)
+            x, y, rcw = self.swervometer.updatePositionTupleFromWheels(0, 0, self.get_current_angle())
+            x, y, rcw = self.swervometer.getPositionTuple()
+            print("Updated: x: ", x, " y: ", y, " rcw: ", rcw)
 
     def update_smartdash(self):
         """

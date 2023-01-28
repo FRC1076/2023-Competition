@@ -19,7 +19,6 @@ from swervedrive import BalanceConfig
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
-from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
 
@@ -36,10 +35,9 @@ class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
 
         self.drivetrain = None
-        self.swerveometer = None
+        self.swervometer = None
         self.driver = None
         self.operator = None
-        self.feeder = None
         self.tester = None
         self.auton = None
 
@@ -57,24 +55,24 @@ class MyRobot(wpilib.TimedRobot):
                 controllers = self.initControllers(config)
                 self.driver = controllers[0]
                 self.operator = controllers[1]
-            if key == 'DRIVETRAIN':
-                self.drivetrain = self.initDrivetrain(config)
-                print(self.drivetrain)
             if key == 'SWERVOMETER':
                 self.swervometer = self.initSwervometer(config)
-            if key == 'FEEDER':
-                self.feeder = self.initFeeder(config)
+            if key == 'DRIVETRAIN':
+                self.drivetrain = self.initDrivetrain(config)
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
 
+        if self.drivetrain:
+            self.drivetrain.resetGyro()
+            self.drivetrain.printGyro()
+
         if TEST_MODE:
             self.tester = Tester(self)
             self.tester.initTestTeleop()
             self.tester.testCodePaths()
-            
 
     def initControllers(self, config):
         ctrls = {}
@@ -88,66 +86,6 @@ class MyRobot(wpilib.TimedRobot):
             rta = ctrlConfig['RIGHT_TRIGGER_AXIS']
             ctrls[controller_id] = Controller(ctrl, dz, lta, rta)
         return ctrls
-
-
-    def initAuton(self, config):
-        self.autonScoreExisting = config['SCORE_EXISTING']
-        self.autonPickupNew = config['PICKUP_NEW']
-        self.scoreNew = config['SCORE_NEW']
-        self.balanceBot = config['BALANCE_BOT']
-        return True
-
-
-    def initDrivetrain(self, config):
-        
-        self.drive_type = config['DRIVETYPE']  # side effect!
-
-        self.rotationCorrection = config['ROTATION_CORRECTION']
-
-        balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
-
-        flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
-        frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
-        rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
-        rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
-
-        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
-
-        # Drive motors
-        flModule_driveMotor = rev.CANSparkMax(config['FRONTLEFT_DRIVEMOTOR'], motor_type)
-        frModule_driveMotor = rev.CANSparkMax(config['FRONTRIGHT_DRIVEMOTOR'], motor_type)
-        rlModule_driveMotor = rev.CANSparkMax(config['REARLEFT_DRIVEMOTOR'], motor_type)
-        rrModule_driveMotor = rev.CANSparkMax(config['REARRIGHT_DRIVEMOTOR'], motor_type)
-
-        # Set ramp rates of drive motors
-        #flModule_driveMotor.setClosedLoopRampRate(0.5)
-        #frModule_driveMotor.setClosedLoopRampRate(0.5)
-        #rlModule_driveMotor.setClosedLoopRampRate(0.5)
-        #rrModule_driveMotor.setClosedLoopRampRate(0.5)
-
-        # Rotate motors
-        flModule_rotateMotor = rev.CANSparkMax(config['FRONTLEFT_ROTATEMOTOR'], motor_type)
-        frModule_rotateMotor = rev.CANSparkMax(config['FRONTRIGHT_ROTATEMOTOR'], motor_type)
-        rlModule_rotateMotor = rev.CANSparkMax(config['REARLEFT_ROTATEMOTOR'], motor_type)
-        rrModule_rotateMotor = rev.CANSparkMax(config['REARRIGHT_ROTATEMOTOR'], motor_type)
-
-        flModule_encoder = ctre.CANCoder(config['FRONTLEFT_ENCODER'])
-        frModule_encoder = ctre.CANCoder(config['FRONTRIGHT_ENCODER'])
-        rlModule_encoder = ctre.CANCoder(config['REARLEFT_ENCODER'])
-        rrModule_encoder = ctre.CANCoder(config['REARRIGHT_ENCODER'])
-
-        frontLeftModule = SwerveModule(flModule_driveMotor, flModule_rotateMotor, flModule_encoder, flModule_cfg)
-        frontRightModule = SwerveModule(frModule_driveMotor, frModule_rotateMotor, frModule_encoder, frModule_cfg)
-        rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_rotateMotor, rlModule_encoder, rlModule_cfg)
-        rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
-
-        gyro = AHRS.create_spi()
-
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, gyro, balance_cfg)
-
-        return swerve
-
-        #self.testingModule = frontLeftModule
 
     def initSwervometer(self, config):
         
@@ -226,22 +164,70 @@ class MyRobot(wpilib.TimedRobot):
 
         return swervometer
 
-    #EXAMPLE
-    def initFeeder(self, config):
-        # assuming this is a Neo; otherwise it may not be brushless
-        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
-        feeder = rev.CANSparkMax(config['FEEDER_ID'], motor_type)
-        return Feeder(feeder, config['FEEDER_SPEED'])
+    def initDrivetrain(self, config):
+        
+        self.drive_type = config['DRIVETYPE']  # side effect!
 
+        self.rotationCorrection = config['ROTATION_CORRECTION']
+
+        balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
+
+        flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+
+        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
+
+        # Drive motors
+        flModule_driveMotor = rev.CANSparkMax(config['FRONTLEFT_DRIVEMOTOR'], motor_type)
+        frModule_driveMotor = rev.CANSparkMax(config['FRONTRIGHT_DRIVEMOTOR'], motor_type)
+        rlModule_driveMotor = rev.CANSparkMax(config['REARLEFT_DRIVEMOTOR'], motor_type)
+        rrModule_driveMotor = rev.CANSparkMax(config['REARRIGHT_DRIVEMOTOR'], motor_type)
+
+        # Set ramp rates of drive motors
+        #flModule_driveMotor.setClosedLoopRampRate(0.5)
+        #frModule_driveMotor.setClosedLoopRampRate(0.5)
+        #rlModule_driveMotor.setClosedLoopRampRate(0.5)
+        #rrModule_driveMotor.setClosedLoopRampRate(0.5)
+
+        # Rotate motors
+        flModule_rotateMotor = rev.CANSparkMax(config['FRONTLEFT_ROTATEMOTOR'], motor_type)
+        frModule_rotateMotor = rev.CANSparkMax(config['FRONTRIGHT_ROTATEMOTOR'], motor_type)
+        rlModule_rotateMotor = rev.CANSparkMax(config['REARLEFT_ROTATEMOTOR'], motor_type)
+        rrModule_rotateMotor = rev.CANSparkMax(config['REARRIGHT_ROTATEMOTOR'], motor_type)
+
+        flModule_encoder = ctre.CANCoder(config['FRONTLEFT_ENCODER'])
+        frModule_encoder = ctre.CANCoder(config['FRONTRIGHT_ENCODER'])
+        rlModule_encoder = ctre.CANCoder(config['REARLEFT_ENCODER'])
+        rrModule_encoder = ctre.CANCoder(config['REARRIGHT_ENCODER'])
+
+        frontLeftModule = SwerveModule(flModule_driveMotor, flModule_rotateMotor, flModule_encoder, flModule_cfg)
+        frontRightModule = SwerveModule(frModule_driveMotor, frModule_rotateMotor, frModule_encoder, frModule_cfg)
+        rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_rotateMotor, rlModule_encoder, rlModule_cfg)
+        rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
+
+        gyro = AHRS.create_spi()
+
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg)
+
+        return swerve
+
+        #self.testingModule = frontLeftModule
+
+    def initAuton(self, config):
+        self.autonScoreExisting = config['SCORE_EXISTING']
+        self.autonPickupNew = config['PICKUP_NEW']
+        self.scoreNew = config['SCORE_NEW']
+        self.balanceBot = config['BALANCE_BOT']
+        return True
 
     def robotPeriodic(self):
         return True
 
-
     def teleopInit(self):
         print("teleopInit ran")
         return True
-
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
@@ -269,7 +255,6 @@ class MyRobot(wpilib.TimedRobot):
         # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
 
         self.drivetrain.move(x, y, rcw)
-        self.drivetrain.execute()
 
     def teleopDrivetrain(self):
         # if (not self.drivetrain):
@@ -283,10 +268,11 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard.putNumber('ctrl right x', driver.getRightX())
         self.dashboard.putNumber('ctrl right y', driver.getRightY())
         
-        #self.drivetrain.printGyro()
-
+        
+        # Note this is a bad idea in competition, since it's reset automatically in robotInit.
         if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
             self.drivetrain.resetGyro()
+            self.drivetrain.printGyro()
 
         if (driver.getRightBumper()):
             speedMulti = 0.125
@@ -300,7 +286,7 @@ class MyRobot(wpilib.TimedRobot):
             self.drivetrain.balance()
         else:
             self.move(self.deadzoneCorrection(-driver.getRightX(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getRightY(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getLeftX(), 0.2 * speedMulti))
-            #print("Driver right x", driver.getRightX())
+            self.drivetrain.execute()
 
         # Vectoral Button Drive
         #if self.gamempad.getPOV() == 0:
@@ -318,11 +304,11 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.drivetrain:
             return
-        self.drivetrain.resetGyro()
+        if not self.servometer:
+            return
+
         self.autonTimer = wpilib.Timer()
         self.autonTimer.start()
-        self.autonHookUp = False
-        self.autonHookDown = False
 
     def autonomousPeriodic(self):
         if not self.auton:
