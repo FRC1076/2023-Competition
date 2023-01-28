@@ -185,6 +185,8 @@ class SwerveModule:
         # Set the requested speed as the driveMotor's voltage
         self.driveMotor.set(self._requested_speed)
 
+        #print("Angle: ", self.get_current_angle(), " Absolute Position: ", self.sd_prefix, " ", self.encoder.getAbsolutePosition(), self.encoder_zero, self.encoder.getAbsolutePosition() - self.encoder_zero)
+
         self.update_smartdash()
 
     def testMove(self, driveInput, rotateInput):

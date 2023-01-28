@@ -18,10 +18,10 @@ from swervemodule import ModuleConfig
 from swervedrive import BalanceConfig
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
+from swervometer import Swervometer
 from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
-from hooks import Hooks
 
 # Drive Types
 ARCADE = 1
@@ -42,7 +42,6 @@ class MyRobot(wpilib.TimedRobot):
         self.feeder = None
         self.tester = None
         self.auton = None
-        self.hooks = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -67,8 +66,6 @@ class MyRobot(wpilib.TimedRobot):
                 self.feeder = self.initFeeder(config)
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
-            if key == 'HOOKS':
-                self.hooks = self.initHooks(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
@@ -94,12 +91,10 @@ class MyRobot(wpilib.TimedRobot):
 
 
     def initAuton(self, config):
-        self.autonHookUpTime = config['HOOK_UP_TIME']
-        self.autonDriveForwardTime = config['DRIVE_FORWARD_TIME']
-        self.autonHookDownTime = config['HOOK_DOWN_TIME']
-        self.autonDriveBackwardTime = config['DRIVE_BACKWARD_TIME']
-        self.autonForwardSpeed = config['AUTON_SPEED_FORWARD']
-        self.autonBackwardSpeed = config['AUTON_SPEED_BACKWARD']
+        self.autonScoreExisting = config['SCORE_EXISTING']
+        self.autonPickupNew = config['PICKUP_NEW']
+        self.scoreNew = config['SCORE_NEW']
+        self.balanceBot = config['BALANCE_BOT']
         return True
 
 
@@ -167,29 +162,36 @@ class MyRobot(wpilib.TimedRobot):
             if team_is_red:
                 starting_position_x = config['FIELD_RED_A_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_A_START_POSITION_Y']
+                starting_angle = config['FIELD_RED_A_START_ANGLE']
             else: # team_is_blu
                 starting_position_x = config['FIELD_BLU_A_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
+                starting_angle = config['FIELD_BLU_A_START_ANGLE']
         if (config['FIELD_START_POSITION'] == 'B'):
             if team_is_red:
                 starting_position_x = config['FIELD_RED_B_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_B_START_POSITION_Y']
+                starting_angle = config['FIELD_RED_B_START_ANGLE']
             else: # team_is_blu
                 starting_position_x = config['FIELD_BLU_B_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
+                starting_angle = config['FIELD_BLU_B_START_ANGLE']
         else: # config['FIELD_START_POSITION'] == 'C'
             if team_is_red:
                 starting_position_x = config['FIELD_RED_C_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_C_START_POSITION_Y']
+                starting_angle = config['FIELD_RED_C_START_ANGLE']
             else: # team_is_blu
                 starting_position_x = config['FIELD_BLU_C_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
+                starting_angle = config['FIELD_BLU_C_START_ANGLE']
         
         field_cfg = FieldConfig(sd_prefix='Field_Module',
                                 origin_x=config['FIELD_ORIGIN_X'],
                                 origin_y=config['FIELD_ORIGIN_Y'],
                                 start_position_x= starting_position_x,
                                 start_position_y= starting_position_y,
+                                start_angle= starting_angle,
                                 tag1_x=config['FIELD_TAG1_X'],
                                 tag1_y=config['FIELD_TAG1_Y'],
                                 tag2_x=config['FIELD_TAG2_X'],
@@ -213,10 +215,16 @@ class MyRobot(wpilib.TimedRobot):
                                 frame_dimension_y=config['ROBOT_FRAME_DIMENSION_Y'],
                                 bumper_dimension_x=config['ROBOT_BUMPER_DIMENSION_X'],
                                 bumper_dimension_y=config['ROBOT_BUMPER_DIMENSION_Y'],
+                                com_offset_x=config['ROBOT_COM_OFFSET_X'],
+                                com_offset_y=config['ROBOT_COM_OFFSET_Y'],
                                 gyro_offset_x=config['ROBOT_GYRO_OFFSET_X'],
                                 gyro_offset_y=config['ROBOT_GYRO_OFFSET_Y'],
                                 camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],
                                 camera_offset_y=config['ROBOT_CAMERA_OFFSET_Y'])
+
+        swervometer = Swervometer(field_cfg, robot_cfg)
+
+        return swervometer
 
     #EXAMPLE
     def initFeeder(self, config):
@@ -237,7 +245,6 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
-        self.teleopHooks()
         return True
 
     def move(self, x, y, rcw):
@@ -305,42 +312,7 @@ class MyRobot(wpilib.TimedRobot):
         #elif self.gamempad.getPOV() == 270:
         #    self.drive.set_raw_strafe(-0.35)
         return
-
-    def initHooks(self, config):
-        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushed
-
-        #Front
-        hook1 = rev.CANSparkMax(config['FRONT_HOOK_ID'], motor_type)
-
-        #Back
-        hook2 = rev.CANSparkMax(config['BACK_HOOK_ID'], motor_type)
-
-        #Left
-        hook3 = rev.CANSparkMax(config['LEFT_HOOK_ID'], motor_type)
-
-        #Right
-        hook4 = rev.CANSparkMax(config['RIGHT_HOOK_ID'], motor_type)
-
-        return Hooks([hook1, hook2, hook3, hook4])
     
-    def teleopHooks(self):
-        operator = self.operator.xboxController
-
-        if operator.getYButtonReleased():
-            self.hooks.change_front()
-
-        if operator.getAButtonReleased():
-            self.hooks.change_back()
-
-        if operator.getXButtonReleased():
-            self.hooks.change_left()
-
-        if operator.getBButtonReleased():
-            self.hooks.change_right()
-
-        self.hooks.update()
-
-
     def autonomousInit(self):
         if not self.auton:
             return
@@ -364,26 +336,6 @@ class MyRobot(wpilib.TimedRobot):
         #return
         driver = self.driver.xboxController
         #if driver.getLeftBumper() and driver.getRightBumper():
-        
-        if self.autonTimer.get() < self.autonHookUpTime:
-            print("hook up")
-            #if self.autonHookUp == False:
-                #self.hooks.change_right()
-                #self.autonHookUp == True
-            #self.hooks.update()
-        elif self.autonHookUpTime <= self.autonTimer.get() < self.autonDriveForwardTime:
-            print("move forwards")
-            #self.move(0, -self.autonForwardSpeed, 0)
-        elif self.autonDriveForwardTime <= self.autonTimer.get() < self.autonHookDownTime:
-            print("hook down")
-            #if self.autonHookDown == False:
-                #self.hooks.change_right()
-                #self.autonHookDown = True
-            #self.hooks.update()
-        elif self.autonHookDownTime <= self.autonTimer.get() < self.autonDriveBackwardTime:
-            print("move backwards")
-            #self.move(0, self.autonBackwardSpeed, 0)
-        #self.hooks.update()
 
     def deadzoneCorrection(self, val, deadzone):
         """

@@ -9,6 +9,7 @@ from networktables import NetworkTables
 from networktables.util import ntproperty
 from collections import namedtuple
 from wpimath.controller import PIDController
+from swervometer import Swervometer
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 
@@ -450,6 +451,12 @@ class SwerveDrive:
         for key in self.modules:
             self.modules[key].execute()
         
+        #x, y, rcw = self.swervometer.getPositionTuple()
+        #print("Original: x: ", x, " y: ", y, " rcw: ", rcw)
+        #x, y, rcw = self.swervometer.updatePositionTupleFromWheels(x, y, self.get_current_angle())
+        #x, y, rcw = self.swervometer.getPositionTuple()
+        #print("Updated: x: ", x, " y: ", y, " rcw: ", rcw)
+
     def update_smartdash(self):
         """
         Pushes some internal variables for debugging.
