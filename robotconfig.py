@@ -122,10 +122,10 @@ hooksConfig = {
 }
 
 controlArmConfig = {
-    'RAISER_RIGHT_ID': -1,
-    'RAISER_LEFT_ID': -1,
-    'EXTENDER_RIGHT_ID': -1,
-    'EXTENDER_LEFT_ID': -1
+    'RIGHT_ID': -1,
+    'LEFT_ID': -1,
+    'ROTATOR_ID': -1,
+    'INTAKE_ID': -1
 }
 
 #######################
@@ -172,7 +172,8 @@ testBot = {
     'CONTROLLERS': controllerConfig,
     'DRIVETRAIN': drivetrainConfig,
     'HOOKS': hooksConfig,
-    'AUTON': autonConfig
+    'AUTON': autonConfig,
+    'CONTROLARM': controlArmConfig
 }
 
 showbot['SHOOTER']['SHOOTER_ID'] = 10 # how to override just one thing

@@ -19,7 +19,7 @@ from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
 from hooks import Hooks
-from controlarm import Elevator, ControlArm
+from controlarm import ControlArm
 
 # Drive Types
 ARCADE = 1
@@ -91,7 +91,7 @@ class MyRobot(wpilib.TimedRobot):
         return ctrls
 
     def initControlArm(self, config):
-        self.control_arm = ControlArm(Elevator(config['RAISER_RIGHT_ID'], config['RAISER_LEFT_ID']), Elevator(config['EXTENDER_RIGHT_ID'], config['EXTENDER_LEFT_ID']))
+        self.control_arm = ControlArm(config['RIGHT_I'], config['LEFT_ID'], config['ROTATOR_ID'], config['INTAKE_ID'])
 
     def initAuton(self, config):
         self.autonHookUpTime = config['HOOK_UP_TIME']
@@ -177,6 +177,7 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.teleopDrivetrain()
         self.teleopHooks()
+        self.teleopControlArm()
         return True
 
     def move(self, x, y, rcw):
@@ -273,6 +274,12 @@ class MyRobot(wpilib.TimedRobot):
 
         self.hooks.update()
 
+    def teleopControlArm(self):
+        operator = self.operator.xboxController
+        #deadzone
+        self.control_arm.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
+        self.control_arm.loop()
+        
 
     def autonomousInit(self):
         if not self.auton:
