@@ -7,9 +7,9 @@ import wpimath.controller
 import ctre
 import rev
 
-from networktables import NetworkTables
+#from networktables import NetworkTables
 from wpimath.controller import PIDController
-from collections import namedtuple
+from collections import namedtupleN
 
 # Create the structure of the config: SmartDashboard prefix, Encoder's zero point, Drive motor inverted, Allow reverse
 ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse', 'heading_kP', 'heading_kI', 'heading_kD'])

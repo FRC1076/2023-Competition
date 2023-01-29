@@ -5,8 +5,9 @@ from util import clamp
 #from magicbot import magiccomponent
 import swervemodule
 
-from networktables import NetworkTables
-from networktables.util import ntproperty
+import ntcore
+#from networktables import NetworkTables
+#from networktables.util import ntproperty
 from collections import namedtuple
 from wpimath.controller import PIDController
 from swervometer import Swervometer
@@ -16,10 +17,10 @@ BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'b
 class SwerveDrive:
 
     # Get some config options from the dashboard.
-    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
-    rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
-    xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
-    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
+    #lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
+    #rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
+    #xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
+    #debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
     def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _gyro, _balance_cfg):
         

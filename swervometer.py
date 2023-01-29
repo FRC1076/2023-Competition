@@ -1,3 +1,5 @@
+import math
+#import numpy
 import wpilib
 from collections import namedtuple
 
@@ -35,11 +37,33 @@ class Swervometer:
         return self.currentX, self.currentY, self.currentAngle
         
     def updatePositionTupleFromWheels(self, relativePositionTuple):
-        x,y,rcw = relativePositionTuple
+        x, y, rcw = relativePositionTuple
         self.currentX += x
         self.currentY += y
         self.currentAngle = rcw
         return self.currentX, self.currentY, self.currentAngle
+
+    def calcTranslationalAndRotationalXandY(self, x_input, y_input, rcw, old_heading, distance, frameX, frameY):
+        
+        # theta is the angle from zero that robot heads without rotation
+        theta = numpy.arctan(x_input / y_input)
+
+        # find the amount of translational movement
+        x_translational = distance * numpy.sin(theta)
+        y_translational = distance * numpy.cos(theta)
+
+        # r is the radius of the frame
+        r = math.sqrt((frameX * frameX) + (frameY + frameY))
+
+        # psi is the angle __
+        psi = (rcw + old_heading) % 360
+
+        # find the amount of rotational movement
+        rotational_distance = r * numpy.tan(psi)
+        x_rotational = rotational_distance * numpy.cos(psi)
+        y_rotational = rotational_distance * numpy.sin(psi)
+
+        return x_translational, y_translational, x_rotational, y_rotational
 
     def updatePositionTupleFromCamera(self, tagNumber, relativePositionTuple):
         tagNum = tagNumber
