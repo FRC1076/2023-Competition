@@ -124,6 +124,13 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_C_START_ANGLE']
         
+        if config['HAS_BUMPERS_ATTACHED']:
+            actual_bumper_dimension_x = config['ROBOT_BUMPER_DIMENSION_X']
+            actual_bumper_dimension_y = config['ROBOT_BUMPER_DIMENSION_Y']
+        else:
+             actual_bumper_dimension_x = 0.0
+             actual_bumper_dimension_y = 0.0
+
         field_cfg = FieldConfig(sd_prefix='Field_Module',
                                 origin_x=config['FIELD_ORIGIN_X'],
                                 origin_y=config['FIELD_ORIGIN_Y'],
@@ -151,8 +158,8 @@ class MyRobot(wpilib.TimedRobot):
                                 is_red_team=team_is_red,
                                 frame_dimension_x=config['ROBOT_FRAME_DIMENSION_X'],
                                 frame_dimension_y=config['ROBOT_FRAME_DIMENSION_Y'],
-                                bumper_dimension_x=config['ROBOT_BUMPER_DIMENSION_X'],
-                                bumper_dimension_y=config['ROBOT_BUMPER_DIMENSION_Y'],
+                                bumper_dimension_x=actual_bumper_dimension_x,
+                                bumper_dimension_y=actual_bumper_dimension_y,
                                 com_offset_x=config['ROBOT_COM_OFFSET_X'],
                                 com_offset_y=config['ROBOT_COM_OFFSET_Y'],
                                 gyro_offset_x=config['ROBOT_GYRO_OFFSET_X'],
