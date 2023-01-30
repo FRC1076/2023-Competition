@@ -91,7 +91,7 @@ class MyRobot(wpilib.TimedRobot):
         return ctrls
 
     def initControlArm(self, config):
-        self.control_arm = ControlArm(config['RIGHT_I'], config['LEFT_ID'], config['ROTATOR_ID'], config['INTAKE_ID'])
+        self.control_arm = ControlArm(config['RIGHT_I'], config['LEFT_ID'], config['INTAKE_TOP_ID'], config['INTAKE_BOTTOM_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
 
     def initAuton(self, config):
         self.autonHookUpTime = config['HOOK_UP_TIME']
@@ -278,7 +278,10 @@ class MyRobot(wpilib.TimedRobot):
         operator = self.operator.xboxController
         #deadzone
         self.control_arm.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
-        self.control_arm.loop()
+        if operator.getYButtonReleased():
+            self.control_arm.toggle_arm()
+        if operator.getXButtonReleased():
+            self.control_arm.toggle_intake()
         
 
     def autonomousInit(self):

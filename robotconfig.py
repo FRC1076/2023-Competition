@@ -124,8 +124,10 @@ hooksConfig = {
 controlArmConfig = {
     'RIGHT_ID': -1,
     'LEFT_ID': -1,
-    'ROTATOR_ID': -1,
-    'INTAKE_ID': -1
+    'INTAKE_TOP_ID': -1,
+    'INTAKE_BOTTOM_ID': -1,
+    'SOLENOID_FORWARD_ID': -1,
+    'SOLENOID_REVERSE_ID': -1
 }
 
 #######################
