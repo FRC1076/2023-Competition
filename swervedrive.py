@@ -5,22 +5,24 @@ from util import clamp
 #from magicbot import magiccomponent
 import swervemodule
 
-from networktables import NetworkTables
-from networktables.util import ntproperty
+import ntcore
+#from networktables import NetworkTables
+#from networktables.util import ntproperty
 from collections import namedtuple
 from wpimath.controller import PIDController
+from swervometer import Swervometer
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 
 class SwerveDrive:
 
     # Get some config options from the dashboard.
-    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
-    rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
-    xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
-    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
+    #lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
+    #rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
+    #xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
+    #debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _gyro, _balance_cfg):
+    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _gyro, _balance_cfg):
         
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
@@ -35,6 +37,7 @@ class SwerveDrive:
             'rear_right': self.rearRightModule
         }
 
+        self.swervometer = _swervometer
         self.gyro = _gyro
         self.gyro_angle_zero = 0.0
         #assuming balanced at initialization
@@ -177,7 +180,8 @@ class SwerveDrive:
         print("Angle: ", self.getGyroAngle(), ", Pitch: ", self.getGyroPitch(), ", Yaw: ", self.getGyroYaw(), ", Roll: ", self.getGyroRoll())
 
     def resetGyro(self):
-        self.gyro.reset()
+        if self.gyro:
+            self.gyro.reset()
 
     def flush(self):
         """
@@ -450,6 +454,13 @@ class SwerveDrive:
         for key in self.modules:
             self.modules[key].execute()
         
+        if self.swervometer:
+            x, y, rcw = self.swervometer.getPositionTuple()
+            print("Original: x: ", x, " y: ", y, " rcw: ", rcw)
+            x, y, rcw = self.swervometer.updatePositionTupleFromWheels(0, 0, self.get_current_angle())
+            x, y, rcw = self.swervometer.getPositionTuple()
+            print("Updated: x: ", x, " y: ", y, " rcw: ", rcw)
+
     def update_smartdash(self):
         """
         Pushes some internal variables for debugging.
