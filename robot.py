@@ -19,7 +19,8 @@ from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
 from hooks import Hooks
-from controlarm import ControlArm
+from grabber import Grabber
+from intake import Intake
 
 # Drive Types
 ARCADE = 1
@@ -40,7 +41,7 @@ class MyRobot(wpilib.TimedRobot):
         self.tester = None
         self.auton = None
         self.hooks = None
-        self.controlarm = None
+        self.grabber = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -65,8 +66,10 @@ class MyRobot(wpilib.TimedRobot):
                 self.auton = self.initAuton(config)
             if key == 'HOOKS':
                 self.hooks = self.initHooks(config)
-            if key == 'CONTROLARM':
-                self.controlarm = self.initControlArm(config)
+            if key == 'GRABBER':
+                self.grabber = self.initGrabber(config)
+            if key == 'INTAKE':
+                self.intake = self.initIntake(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
@@ -90,8 +93,9 @@ class MyRobot(wpilib.TimedRobot):
             ctrls[controller_id] = Controller(ctrl, dz, lta, rta)
         return ctrls
 
-    def initControlArm(self, config):
-        self.control_arm = ControlArm(config['RIGHT_I'], config['LEFT_ID'], config['INTAKE_TOP_ID'], config['INTAKE_BOTTOM_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+    def initGrabber(self, config):
+        grabber = Grabber(config['RIGHT_I'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+        return grabber
 
     def initAuton(self, config):
         self.autonHookUpTime = config['HOOK_UP_TIME']
@@ -164,6 +168,8 @@ class MyRobot(wpilib.TimedRobot):
         feeder = rev.CANSparkMax(config['FEEDER_ID'], motor_type)
         return Feeder(feeder, config['FEEDER_SPEED'])
 
+    def initIntake(self, config):
+        return Intake(config['INTAKE_MOTOR_ID'])
 
     def robotPeriodic(self):
         return True
@@ -177,7 +183,8 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.teleopDrivetrain()
         self.teleopHooks()
-        self.teleopControlArm()
+        self.teleopGrabber()
+        self.teleopIntake()
         return True
 
     def move(self, x, y, rcw):
@@ -274,14 +281,17 @@ class MyRobot(wpilib.TimedRobot):
 
         self.hooks.update()
 
-    def teleopControlArm(self):
+    def teleopGrabber(self):
         operator = self.operator.xboxController
         #deadzone
-        self.control_arm.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
+        self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
         if operator.getYButtonReleased():
-            self.control_arm.toggle_arm()
+            self.grabber.toggle()
+    
+    def teleopIntake(self):
+        operator = self.operator.xboxController
         if operator.getXButtonReleased():
-            self.control_arm.toggle_intake()
+            self.intake.toggle()
         
 
     def autonomousInit(self):

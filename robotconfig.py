@@ -47,9 +47,7 @@ shooterConfig = {
 
 intakeConfig = {
     # Update IDs when known
-    'INTAKE_MOTOR_ID': 17,
-    'INTAKE_SOLENOID_FORWARD_ID': 1,
-    'INTAKE_SOLENOID_REVERSE_ID': 2,
+    'INTAKE_MOTOR_ID': -1
 }
 
 feederConfig = {
@@ -121,7 +119,7 @@ hooksConfig = {
     'RIGHT_BOTTOM_PORT': 7
 }
 
-controlArmConfig = {
+grabberConfig = {
     'RIGHT_ID': -1,
     'LEFT_ID': -1,
     'INTAKE_TOP_ID': -1,
@@ -145,7 +143,8 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'AUTON': autonConfig,
     'CLIMBER': climberConfig,
     'HOOKS': hooksConfig,
-    'CONTROLARM': controlArmConfig
+    'GRABBER': grabberConfig,
+    'INTAKE': intakeConfig
 }
 
 gull_lake = {
@@ -175,7 +174,8 @@ testBot = {
     'DRIVETRAIN': drivetrainConfig,
     'HOOKS': hooksConfig,
     'AUTON': autonConfig,
-    'CONTROLARM': controlArmConfig
+    'GRABBER': grabberConfig,
+    'INTAKE': intakeConfig
 }
 
 showbot['SHOOTER']['SHOOTER_ID'] = 10 # how to override just one thing
