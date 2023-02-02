@@ -4,10 +4,11 @@ import sys
 
 import wpilib
 import wpilib.drive
+from wpilib import DoubleSolenoid
 import wpimath.controller
 from wpilib import interfaces
 import rev
-import ctre
+#import ctre
 from navx import AHRS
 
 from robotconfig import robotconfig
@@ -39,6 +40,7 @@ class MyRobot(wpilib.TimedRobot):
         self.tester = None
         self.auton = None
         self.hooks = None
+        self.piston = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -63,6 +65,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.auton = self.initAuton(config)
             if key == 'HOOKS':
                 self.hooks = self.initHooks(config)
+            if key == 'PISTON':
+                self.piston = self.initPiston(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
@@ -158,6 +162,14 @@ class MyRobot(wpilib.TimedRobot):
         feeder = rev.CANSparkMax(config['FEEDER_ID'], motor_type)
         return Feeder(feeder, config['FEEDER_SPEED'])
 
+    def initPiston(self, config):
+        pneumatics_module_type = wpilib.PneumaticsModuleType.REVPH
+
+        solenoid = wpilib.DoubleSolenoid(pneumatics_module_type,
+                                         config['SOLENOID_FORWARD_ID'],
+                                         config['SOLENOID_REVERSE_ID'])
+
+        return solenoid
 
     def robotPeriodic(self):
         return True
@@ -165,12 +177,14 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopInit(self):
         print("teleopInit ran")
+        self.piston.set(DoubleSolenoid.Value.kOff)
         return True
 
 
     def teleopPeriodic(self):
-        self.teleopDrivetrain()
-        self.teleopHooks()
+        #self.teleopDrivetrain()
+        #self.teleopHooks()
+        self.teleopPiston()
         return True
 
     def move(self, x, y, rcw):
@@ -266,6 +280,15 @@ class MyRobot(wpilib.TimedRobot):
             self.hooks.change_right()
 
         self.hooks.update()
+
+    def teleopPiston(self):
+        driver = self.driver.xboxController
+
+        if driver.getLeftBumper():
+            self.piston.set(DoubleSolenoid.Value.kReverse)
+
+        if driver.getRightBumper():
+            self.piston.set(DoubleSolenoid.Value.kForward)
 
 
     def autonomousInit(self):

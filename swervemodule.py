@@ -4,7 +4,7 @@ from util import clamp
 import wpilib
 import wpilib.drive
 import wpimath.controller
-import ctre
+#import ctre
 import rev
 
 from networktables import NetworkTables

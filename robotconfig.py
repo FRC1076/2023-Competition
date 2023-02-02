@@ -121,6 +121,11 @@ hooksConfig = {
     'RIGHT_BOTTOM_PORT': 7
 }
 
+pistonConfig = {
+    'SOLENOID_FORWARD_ID': 4,
+    'SOLENOID_REVERSE_ID': 5
+}
+
 #######################
 ###  ROBOT CONFIGS  ###
 #######################
@@ -167,9 +172,14 @@ testBot = {
     'AUTON': autonConfig
 }
 
+pistonTest = {
+    'CONTROLLERS': controllerConfig,
+    'PISTON': pistonConfig
+}
+
 showbot['SHOOTER']['SHOOTER_ID'] = 10 # how to override just one thing
 
 ##########################
 ###  CONFIG TO DEPLOY  ###
 ##########################
-robotconfig = testBot
+robotconfig = pistonTest
