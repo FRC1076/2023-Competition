@@ -10,10 +10,11 @@ class Vision:
         self.table.putNumber('pipeline', APRILTAGS) # default to AprilTags pipeline
         
     def getPipeline(self):
+        self.pipeline = self.table.getNumber('getpipe')
         return self.pipeline
 
     def setPipeline(self, pl : int):
-        if 0 <= pl <= 1 # change numbers to reflect min/max pipelines
+        if 0 <= pl <= 1: # change numbers to reflect min/max pipelines
             self.pipeline = pl
             self.table.putNumber('pipeline', pl)
         else:
@@ -21,6 +22,11 @@ class Vision:
 
     def hasTargets(self):
         return bool(table.getNumber('tv'))
+
+    def shouldUpdatePosition(self):
+        if (self.pipeline == 0 and self.hasTargets):
+            return True
+        return False
 
     def getTargetOffsetX(self):
         if self.hasTargets():

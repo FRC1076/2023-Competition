@@ -15,7 +15,6 @@ from controller import Controller
 from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
 from swervemodule import ModuleConfig
-from feeder import Feeder
 from tester import Tester
 from networktables import NetworkTables
 from hooks import Hooks
@@ -55,14 +54,14 @@ class MyRobot(wpilib.TimedRobot):
             if key == 'CONTROLLERS':
                 controllers = self.initControllers(config)
                 self.driver = controllers[0]
-                self.operator = controllers[1]
+                # self.operator = controllers[1]
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
                 print(self.drivetrain)
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
-            if key == 'HOOKS':
-                self.hooks = self.initHooks(config)
+            # if key == 'HOOKS':
+            #     self.hooks = self.initHooks(config)
             if key == 'VISION':
                 self.vision = self.initVision(config)
 
@@ -105,51 +104,42 @@ class MyRobot(wpilib.TimedRobot):
 
         self.rotationCorrection = config['ROTATION_CORRECTION']
 
-        flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True)
-        frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True)
-        rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True)
-        rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True)
+        # flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True)
+        # frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True)
+        # rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True)
+        # rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True)
 
-        # flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=0.0, inverted=True, allow_reverse=True)
-        # frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=0.0, inverted=False, allow_reverse=True)
-        # rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.0, inverted=True, allow_reverse=True)
-        # rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=0.0, inverted=False, allow_reverse=True)
+        # motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
 
-        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
+        # # Drive motors
+        # flModule_driveMotor = rev.CANSparkMax(config['FRONTLEFT_DRIVEMOTOR'], motor_type)
+        # frModule_driveMotor = rev.CANSparkMax(config['FRONTRIGHT_DRIVEMOTOR'], motor_type)
+        # rlModule_driveMotor = rev.CANSparkMax(config['REARLEFT_DRIVEMOTOR'], motor_type)
+        # rrModule_driveMotor = rev.CANSparkMax(config['REARRIGHT_DRIVEMOTOR'], motor_type)
 
-        # Drive motors
-        flModule_driveMotor = rev.CANSparkMax(config['FRONTLEFT_DRIVEMOTOR'], motor_type)
-        frModule_driveMotor = rev.CANSparkMax(config['FRONTRIGHT_DRIVEMOTOR'], motor_type)
-        rlModule_driveMotor = rev.CANSparkMax(config['REARLEFT_DRIVEMOTOR'], motor_type)
-        rrModule_driveMotor = rev.CANSparkMax(config['REARRIGHT_DRIVEMOTOR'], motor_type)
+        # # Rotate motors
+        # flModule_rotateMotor = rev.CANSparkMax(config['FRONTLEFT_ROTATEMOTOR'], motor_type)
+        # frModule_rotateMotor = rev.CANSparkMax(config['FRONTRIGHT_ROTATEMOTOR'], motor_type)
+        # rlModule_rotateMotor = rev.CANSparkMax(config['REARLEFT_ROTATEMOTOR'], motor_type)
+        # rrModule_rotateMotor = rev.CANSparkMax(config['REARRIGHT_ROTATEMOTOR'], motor_type)
 
-        # Set ramp rates of drive motors
-        #flModule_driveMotor.setClosedLoopRampRate(0.5)
-        #frModule_driveMotor.setClosedLoopRampRate(0.5)
-        #rlModule_driveMotor.setClosedLoopRampRate(0.5)
-        #rrModule_driveMotor.setClosedLoopRampRate(0.5)
+        # flModule_encoder = ctre.CANCoder(config['FRONTLEFT_ENCODER'])
+        # frModule_encoder = ctre.CANCoder(config['FRONTRIGHT_ENCODER'])
+        # rlModule_encoder = ctre.CANCoder(config['REARLEFT_ENCODER'])
+        # rrModule_encoder = ctre.CANCoder(config['REARRIGHT_ENCODER'])
 
-        # Rotate motors
-        flModule_rotateMotor = rev.CANSparkMax(config['FRONTLEFT_ROTATEMOTOR'], motor_type)
-        frModule_rotateMotor = rev.CANSparkMax(config['FRONTRIGHT_ROTATEMOTOR'], motor_type)
-        rlModule_rotateMotor = rev.CANSparkMax(config['REARLEFT_ROTATEMOTOR'], motor_type)
-        rrModule_rotateMotor = rev.CANSparkMax(config['REARRIGHT_ROTATEMOTOR'], motor_type)
+        # frontLeftModule = SwerveModule(flModule_driveMotor, flModule_rotateMotor, flModule_encoder, flModule_cfg)
+        # frontRightModule = SwerveModule(frModule_driveMotor, frModule_rotateMotor, frModule_encoder, frModule_cfg)
+        # rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_rotateMotor, rlModule_encoder, rlModule_cfg)
+        # rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
 
-        flModule_encoder = ctre.CANCoder(config['FRONTLEFT_ENCODER'])
-        frModule_encoder = ctre.CANCoder(config['FRONTRIGHT_ENCODER'])
-        rlModule_encoder = ctre.CANCoder(config['REARLEFT_ENCODER'])
-        rrModule_encoder = ctre.CANCoder(config['REARRIGHT_ENCODER'])
+        # gyro = AHRS.create_spi()
 
-        frontLeftModule = SwerveModule(flModule_driveMotor, flModule_rotateMotor, flModule_encoder, flModule_cfg)
-        frontRightModule = SwerveModule(frModule_driveMotor, frModule_rotateMotor, frModule_encoder, frModule_cfg)
-        rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_rotateMotor, rlModule_encoder, rlModule_cfg)
-        rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
+        # swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, gyro)
 
-        gyro = AHRS.create_spi()
+        # return swerve
 
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, gyro)
-
-        return swerve
+        self.testMotor = rev.CANSparkMax(5, rev.CANSparkMaxLowLevel.MotorType.kBrushless)
 
         #self.testingModule = frontLeftModule
 
@@ -170,7 +160,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
-        self.teleopHooks()
+        # self.teleopHooks()
         return True
 
     def move(self, x, y, rcw):
@@ -181,8 +171,10 @@ class MyRobot(wpilib.TimedRobot):
         :param rcw: Velocity in z axis [-1, 1]
         """
         
-        self.drivetrain.move(x, y, rcw)
-        self.drivetrain.execute()
+        self.testMotor.set(rcw)
+
+        # self.drivetrain.move(x, y, rcw)
+        # self.drivetrain.execute()
 
     def teleopDrivetrain(self):
         # if (not self.drivetrain):
