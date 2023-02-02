@@ -194,6 +194,10 @@ class SwerveModule:
         self.driveMotor.set(clamp(driveInput))
         self.rotateMotor.set(clamp(rotateInput))
 
+    def idle(self):
+        self.rotateMotor.set(0)
+        self.driveMotor.set(0)
+        
     def update_smartdash(self):
         """
         Output a bunch on internal variables for debugging purposes.

@@ -292,8 +292,15 @@ class MyRobot(wpilib.TimedRobot):
         if(driver.getAButton()):
             self.drivetrain.balance()
         else:
-            self.move(self.deadzoneCorrection(-driver.getRightX(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getRightY(), 0.55 * speedMulti), self.deadzoneCorrection(driver.getLeftX(), 0.2 * speedMulti))
-            self.drivetrain.execute()
+            rightXCorrected = self.deadzoneCorrection(-driver.getRightX(), 0.55 * speedMulti)
+            rightYCorrected = self.deadzoneCorrection(driver.getRightY(), 0.55 * speedMulti)
+            leftXCorrected = self.deadzoneCorrection(driver.getLeftX(), 0.55 * speedMulti)
+            # check if there's any input at all
+            if rightXCorrected != 0 or rightYCorrected != 0 or leftXCorrected != 0:
+                self.move(rightXCorrected, rightYCorrected, leftXCorrected)
+                self.drivetrain.execute()
+            else:
+                self.drivetrain.idle()
 
         # Vectoral Button Drive
         #if self.gamempad.getPOV() == 0:

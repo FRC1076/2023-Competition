@@ -461,6 +461,10 @@ class SwerveDrive:
             x, y, rcw = self.swervometer.getPositionTuple()
             print("Updated: x: ", x, " y: ", y, " rcw: ", rcw)
 
+    def idle(self):
+        for key in self.modules:
+            self.modules[key].idle()
+            
     def update_smartdash(self):
         """
         Pushes some internal variables for debugging.
