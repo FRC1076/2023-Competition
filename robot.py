@@ -20,7 +20,7 @@ from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
 from tester import Tester
-#from networktables import NetworkTables
+from networktables import NetworkTables
 
 # Drive Types
 ARCADE = 1

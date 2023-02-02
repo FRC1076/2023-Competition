@@ -7,9 +7,9 @@ import wpimath.controller
 import ctre
 import rev
 
-#from networktables import NetworkTables
+from networktables import NetworkTables
 from wpimath.controller import PIDController
-from collections import namedtupleN
+from collections import namedtuple
 
 # Create the structure of the config: SmartDashboard prefix, Encoder's zero point, Drive motor inverted, Allow reverse
 ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse', 'heading_kP', 'heading_kI', 'heading_kD'])
@@ -122,7 +122,7 @@ class SwerveModule:
         :param deg: requested angle of wheel from 0 to 359 (Will wrap if over or under)
         """
         # deg %= 360 # mod 360, may want to change
-
+        
         if self.allow_reverse: #addresses module-flipping
             """
             If the difference between the requested degree and the current degree is
@@ -143,6 +143,7 @@ class SwerveModule:
 
         self._requested_speed = speed 
         self._set_deg(deg)
+        print("speed:", speed, " degree:", deg)
 
     def debug(self): #can use logging/SD if useful
         """
@@ -174,7 +175,7 @@ class SwerveModule:
             # Use max-min to clamped the output between -1 and 1. The CANSparkMax PID controller does this automatically, so idk if this is necessary
             output = clamp(error)
 
-        # print('ERROR = ' + str(error) + ', OUTPUT = ' + str(output))
+        print('ERROR = ' + str(error) + ', OUTPUT = ' + str(output))
 
         # Put the output to the dashboard
         self.sd.putNumber('drive/%s/output' % self.sd_prefix, output)
