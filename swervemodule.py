@@ -143,7 +143,7 @@ class SwerveModule:
 
         self._requested_speed = speed 
         self._set_deg(deg)
-        print("speed:", speed, " degree:", deg)
+        #print("speed:", speed, " degree:", deg)
 
     def debug(self): #can use logging/SD if useful
         """
@@ -175,7 +175,7 @@ class SwerveModule:
             # Use max-min to clamped the output between -1 and 1. The CANSparkMax PID controller does this automatically, so idk if this is necessary
             output = clamp(error)
 
-        print('ERROR = ' + str(error) + ', OUTPUT = ' + str(output))
+        #print('ERROR = ' + str(error) + ', OUTPUT = ' + str(output))
 
         # Put the output to the dashboard
         self.sd.putNumber('drive/%s/output' % self.sd_prefix, output)

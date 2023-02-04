@@ -274,21 +274,23 @@ class SwerveDrive:
         self.balance_pitch_pid_controller.setI(self.sd.getNumber('Balance Pitch kI', 0))
         self.balance_pitch_pid_controller.setD(self.sd.getNumber('Balance Pitch kD', 0))
 
-        print("Pitch: kP = ", self.sd.getNumber('Balance Pitch kP', 0), ", kI = ", self.sd.getNumber('Balance Pitch kI', 0), ", kD =", self.sd.getNumber('Balance Pitch kD', 0))
+        #print("Pitch: kP = ", self.sd.getNumber('Balance Pitch kP', 0), ", kI = ", self.sd.getNumber('Balance Pitch kI', 0), ", kD =", self.sd.getNumber('Balance Pitch kD', 0))
         
         self.balance_yaw_pid_controller.setP(self.sd.getNumber('Balance Yaw kP', 0))
         self.balance_yaw_pid_controller.setI(self.sd.getNumber('Balance Yaw kI', 0))
         self.balance_yaw_pid_controller.setD(self.sd.getNumber('Balance Yaw kD', 0))
 
-        print("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
+        #print("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
         
-        self.printGyro()
+        #self.printGyro()
 
         if(self.getGyroYaw() <= 90 or self.getGyroYaw() >= 270):
             BALANCED_YAW = 0.0
         else:
             BALANCED_YAW = 180.0
         BALANCED_PITCH = 0.0
+
+        print("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
 
         pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
         yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW) 
@@ -305,8 +307,8 @@ class SwerveDrive:
         else:
             yaw_output = clamp(yaw_error)
         
-        print("XXX Setpoint: ", self.balance_pitch_pid_controller.getSetpoint(), "pitch output: ", pitch_output, " pitch error: ", pitch_error)
-        print("XXX Setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
+        print("Pitch setpoint: ", self.balance_pitch_pid_controller.getSetpoint(), "pitch output: ", pitch_output, " pitch error: ", pitch_error)
+        print("Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
 
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
@@ -338,7 +340,7 @@ class SwerveDrive:
         chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
         chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
 
-        print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
+        #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
         self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
 
         self.set_fwd(chassis_fwd)
@@ -456,10 +458,10 @@ class SwerveDrive:
         
         if self.swervometer:
             x, y, rcw = self.swervometer.getPositionTuple()
-            print("Original: x: ", x, " y: ", y, " rcw: ", rcw)
+            print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
             x, y, rcw = self.swervometer.updatePositionTupleFromWheels(0, 0, self.get_current_angle())
             x, y, rcw = self.swervometer.getPositionTuple()
-            print("Updated: x: ", x, " y: ", y, " rcw: ", rcw)
+            print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
 
     def idle(self):
         for key in self.modules:
