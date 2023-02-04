@@ -453,15 +453,16 @@ class SwerveDrive:
         self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
 
         # Execute each module
+        first_module = True
         for key in self.modules:
             self.modules[key].execute()
-        
-        if self.swervometer:
-            x, y, rcw = self.swervometer.getPositionTuple()
-            print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
-            x, y, rcw = self.swervometer.updatePositionTupleFromWheels(0, 0, self.get_current_angle())
-            #x, y, rcw = self.swervometer.getPositionTuple()
-            print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
+            if self.swervometer and first_module:
+                first_module = False
+                x, y, rcw = self.swervometer.getPositionTuple()
+                print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
+                x, y, rcw = self.swervometer.updatePositionTupleFromWheels(self.modules[key].get_current_velocity(), 0, self.modules[key].get_current_angle())
+                #x, y, rcw = self.swervometer.getPositionTuple()
+                print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
 
     def idle(self):
         for key in self.modules:

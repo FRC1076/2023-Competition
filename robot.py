@@ -88,6 +88,7 @@ class MyRobot(wpilib.TimedRobot):
         return ctrls
 
     def initSwervometer(self, config):
+        print("in initSwervometer")
         
         if (config['TEAM_IS_RED']):
             team_is_red = True
@@ -165,14 +166,17 @@ class MyRobot(wpilib.TimedRobot):
                                 gyro_offset_x=config['ROBOT_GYRO_OFFSET_X'],
                                 gyro_offset_y=config['ROBOT_GYRO_OFFSET_Y'],
                                 camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],
-                                camera_offset_y=config['ROBOT_CAMERA_OFFSET_Y'])
+                                camera_offset_y=config['ROBOT_CAMERA_OFFSET_Y'],
+                                inches_per_rotation=config['ROBOT_INCHES_PER_ROTATION'])
 
         swervometer = Swervometer(field_cfg, robot_cfg)
+        print("initSwerovmeter", swervometer)
 
         return swervometer
 
     def initDrivetrain(self, config):
-        
+        print("In initDriveTrain")
+
         self.drive_type = config['DRIVETYPE']  # side effect!
 
         self.rotationCorrection = config['ROTATION_CORRECTION']
@@ -219,7 +223,7 @@ class MyRobot(wpilib.TimedRobot):
         rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
 
         gyro = AHRS.create_spi()
-
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXself.swervometer: ", self.swervometer)
         swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg)
 
         return swerve

@@ -56,6 +56,10 @@ class SwerveModule:
         self.sd.putNumber('Heading kI', self.heading_pid_controller.getI())
         self.sd.putNumber('Heading kD', self.heading_pid_controller.getD())
         
+    def get_current_velocity(self):
+        velocity = self.driveEncoder.getVelocity()
+        #multiply by ratio (inches / rotation)
+        return velocity
 
     def get_current_angle(self):
         """

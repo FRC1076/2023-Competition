@@ -23,31 +23,6 @@ controllerConfig = {
     }
 }
 
-drivetrainConfig = {
-    'FRONTLEFT_DRIVEMOTOR': 1,
-    'FRONTRIGHT_DRIVEMOTOR': 2,
-    'REARRIGHT_DRIVEMOTOR': 3,
-    'REARLEFT_DRIVEMOTOR': 4,
-    'FRONTLEFT_ROTATEMOTOR': 11,
-    'FRONTRIGHT_ROTATEMOTOR': 12,
-    'REARRIGHT_ROTATEMOTOR': 13,
-    'REARLEFT_ROTATEMOTOR': 14,
-    'FRONTLEFT_ENCODER': 21,
-    'FRONTRIGHT_ENCODER': 22,
-    'REARRIGHT_ENCODER': 23,
-    'REARLEFT_ENCODER': 24,
-    'DRIVETYPE': SWERVE,
-    'ROTATION_CORRECTION': 0.0,
-    'HEADING_KP': 0.005, #0.005 - reverted to this
-    'HEADING_KI': 0.00001, #0.00001 - reverted to this
-    'HEADING_KD':  0.00001, #0.00001 - reverted to this
-    'BALANCE_PITCH_KP': 0.0125,
-    'BALANCE_PITCH_KI': 0.00001,
-    'BALANCE_PITCH_KD':  0.00175,
-    'BALANCE_YAW_KP': 0.005,
-    'BALANCE_YAW_KI': 0.00001,
-    'BALANCE_YAW_KD': 0.00001,
-}
 
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
@@ -99,6 +74,33 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_GYRO_OFFSET_Y': 5.0, # Y-offset of center of gyro (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_INCHES_PER_ROTATION': 1.8035068937, # Inches / Rotation
+}
+
+drivetrainConfig = {
+    'FRONTLEFT_DRIVEMOTOR': 1,
+    'FRONTRIGHT_DRIVEMOTOR': 2,
+    'REARRIGHT_DRIVEMOTOR': 3,
+    'REARLEFT_DRIVEMOTOR': 4,
+    'FRONTLEFT_ROTATEMOTOR': 11,
+    'FRONTRIGHT_ROTATEMOTOR': 12,
+    'REARRIGHT_ROTATEMOTOR': 13,
+    'REARLEFT_ROTATEMOTOR': 14,
+    'FRONTLEFT_ENCODER': 21,
+    'FRONTRIGHT_ENCODER': 22,
+    'REARRIGHT_ENCODER': 23,
+    'REARLEFT_ENCODER': 24,
+    'DRIVETYPE': SWERVE,
+    'ROTATION_CORRECTION': 0.0,
+    'HEADING_KP': 0.005, #0.005 - reverted to this
+    'HEADING_KI': 0.00001, #0.00001 - reverted to this
+    'HEADING_KD':  0.00001, #0.00001 - reverted to this
+    'BALANCE_PITCH_KP': 0.0125,
+    'BALANCE_PITCH_KI': 0.00001,
+    'BALANCE_PITCH_KD':  0.00175,
+    'BALANCE_YAW_KP': 0.005,
+    'BALANCE_YAW_KI': 0.00001,
+    'BALANCE_YAW_KD': 0.00001,
 }
 
 visionConfig = {
@@ -122,15 +124,15 @@ autonConfig = {
 #######################
 testbot = { # Always used for unit tests ($ python robot.py sim)
     'CONTROLLERS': controllerConfig,
+    'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'SWERVOMETER': swervometerConfig,
     'AUTON': autonConfig,
 }
 
 showbot = {
     'CONTROLLERS': controllerConfig,
+    'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'SWERVOMETER': swervometerConfig,
     'AUTON': autonConfig,
 }
 

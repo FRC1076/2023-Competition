@@ -23,7 +23,8 @@ RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',
                                                          'bumper_dimension_x', 'bumper_dimension_y',
                                                          'com_offset_x', 'com_offset_y',
                                                          'gyro_offset_x', 'gyro_offset_y',
-                                                         'camera_offset_x', 'camera_offset_y'])
+                                                         'camera_offset_x', 'camera_offset_y',
+                                                         'inches_per_rotation'])
 
 class Swervometer:
     def __init__(self, field_cfg, robot_property_cfg):
@@ -32,12 +33,12 @@ class Swervometer:
         self.currentX = self.field.origin_x + self.field.start_position_x + self.robotProperty.bumper_dimension_x + self.robotProperty.com_offset_x
         self.currentY = self.field.origin_y + self.field.start_position_y + self.robotProperty.bumper_dimension_y + self.robotProperty.com_offset_y
         self.currentAngle = self.field.start_angle
+        self.inches_per_rotation = self.robotProperty.inches_per_rotation
 
     def getPositionTuple(self):
         return self.currentX, self.currentY, self.currentAngle
         
-    def updatePositionTupleFromWheels(self, relativePositionTuple):
-        x, y, rcw = relativePositionTuple
+    def updatePositionTupleFromWheels(self, x, y, rcw):
         self.currentX += x
         self.currentY += y
         self.currentAngle = rcw
