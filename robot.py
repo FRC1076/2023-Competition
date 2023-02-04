@@ -188,9 +188,13 @@ class MyRobot(wpilib.TimedRobot):
 
         # Drive motors
         flModule_driveMotor = rev.CANSparkMax(config['FRONTLEFT_DRIVEMOTOR'], motor_type)
+        flModule_driveMotor_encoder = flModule_driveMotor.getEncoder()
         frModule_driveMotor = rev.CANSparkMax(config['FRONTRIGHT_DRIVEMOTOR'], motor_type)
+        frModule_driveMotor_encoder = frModule_driveMotor.getEncoder()
         rlModule_driveMotor = rev.CANSparkMax(config['REARLEFT_DRIVEMOTOR'], motor_type)
+        rlModule_driveMotor_encoder = rlModule_driveMotor.getEncoder()
         rrModule_driveMotor = rev.CANSparkMax(config['REARRIGHT_DRIVEMOTOR'], motor_type)
+        rrModule_driveMotor_encoder = rrModule_driveMotor.getEncoder()
 
         # Set ramp rates of drive motors
         #flModule_driveMotor.setClosedLoopRampRate(0.5)
@@ -209,10 +213,10 @@ class MyRobot(wpilib.TimedRobot):
         rlModule_encoder = ctre.CANCoder(config['REARLEFT_ENCODER'])
         rrModule_encoder = ctre.CANCoder(config['REARRIGHT_ENCODER'])
 
-        frontLeftModule = SwerveModule(flModule_driveMotor, flModule_rotateMotor, flModule_encoder, flModule_cfg)
-        frontRightModule = SwerveModule(frModule_driveMotor, frModule_rotateMotor, frModule_encoder, frModule_cfg)
-        rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_rotateMotor, rlModule_encoder, rlModule_cfg)
-        rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
+        frontLeftModule = SwerveModule(flModule_driveMotor, flModule_driveMotor_encoder, flModule_rotateMotor, flModule_encoder, flModule_cfg)
+        frontRightModule = SwerveModule(frModule_driveMotor, frModule_driveMotor_encoder, frModule_rotateMotor, frModule_encoder, frModule_cfg)
+        rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_driveMotor_encoder, rlModule_rotateMotor, rlModule_encoder, rlModule_cfg)
+        rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
 
         gyro = AHRS.create_spi()
 

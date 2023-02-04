@@ -460,7 +460,7 @@ class SwerveDrive:
             x, y, rcw = self.swervometer.getPositionTuple()
             print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
             x, y, rcw = self.swervometer.updatePositionTupleFromWheels(0, 0, self.get_current_angle())
-            x, y, rcw = self.swervometer.getPositionTuple()
+            #x, y, rcw = self.swervometer.getPositionTuple()
             print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
 
     def idle(self):

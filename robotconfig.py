@@ -41,7 +41,7 @@ drivetrainConfig = {
     'HEADING_KP': 0.005, #0.005 - reverted to this
     'HEADING_KI': 0.00001, #0.00001 - reverted to this
     'HEADING_KD':  0.00001, #0.00001 - reverted to this
-    'BALANCE_PITCH_KP': 0.005,
+    'BALANCE_PITCH_KP': 0.0125,
     'BALANCE_PITCH_KI': 0.00001,
     'BALANCE_PITCH_KD':  0.00175,
     'BALANCE_YAW_KP': 0.005,

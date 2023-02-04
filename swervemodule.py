@@ -18,12 +18,14 @@ MAX_VOLTAGE = 5 # Absolute encoder measures from 0V to 5V
 
 class SwerveModule:
 
-    def __init__(self, _driveMotor, _rotateMotor, _encoder, _config):
+    def __init__(self, _driveMotor, _driveEncoder, _rotateMotor, _encoder, _config):
         
         self.driveMotor = _driveMotor
         self.rotateMotor = _rotateMotor
         self.cfg = _config
 
+        self.driveEncoder = _driveEncoder
+        self.driveEncoder_initVal = self.driveEncoder.getVelocity()
         self.encoder = _encoder
         # Config -- change this to reflect how our config is formatted. We will upon testing of the entire drivetrain figure out which need to be inverted.
         self.sd_prefix = self.cfg.sd_prefix or 'Module'
