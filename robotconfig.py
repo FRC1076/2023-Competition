@@ -103,6 +103,35 @@ drivetrainConfig = {
     'BALANCE_YAW_KD': 0.00001,
 }
 
+shooterConfig = {
+    'SHOOTER_ID': 10,
+    'SHOOTER_RPM': 3500,
+}
+
+intakeConfig = {
+    # Update IDs when known
+    'INTAKE_MOTOR_ID': -1
+}
+
+feederConfig = {
+    'FEEDER_ID' : 9,
+    'FEEDER_SPEED': 0.8,
+}
+
+tiltShooterConfig = {
+    'TILTSHOOTER_ID': 1,
+    'ROTATIONS_PER_360': 75,
+    'MIN_DEGREES': 5,
+    'MAX_DEGREES': 25,
+    'BUFFER_DEGREES': 2,
+    'SPEED': 0.1,
+}
+
+aimerConfig = {
+    'AIMING_ROTATION_SPEED': 0.6,
+    'AIMING_ACCURACY_DEGREES': 3,
+}
+
 visionConfig = {
     'TARGET_HEIGHT': 8.5,
     'TARGET_RADIUS': 2,
@@ -119,6 +148,15 @@ autonConfig = {
     'BALANCE_BOT': True,
 }
 
+grabberConfig = {
+    'RIGHT_ID': -1,
+    'LEFT_ID': -1,
+    'INTAKE_TOP_ID': -1,
+    'INTAKE_BOTTOM_ID': -1,
+    'SOLENOID_FORWARD_ID': -1,
+    'SOLENOID_REVERSE_ID': -1
+}
+
 #######################
 ###  ROBOT CONFIGS  ###
 #######################
@@ -126,7 +164,10 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
+    'VISION': visionConfig,
     'AUTON': autonConfig,
+    'GRABBER': grabberConfig,
+    'INTAKE': intakeConfig
 }
 
 showbot = {
