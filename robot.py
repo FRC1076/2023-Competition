@@ -22,6 +22,9 @@ from swervometer import Swervometer
 from tester import Tester
 from networktables import NetworkTables
 
+from grabber import Grabber
+from intake import Intake
+
 # Drive Types
 ARCADE = 1
 TANK = 2
@@ -40,6 +43,7 @@ class MyRobot(wpilib.TimedRobot):
         self.operator = None
         self.tester = None
         self.auton = None
+        self.grabber = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -61,6 +65,10 @@ class MyRobot(wpilib.TimedRobot):
                 self.drivetrain = self.initDrivetrain(config)
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
+            if key == 'GRABBER':
+                self.grabber = self.initGrabber(config)
+            if key == 'INTAKE':
+                self.intake = self.initIntake(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
@@ -173,6 +181,24 @@ class MyRobot(wpilib.TimedRobot):
         print("initSwerovmeter", swervometer)
 
         return swervometer
+        
+    def initGrabber(self, config):
+        grabber = Grabber(config['RIGHT_I'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+        return grabber
+
+    def initAuton(self, config):
+        self.autonHookUpTime = config['HOOK_UP_TIME']
+        self.autonDriveForwardTime = config['DRIVE_FORWARD_TIME']
+        self.autonHookDownTime = config['HOOK_DOWN_TIME']
+        self.autonDriveBackwardTime = config['DRIVE_BACKWARD_TIME']
+        self.autonForwardSpeed = config['AUTON_SPEED_FORWARD']
+        self.autonBackwardSpeed = config['AUTON_SPEED_BACKWARD']
+        self.autonScoreExisting = config['SCORE_EXISTING']
+        self.autonPickupNew = config['PICKUP_NEW']
+        self.scoreNew = config['SCORE_NEW']
+        self.balanceBot = config['BALANCE_BOT']
+        return True
+
 
     def initDrivetrain(self, config):
         print("In initDriveTrain")
@@ -230,12 +256,14 @@ class MyRobot(wpilib.TimedRobot):
 
         #self.testingModule = frontLeftModule
 
-    def initAuton(self, config):
-        self.autonScoreExisting = config['SCORE_EXISTING']
-        self.autonPickupNew = config['PICKUP_NEW']
-        self.scoreNew = config['SCORE_NEW']
-        self.balanceBot = config['BALANCE_BOT']
-        return True
+    def initFeeder(self, config):
+        # assuming this is a Neo; otherwise it may not be brushless
+        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
+        feeder = rev.CANSparkMax(config['FEEDER_ID'], motor_type)
+        return Feeder(feeder, config['FEEDER_SPEED'])
+
+    def initIntake(self, config):
+        return Intake(config['INTAKE_MOTOR_ID'])
 
     def robotPeriodic(self):
         return True
@@ -246,6 +274,8 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
+        self.teleopGrabber()
+        self.teleopIntake()
         return True
 
     def move(self, x, y, rcw):
@@ -321,6 +351,20 @@ class MyRobot(wpilib.TimedRobot):
         #    self.drive.set_raw_strafe(-0.35)
         return
     
+
+
+    def teleopGrabber(self):
+        operator = self.operator.xboxController
+        #deadzone
+        self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
+        if operator.getYButtonReleased():
+            self.grabber.toggle()
+    
+    def teleopIntake(self):
+        operator = self.operator.xboxController
+        if operator.getXButtonReleased():
+            self.intake.toggle()
+        
     def autonomousInit(self):
         if not self.auton:
             return
