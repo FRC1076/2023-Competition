@@ -282,12 +282,16 @@ class SwerveDrive:
 
         #print("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
         
-        #self.printGyro()
+        self.printGyro()
 
-        if(self.getGyroYaw() <= 90 or self.getGyroYaw() >= 270):
+        yawSign = -1
+
+        if(self.getGyroYaw() >= -90 and self.getGyroYaw() <= 90):
             BALANCED_YAW = 0.0
+            yawSign = -1
         else:
             BALANCED_YAW = 180.0
+            yawSign = 1
         BALANCED_PITCH = 0.0
 
         print("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
@@ -313,7 +317,7 @@ class SwerveDrive:
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
         self.sd.putNumber('Balance yaw output', yaw_output)
-        self.move(0.0, -pitch_output, yaw_output)
+        self.move(0.0, yawSign * pitch_output, yaw_output)
         
         self.update_smartdash()
 
@@ -459,10 +463,10 @@ class SwerveDrive:
             if self.swervometer and first_module:
                 first_module = False
                 x, y, rcw = self.swervometer.getPositionTuple()
-                print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
+                #print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
                 x, y, rcw = self.swervometer.updatePositionTupleFromWheels(self.modules[key].get_current_velocity(), 0, self.modules[key].get_current_angle())
                 #x, y, rcw = self.swervometer.getPositionTuple()
-                print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
+                #print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
 
     def idle(self):
         for key in self.modules:
