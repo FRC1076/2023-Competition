@@ -70,12 +70,12 @@ class SwerveDrive:
 
         # Variables that allow enabling and disabling of features in code
         self.squared_inputs = False
-        self.threshold_input_vectors = False
+        self.threshold_input_vectors = True
 
         self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
         self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
 
-        self.request_wheel_lock = False
+        self.wheel_lock = False
         
         self.balance_config = _balance_cfg
         self.balance_pitch_kP = self.balance_config.balance_pitch_kP
@@ -360,23 +360,29 @@ class SwerveDrive:
         Calculate the requested speed and angle of each modules from self._requested_vectors and store them in
         self._requested_speeds and self._requested_angles dictionaries.
         """
+        print("in _calculate_vectors")
         self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw'] = self.normalize([self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw']])
 
         # Does nothing if the values are lower than the input thresh
         if self.threshold_input_vectors:
+            #print("checking thresholds: fwd: ", self._requested_vectors['fwd'], "strafe: ", self._requested_vectors['strafe'], "rcw: ", self._requested_vectors['rcw'])
             if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
+                #print("forward = 0")
                 self._requested_vectors['fwd'] = 0
 
             if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
+                #print("strafe = 0")
                 self._requested_vectors['strafe'] = 0
 
             if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
+                #print("rcw = 0")
                 self._requested_vectors['rcw'] = 0
 
             if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0:  # Prevents a useless loop.
+                #print("all three zero")
                 self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
 
-                if self.request_wheel_lock:
+                if self.wheel_lock:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defence)
 
@@ -385,8 +391,8 @@ class SwerveDrive:
                     self._requested_angles['rear_left'] = -45
                     self._requested_angles['rear_right'] = 45
 
-                    self.request_wheel_lock = False
-
+                    #self.wheel_lock = False
+                    #print("testing wheel lock")
                 return
         
         ratio = math.hypot(self.length, self.width)
@@ -426,6 +432,13 @@ class SwerveDrive:
         self._requested_vectors['fwd'] = 0.0
         self._requested_vectors['strafe'] = 0.0
         self._requested_vectors['rcw'] = 0.0
+
+    def setWheelLock(self, isLocked):
+        #print("is locked", isLocked)
+        self.wheel_lock = isLocked
+    
+    def getWheelLock(self):
+        return self.wheel_lock
 
     def debug(self, debug_modules=False):
         """

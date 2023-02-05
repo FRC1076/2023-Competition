@@ -295,7 +295,9 @@ class MyRobot(wpilib.TimedRobot):
         #print("gyro yaw: " + str(self.drivetrain.getGyroAngle()))
 
         if (driver.getLeftBumper()):
-            self.request_wheel_lock = True
+            self.drivetrain.setWheelLock(True)
+        else:
+            self.drivetrain.setWheelLock(False)
         
         if(driver.getAButton()):
             self.drivetrain.balance()
@@ -305,6 +307,9 @@ class MyRobot(wpilib.TimedRobot):
             leftXCorrected = self.deadzoneCorrection(driver.getLeftX(), 0.55 * speedMulti)
             # check if there's any input at all
             if rightXCorrected != 0 or rightYCorrected != 0 or leftXCorrected != 0:
+                self.move(rightXCorrected, rightYCorrected, leftXCorrected)
+                self.drivetrain.execute()
+            elif self.drivetrain.getWheelLock():
                 self.move(rightXCorrected, rightYCorrected, leftXCorrected)
                 self.drivetrain.execute()
             else:
