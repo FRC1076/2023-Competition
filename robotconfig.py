@@ -123,7 +123,8 @@ hooksConfig = {
 
 pistonConfig = {
     'SOLENOID_FORWARD_ID': 4,
-    'SOLENOID_REVERSE_ID': 5
+    'SOLENOID_REVERSE_ID': 5,
+    'MOTOR_ID': 15
 }
 
 #######################

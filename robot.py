@@ -168,7 +168,10 @@ class MyRobot(wpilib.TimedRobot):
         solenoid = wpilib.DoubleSolenoid(pneumatics_module_type,
                                          config['SOLENOID_FORWARD_ID'],
                                          config['SOLENOID_REVERSE_ID'])
-
+        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushed
+        self.suction_motor = rev.CANSparkMax(config['MOTOR_ID'], motor_type)
+        self.suction_state = False
+        self.motor_state = False
         return solenoid
 
     def robotPeriodic(self):
@@ -284,11 +287,22 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPiston(self):
         driver = self.driver.xboxController
 
-        if driver.getLeftBumper():
-            self.piston.set(DoubleSolenoid.Value.kReverse)
-
-        if driver.getRightBumper():
-            self.piston.set(DoubleSolenoid.Value.kForward)
+        if driver.getLeftBumperReleased():
+            #if vacuuming
+            if self.suction_state:
+                self.piston.set(DoubleSolenoid.Value.kReverse)
+                self.suction_state = False
+            else:
+                self.piston.set(DoubleSolenoid.Value.kForward)
+                self.suction_state = True
+        
+        if driver.getRightBumperReleased():
+            if self.motor_state:
+                self.suction_motor.set(0)
+                self.motor_state = False
+            else:
+                self.suction_motor.set(1)
+                self.motor_state = True
 
 
     def autonomousInit(self):
