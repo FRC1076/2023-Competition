@@ -24,6 +24,7 @@ RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',
                                                          'com_offset_x', 'com_offset_y',
                                                          'gyro_offset_x', 'gyro_offset_y',
                                                          'camera_offset_x', 'camera_offset_y',
+                                                         'swerve_module_offset_x', 'swerve_module_offset_y',
                                                          'inches_per_rotation'])
 
 class Swervometer:
@@ -33,8 +34,10 @@ class Swervometer:
         self.currentX = self.field.origin_x + self.field.start_position_x + self.robotProperty.bumper_dimension_x + self.robotProperty.com_offset_x
         self.currentY = self.field.origin_y + self.field.start_position_y + self.robotProperty.bumper_dimension_y + self.robotProperty.com_offset_y
         self.currentAngle = self.field.start_angle
-        self.inches_per_rotation = self.robotProperty.inches_per_rotation
-
+        self.inchesPerRotation = self.robotProperty.inches_per_rotation
+        self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
+        self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
+        
     def getPositionTuple(self):
         return self.currentX, self.currentY, self.currentAngle
         

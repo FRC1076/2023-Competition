@@ -17,7 +17,7 @@ BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'b
 class SwerveDrive:
 
     # Get some config options from the dashboard.
-    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
+    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.001)
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.

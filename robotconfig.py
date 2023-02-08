@@ -30,14 +30,14 @@ swervometerConfig = { # All positions measured in inches
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (lower left from red start)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (lower left from red start)
-    'FIELD_RED_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on red team
-    'FIELD_RED_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on red team
+    'FIELD_RED_A_START_POSITION_X': 159.0, # X-Coordinate of starting position A when on red team
+    'FIELD_RED_A_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion A when on red team
     'FIELD_RED_A_START_ANGLE': 0.0, # Heading angle of starting position A when on red team
-    'FIELD_RED_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on red team
-    'FIELD_RED_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on red team
+    'FIELD_RED_B_START_POSITION_X': 225.0, # X-Coordinate of starting position B when on red team
+    'FIELD_RED_B_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion B when on red team
     'FIELD_RED_B_START_ANGLE': 0.0, # Heading angle of starting position B when on red team
-    'FIELD_RED_C_START_POSITION_X': 100.0, # X-Coordinate of starting position C when on red team
-    'FIELD_RED_C_START_POSITION_Y': 800.0, # Y-Coordinate of starting postion C when on red team
+    'FIELD_RED_C_START_POSITION_X': 291.0, # X-Coordinate of starting position C when on red team
+    'FIELD_RED_C_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion C when on red team
     'FIELD_RED_C_START_ANGLE': 0.0, # Heading angle of starting position C when on red team
     'FIELD_BLU_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on blue team
     'FIELD_BLU_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on blue team
@@ -74,6 +74,8 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_GYRO_OFFSET_Y': 5.0, # Y-offset of center of gyro (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_SWERVE_MODULE_OFFSET_X': 9.75, # X-offset of swerve module center from COM
+    'ROBOT_SWERVE_MODULE_OFFSET_Y': 13.75, # X-offset of swerve module center from COM
     'ROBOT_INCHES_PER_ROTATION': 1.8035068937, # Inches / Rotation
 }
 
@@ -95,9 +97,9 @@ drivetrainConfig = {
     'HEADING_KP': 0.005, #0.005 - reverted to this
     'HEADING_KI': 0.00001, #0.00001 - reverted to this
     'HEADING_KD':  0.00001, #0.00001 - reverted to this
-    'BALANCE_PITCH_KP': 0.0125,
+    'BALANCE_PITCH_KP': 0.01,
     'BALANCE_PITCH_KI': 0.00001,
-    'BALANCE_PITCH_KD':  0.00175,
+    'BALANCE_PITCH_KD':  0.0005,
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,

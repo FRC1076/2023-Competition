@@ -167,6 +167,8 @@ class MyRobot(wpilib.TimedRobot):
                                 gyro_offset_y=config['ROBOT_GYRO_OFFSET_Y'],
                                 camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],
                                 camera_offset_y=config['ROBOT_CAMERA_OFFSET_Y'],
+                                swerve_module_offset_x=config['ROBOT_SWERVE_MODULE_OFFSET_X'],
+                                swerve_module_offset_y=config['ROBOT_SWERVE_MODULE_OFFSET_Y'],
                                 inches_per_rotation=config['ROBOT_INCHES_PER_ROTATION'])
 
         swervometer = Swervometer(field_cfg, robot_cfg)
