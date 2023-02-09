@@ -24,8 +24,7 @@ RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',
                                                          'com_offset_x', 'com_offset_y',
                                                          'gyro_offset_x', 'gyro_offset_y',
                                                          'camera_offset_x', 'camera_offset_y',
-                                                         'swerve_module_offset_x', 'swerve_module_offset_y',
-                                                         'inches_per_rotation'])
+                                                         'swerve_module_offset_x', 'swerve_module_offset_y'])
 
 class Swervometer:
     def __init__(self, field_cfg, robot_property_cfg):
@@ -33,21 +32,60 @@ class Swervometer:
         self.robotProperty = robot_property_cfg
         self.currentX = self.field.origin_x + self.field.start_position_x + self.robotProperty.bumper_dimension_x + self.robotProperty.com_offset_x
         self.currentY = self.field.origin_y + self.field.start_position_y + self.robotProperty.bumper_dimension_y + self.robotProperty.com_offset_y
-        self.currentAngle = self.field.start_angle
-        self.inchesPerRotation = self.robotProperty.inches_per_rotation
+        self.currentRCW = self.field.start_angle
         self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
+        self.movingToTarget = False
+    
+    def calculateCOF(self, modules, currentGyroAngle):
+        for key in self.modules:
+            positionChange = self.modules[key].positionChange
+            newAngle = self.modules[key].newAngle
+            if(key == 'front_left'):
+                frontLeftXChange = positionChange * math.sin(newAngle)
+                frontLeftYChange = positionChange * math.cos(newAngle)
+            elif(key == 'front_right'):
+                frontRightXChange = positionChange * math.sin(newAngle)
+                frontRightYChange = positionChange * math.cos(newAngle)
+            elif(key == 'rear_left'):
+                rearLeftXChange = positionChange * math.sin(newAngle)
+                rearLeftYChange = positionChange * math.cos(newAngle)
+            else: # (key == 'front_left')
+                rearRightXChange = positionChange * math.sin(newAngle)
+                rearRightYChange = positionChange * math.cos(newAngle)
         
-    def getPositionTuple(self):
-        return self.currentX, self.currentY, self.currentAngle
-        
-    def updatePositionTupleFromWheels(self, x, y, rcw):
-        self.currentX += x
-        self.currentY += y
-        self.currentAngle = rcw
-        return self.currentX, self.currentY, self.currentAngle
+        midpointX1 = (frontLeftXChange + rearRightXChange)/2
+        midpointY1 = (frontLeftYChange + rearRightYChange)/2
 
-    def calcTranslationalAndRotationalXandY(self, x_input, y_input, rcw, old_heading, distance, frameX, frameY):
+        midpointX2 = (frontRightXChange + rearLeftXChange)/2
+        midpointY2 = (frontRightYChange + rearLeftYChange)/2
+
+        self.currentX = (midpointX1 + midpointX2)/2
+        self.currentY = (midpointY1 + midpointY2)/2
+        self.currentRCW = currentGyroAngle
+        
+        return self.currentX, self.currentY, self.currentRCW
+
+    def setMovingToTarget(self, _movingToTarget):
+        self.movingToTarget = _movingToTarget
+
+    def setCurrentPositionTuple(self, x, y, rcw):
+        self.currentX = x
+        self.currentY = y
+        self.currentRCW = rcw
+
+    def getNewPositionTuple(self):
+        return self.currentX, self.currentY, self.currentRCW
+        
+    def setNewPositionTuple(self, x, y, rcw):
+        self.currentX = x
+        self.currentY = y
+        self.currentRCW = rcw
+
+    def getCurrentPositionTuple(self):
+        return self.currentX, self.currentY, self.currentRCW
+    
+        def calcTranslationalAndRotationalXandY(self, x_input, y_input, rcw, old_heading, distance, frameX, frameY):
         
         # theta is the angle from zero that robot heads without rotation
         theta = numpy.arctan(x_input / y_input)
@@ -77,8 +115,8 @@ class Swervometer:
 
         self.currentX = tagX - x - (self.field.camera_offset_x - self.field.com_offset_x)
         self.currentY = tagY - y - (self.field.camera_offset_y - self.field.com_offset_y)
-        self.currentAngle = rcw
-        return self.currentX, self.currentY, self.currentAngle
+        self.currentRCW = rcw
+        return self.currentX, self.currentY, self.currentRCW
 
     def getTagPosition(self, tagNumber):
         match tagNumber:

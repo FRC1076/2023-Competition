@@ -49,6 +49,8 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.config = robotconfig
 
+        self.dashboard = NetworkTables.getTable('SmartDashboard')
+
         print(self.config)
         for key, config in self.config.items():
             if key == 'CONTROLLERS':
@@ -62,7 +64,6 @@ class MyRobot(wpilib.TimedRobot):
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
 
-        self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
 
         if self.drivetrain:
@@ -97,7 +98,10 @@ class MyRobot(wpilib.TimedRobot):
             team_is_red = False
             team_is_blu = True
 
+        self.dashboard.putBoolean('Team is Red', team_is_red)
+
         if (config['FIELD_START_POSITION'] == 'A'):
+            self.dashboard.putString('Field Start Position', 'A')
             if team_is_red:
                 starting_position_x = config['FIELD_RED_A_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_A_START_POSITION_Y']
@@ -107,6 +111,7 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_A_START_ANGLE']
         if (config['FIELD_START_POSITION'] == 'B'):
+            self.dashboard.putString('Field Start Position', 'B')
             if team_is_red:
                 starting_position_x = config['FIELD_RED_B_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_B_START_POSITION_Y']
@@ -116,6 +121,7 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_B_START_ANGLE']
         else: # config['FIELD_START_POSITION'] == 'C'
+            self.dashboard.putString('Field Start Position', 'C')
             if team_is_red:
                 starting_position_x = config['FIELD_RED_C_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_C_START_POSITION_Y']
@@ -125,12 +131,15 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_C_START_ANGLE']
         
-        if config['HAS_BUMPERS_ATTACHED']:
+        bumpers_attached = config['HAS_BUMPERS_ATTACHED']
+        if bumpers_attached:
             actual_bumper_dimension_x = config['ROBOT_BUMPER_DIMENSION_X']
             actual_bumper_dimension_y = config['ROBOT_BUMPER_DIMENSION_Y']
         else:
              actual_bumper_dimension_x = 0.0
              actual_bumper_dimension_y = 0.0
+
+        self.dashboard.putBoolean('Has Bumpers Attached', bumpers_attached)
 
         field_cfg = FieldConfig(sd_prefix='Field_Module',
                                 origin_x=config['FIELD_ORIGIN_X'],
@@ -168,16 +177,13 @@ class MyRobot(wpilib.TimedRobot):
                                 camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],
                                 camera_offset_y=config['ROBOT_CAMERA_OFFSET_Y'],
                                 swerve_module_offset_x=config['ROBOT_SWERVE_MODULE_OFFSET_X'],
-                                swerve_module_offset_y=config['ROBOT_SWERVE_MODULE_OFFSET_Y'],
-                                inches_per_rotation=config['ROBOT_INCHES_PER_ROTATION'])
+                                swerve_module_offset_y=config['ROBOT_SWERVE_MODULE_OFFSET_Y'])
 
         swervometer = Swervometer(field_cfg, robot_cfg)
-        print("initSwerovmeter", swervometer)
 
         return swervometer
 
     def initDrivetrain(self, config):
-        print("In initDriveTrain")
 
         self.drive_type = config['DRIVETYPE']  # side effect!
 
@@ -185,10 +191,10 @@ class MyRobot(wpilib.TimedRobot):
 
         balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
 
-        flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
-        frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
-        rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
-        rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True, heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.0, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
+        rrModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=162.0, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
 
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
 
@@ -214,29 +220,33 @@ class MyRobot(wpilib.TimedRobot):
         rlModule_rotateMotor = rev.CANSparkMax(config['REARLEFT_ROTATEMOTOR'], motor_type)
         rrModule_rotateMotor = rev.CANSparkMax(config['REARRIGHT_ROTATEMOTOR'], motor_type)
 
-        flModule_encoder = ctre.CANCoder(config['FRONTLEFT_ENCODER'])
-        frModule_encoder = ctre.CANCoder(config['FRONTRIGHT_ENCODER'])
-        rlModule_encoder = ctre.CANCoder(config['REARLEFT_ENCODER'])
-        rrModule_encoder = ctre.CANCoder(config['REARRIGHT_ENCODER'])
+        flModule_rotateMotor_encoder = ctre.CANCoder(config['FRONTLEFT_ENCODER'])
+        frModule_rotateMotor_encoder = ctre.CANCoder(config['FRONTRIGHT_ENCODER'])
+        rlModule_rotateMotor_encoder = ctre.CANCoder(config['REARLEFT_ENCODER'])
+        rrModule_rotateMotor_encoder = ctre.CANCoder(config['REARRIGHT_ENCODER'])
 
-        frontLeftModule = SwerveModule(flModule_driveMotor, flModule_driveMotor_encoder, flModule_rotateMotor, flModule_encoder, flModule_cfg)
-        frontRightModule = SwerveModule(frModule_driveMotor, frModule_driveMotor_encoder, frModule_rotateMotor, frModule_encoder, frModule_cfg)
-        rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_driveMotor_encoder, rlModule_rotateMotor, rlModule_encoder, rlModule_cfg)
-        rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_encoder, rrModule_cfg)
+        frontLeftModule = SwerveModule(flModule_driveMotor, flModule_driveMotor_encoder, flModule_rotateMotor, flModule_rotateMotor_encoder, flModule_cfg)
+        frontRightModule = SwerveModule(frModule_driveMotor, frModule_driveMotor_encoder, frModule_rotateMotor, frModule_rotateMotor_encoder, frModule_cfg)
+        rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_driveMotor_encoder, rlModule_rotateMotor, rlModule_rotateMotor_encoder, rlModule_cfg)
+        rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_rotateMotor_encoder, rrModule_cfg)
 
         gyro = AHRS.create_spi()
-        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXself.swervometer: ", self.swervometer)
+        
         swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg)
 
         return swerve
 
-        #self.testingModule = frontLeftModule
-
     def initAuton(self, config):
         self.autonScoreExisting = config['SCORE_EXISTING']
         self.autonPickupNew = config['PICKUP_NEW']
-        self.scoreNew = config['SCORE_NEW']
-        self.balanceBot = config['BALANCE_BOT']
+        self.autonScoreNew = config['SCORE_NEW']
+        self.autonBalanceRobot = config['BALANCE_BOT']
+
+        self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
+        self.dashboard.putNumber('Auton Pickup New Element', self.autonPickupNew)
+        self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
+        self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
+
         return True
 
     def robotPeriodic(self):
@@ -284,7 +294,6 @@ class MyRobot(wpilib.TimedRobot):
 
         self.dashboard.putNumber('ctrl right x', driver.getRightX())
         self.dashboard.putNumber('ctrl right y', driver.getRightY())
-        
         
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
         if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
@@ -341,16 +350,14 @@ class MyRobot(wpilib.TimedRobot):
 
     def autonomousPeriodic(self):
         if not self.auton:
-            print("failed self.auton")
             return
         if not self.drivetrain:
-            print("failed self.drivetrain")
             return
-        
+        if not self.servometer:
+            return
+
         print("autonomousPeriodic")
-        #return
-        driver = self.driver.xboxController
-        #if driver.getLeftBumper() and driver.getRightBumper():
+        self.drivetrain.goToPosition(100, 100, 90)
 
     def deadzoneCorrection(self, val, deadzone):
         """

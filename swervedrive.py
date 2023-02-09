@@ -72,6 +72,9 @@ class SwerveDrive:
         self.squared_inputs = False
         self.threshold_input_vectors = True
 
+        # Variable that tracks whether robot is en route to destination
+        self.swervometer.setMovingToTarget(False)
+
         self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
         self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
 
@@ -354,6 +357,10 @@ class SwerveDrive:
         # self.set_strafe(strafe)
 
         self.set_rcw(rcw)
+    
+    def goToPosition(x, y, rcw):
+        self.swervometer.setTarget(x, y, rcw)
+        return
 
     def _calculate_vectors(self):
         """
@@ -473,13 +480,9 @@ class SwerveDrive:
         first_module = True
         for key in self.modules:
             self.modules[key].execute()
-            if self.swervometer and first_module:
-                first_module = False
-                x, y, rcw = self.swervometer.getPositionTuple()
-                #print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
-                x, y, rcw = self.swervometer.updatePositionTupleFromWheels(self.modules[key].get_current_velocity(), 0, self.modules[key].get_current_angle())
-                #x, y, rcw = self.swervometer.getPositionTuple()
-                #print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
+
+        COFX, COFY, COFAngle = self.swervometer.calculateCOF(self.modules, self.getGyroAngle())
+        print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 
     def idle(self):
         for key in self.modules:

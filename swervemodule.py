@@ -12,21 +12,21 @@ from wpimath.controller import PIDController
 from collections import namedtuple
 
 # Create the structure of the config: SmartDashboard prefix, Encoder's zero point, Drive motor inverted, Allow reverse
-ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse', 'heading_kP', 'heading_kI', 'heading_kD'])
+ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse', 'position_conversion', 'heading_kP', 'heading_kI', 'heading_kD'])
 
 MAX_VOLTAGE = 5 # Absolute encoder measures from 0V to 5V
 
 class SwerveModule:
 
-    def __init__(self, _driveMotor, _driveEncoder, _rotateMotor, _encoder, _config):
+    def __init__(self, _driveMotor, _driveEncoder, _rotateMotor, _rotateEncoder, _config):
         
         self.driveMotor = _driveMotor
         self.rotateMotor = _rotateMotor
         self.cfg = _config
 
         self.driveEncoder = _driveEncoder
-        self.driveEncoder_initVal = self.driveEncoder.getVelocity()
-        self.encoder = _encoder
+        self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
+        self.rotateEncoder = _rotateEncoder
         # Config -- change this to reflect how our config is formatted. We will upon testing of the entire drivetrain figure out which need to be inverted.
         self.sd_prefix = self.cfg.sd_prefix or 'Module'
         self.encoder_zero = self.cfg.zero or 0 #idk the point of this, maybe useful for other encoder type
@@ -65,7 +65,7 @@ class SwerveModule:
         """
         :returns: the voltage position after the zero
         """
-        angle = (self.encoder.getAbsolutePosition() - self.encoder_zero) % 360
+        angle = (self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360
 
         if self.moduleFlipped:
             angle = (angle + 180) % 360
@@ -129,6 +129,9 @@ class SwerveModule:
         """
         # deg %= 360 # mod 360, may want to change
         
+        self.currentPosition = self.driveEncoder.getPosition()
+        self.currentAngle = self.get_current_angle()
+
         if self.allow_reverse: #addresses module-flipping
             """
             If the difference between the requested degree and the current degree is
@@ -194,8 +197,11 @@ class SwerveModule:
 
         #print("Angle: ", self.get_current_angle(), " Absolute Position: ", self.sd_prefix, " ", self.encoder.getAbsolutePosition(), self.encoder_zero, self.encoder.getAbsolutePosition() - self.encoder_zero)
 
-        self.update_smartdash()
+        self.positionChange = self.driveEncoder.getPosition() - self.currentPosition
+        self.newAngle = self.get_current_angle()
 
+        self.update_smartdash()
+    
     def testMove(self, driveInput, rotateInput):
         self.driveMotor.set(clamp(driveInput))
         self.rotateMotor.set(clamp(rotateInput))
@@ -213,7 +219,7 @@ class SwerveModule:
         if self.debugging.getBoolean(False):
 
             self.sd.putNumber('drive/%s/requested_speed' % self.sd_prefix, self._requested_speed)
-            self.sd.putNumber('drive/%s/encoder position' % self.sd_prefix, self.encoder.getAbsolutePosition())
+            self.sd.putNumber('drive/%s/encoder position' % self.sd_prefix, self.rotateEncoder.getAbsolutePosition())
             self.sd.putNumber('drive/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
 
             self.sd.putNumber('drive/%s/Heading PID Setpoint' % self.sd_prefix, self.heading_pid_controller.getSetpoint())

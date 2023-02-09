@@ -76,7 +76,6 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
     'ROBOT_SWERVE_MODULE_OFFSET_X': 9.75, # X-offset of swerve module center from COM
     'ROBOT_SWERVE_MODULE_OFFSET_Y': 13.75, # X-offset of swerve module center from COM
-    'ROBOT_INCHES_PER_ROTATION': 1.8035068937, # Inches / Rotation
 }
 
 drivetrainConfig = {
@@ -103,6 +102,7 @@ drivetrainConfig = {
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
+    'ROBOT_INCHES_PER_ROTATION': 1.8035068937, # Inches per rotation of wheels
 }
 
 visionConfig = {
