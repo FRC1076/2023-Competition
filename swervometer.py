@@ -36,32 +36,43 @@ class Swervometer:
         self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
         self.movingToTarget = False
+        print("init current X: ", self.currentX, " init current y: ", self.currentY)
     
     def calculateCOF(self, modules, currentGyroAngle):
-        for key in self.modules:
-            positionChange = self.modules[key].positionChange
-            newAngle = self.modules[key].newAngle
+        for key in modules:
+            positionChange = modules[key].positionChange
+            newAngle = modules[key].newAngle
+            
             if(key == 'front_left'):
+                print("fl: pc: ", positionChange, "na: ", newAngle)
                 frontLeftXChange = positionChange * math.sin(newAngle)
                 frontLeftYChange = positionChange * math.cos(newAngle)
             elif(key == 'front_right'):
+                print("fr: pc: ", positionChange, "na: ", newAngle)
                 frontRightXChange = positionChange * math.sin(newAngle)
                 frontRightYChange = positionChange * math.cos(newAngle)
             elif(key == 'rear_left'):
+                print("rl: pc: ", positionChange, "na: ", newAngle)
                 rearLeftXChange = positionChange * math.sin(newAngle)
                 rearLeftYChange = positionChange * math.cos(newAngle)
             else: # (key == 'front_left')
+                print("rr: pc: ", positionChange, "na: ", newAngle)
                 rearRightXChange = positionChange * math.sin(newAngle)
                 rearRightYChange = positionChange * math.cos(newAngle)
         
+        #print("flx: ", frontLeftXChange, " fly: ", frontLeftYChange, " frx: ", frontRightXChange, " fry: ", frontRightYChange, "rlx: ", rearLeftXChange, " rly: ", rearLeftYChange, " rrx: ", rearRightXChange, " rry: ", rearRightYChange)
+
         midpointX1 = (frontLeftXChange + rearRightXChange)/2
         midpointY1 = (frontLeftYChange + rearRightYChange)/2
 
         midpointX2 = (frontRightXChange + rearLeftXChange)/2
         midpointY2 = (frontRightYChange + rearLeftYChange)/2
 
-        self.currentX = (midpointX1 + midpointX2)/2
-        self.currentY = (midpointY1 + midpointY2)/2
+        print("old x: ", self.currentX, " old y: ", self.currentY)
+        print("change x: ", (midpointX1 + midpointX2)/2, " change y: ", (midpointY1 + midpointY2)/2)
+
+        self.currentX += (midpointX1 + midpointX2)/2
+        self.currentY += (midpointY1 + midpointY2)/2
         self.currentRCW = currentGyroAngle
         
         return self.currentX, self.currentY, self.currentRCW
@@ -85,7 +96,7 @@ class Swervometer:
     def getCurrentPositionTuple(self):
         return self.currentX, self.currentY, self.currentRCW
     
-        def calcTranslationalAndRotationalXandY(self, x_input, y_input, rcw, old_heading, distance, frameX, frameY):
+    def calcTranslationalAndRotationalXandY(self, x_input, y_input, rcw, old_heading, distance, frameX, frameY):
         
         # theta is the angle from zero that robot heads without rotation
         theta = numpy.arctan(x_input / y_input)

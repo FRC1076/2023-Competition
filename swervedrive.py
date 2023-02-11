@@ -285,7 +285,7 @@ class SwerveDrive:
 
         #print("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
         
-        self.printGyro()
+        #self.printGyro()
 
         yawSign = -1
 
@@ -393,10 +393,10 @@ class SwerveDrive:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defence)
 
-                    self._requested_angles['front_left'] = 45
-                    self._requested_angles['front_right'] = -45
-                    self._requested_angles['rear_left'] = -45
-                    self._requested_angles['rear_right'] = 45
+                    self._requested_angles['front_left'] = 0 #45
+                    self._requested_angles['front_right'] = 0 #-45
+                    self._requested_angles['rear_left'] = 0 #-45
+                    self._requested_angles['rear_right'] = 0 #45
 
                     #self.wheel_lock = False
                     #print("testing wheel lock")

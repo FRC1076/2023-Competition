@@ -20,13 +20,18 @@ class SwerveModule:
 
     def __init__(self, _driveMotor, _driveEncoder, _rotateMotor, _rotateEncoder, _config):
         
-        self.driveMotor = _driveMotor
-        self.rotateMotor = _rotateMotor
         self.cfg = _config
 
+        self.driveMotor = _driveMotor
         self.driveEncoder = _driveEncoder
+        self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
+
+        self.currentPosition = self.driveEncoder.getPosition()
+
+        self.rotateMotor = _rotateMotor
         self.rotateEncoder = _rotateEncoder
+
         # Config -- change this to reflect how our config is formatted. We will upon testing of the entire drivetrain figure out which need to be inverted.
         self.sd_prefix = self.cfg.sd_prefix or 'Module'
         self.encoder_zero = self.cfg.zero or 0 #idk the point of this, maybe useful for other encoder type
@@ -129,9 +134,7 @@ class SwerveModule:
         """
         # deg %= 360 # mod 360, may want to change
         
-        self.currentPosition = self.driveEncoder.getPosition()
-        self.currentAngle = self.get_current_angle()
-
+        
         if self.allow_reverse: #addresses module-flipping
             """
             If the difference between the requested degree and the current degree is
@@ -197,8 +200,12 @@ class SwerveModule:
 
         #print("Angle: ", self.get_current_angle(), " Absolute Position: ", self.sd_prefix, " ", self.encoder.getAbsolutePosition(), self.encoder_zero, self.encoder.getAbsolutePosition() - self.encoder_zero)
 
-        self.positionChange = self.driveEncoder.getPosition() - self.currentPosition
+        #self.positionChange = self.driveEncoder.getPosition() - self.currentPosition
+        self.positionChange = self.driveEncoder.getPosition()
         self.newAngle = self.get_current_angle()
+
+        #self.currentPosition = self.driveEncoder.getPosition()
+        #self.currentAngle = self.get_current_angle()
 
         self.update_smartdash()
     
