@@ -27,7 +27,7 @@ class SwerveModule:
         self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
 
-        self.currentPosition = self.driveEncoder.getPosition()
+        #self.currentPosition = self.driveEncoder.getPosition()
 
         self.rotateMotor = _rotateMotor
         self.rotateEncoder = _rotateEncoder
