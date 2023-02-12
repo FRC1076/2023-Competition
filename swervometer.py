@@ -47,41 +47,66 @@ class Swervometer:
         self.currentRCW = rcw
 
     def calculateCOF(self, modules, currentGyroAngle):
+
+        # currentGyroAngle is the rotation of the bot as determined by the gyro
+
+        # psi is the angle from the front of the bot to the first corner. Mod 360 shouldn't be needed.
+        # although we recalculate it here, psi and the hypotenuse are constants
+
+        frontRightPsi = math.arctan(self.swerveModuleOffsetX / self.swerveModuleOffsetY) % 360
+        rearRightPsi = (frontRightPsi + 90) % 360
+        rearLeftPsi = (frontRightPsi + 180) % 360
+        frontLeftPsi = (frontRightPsi + 270) % 360
+        hypotenuse = math.sqrt(math.sqr(self.swerveModuleOffsetX) + math.sqr(self.swerveModuleOffsetY))
+        
         for key in modules:
             positionChange = modules[key].positionChange
+
+            # newAngle is the angle of the module wheel relative to the frame of the bot
             newAngle = (modules[key].newAngle + 0) % 360
             
+            # Each of these calculations is different because positionChange, newAngle, and psi are different for each corner
             if(key == 'front_left'):
-                frontLeftXChange = positionChange * math.sin(newAngle)
-                frontLeftYChange = positionChange * math.cos(newAngle)
-                print("fl: pc: ", positionChange, "na: ", newAngle, "flx: ", frontLeftXChange, "fly: ", frontLeftYChange)
+                baseAngle = (frontLeftPsi + currentGyroAngle) % 360
+                newCombinedAngle = (baseAngle + newAngle) % 360
+                frontLeftXChange = positionChange * math.sin(newCombinedAngle)
+                frontLeftYChange = positionChange * math.cos(newCombinedAngle)
+                swerveModuleOffsetXCoordinate = hypotenuse * math.sin(baseAngle)
+                swerveModuleOffsetYCoordinate = hypotenuse * math.cos(baseAngle) 
+                frontLeftXCoordinate = self.currentX + swerveModuleOffsetXCoordinate + frontLeftXChange
+                frontLeftYCoordinate = self.currentY + swerveModuleOffsetYCoordinate + frontLeftYChange
+                print("fl: pc: ", positionChange, "na: ", newAngle, "flx: ", frontLeftXCoordinate, "fly: ", frontLeftYCoordinate)
             elif(key == 'front_right'):
-                frontRightXChange = positionChange * math.sin(newAngle)
-                frontRightYChange = positionChange * math.cos(newAngle)
-                print("fr: pc: ", positionChange, "na: ", newAngle, "frx: ", frontRightXChange, "fry: ", frontRightYChange)
+                baseAngle = (frontRightPsi + currentGyroAngle) %360
+                newCombinedAngle = (baseAngle + newAngle) % 360
+                frontRightXChange = positionChange * math.sin(newCombinedAngle)
+                frontRightYChange = positionChange * math.cos(newCombinedAngle)
+                swerveModuleOffsetXCoordinate = hypotenuse * math.sin(baseAngle)
+                swerveModuleOffsetYCoordinate = hypotenuse * math.cos(baseAngle) 
+                frontRightXCoordinate = self.currentX + swerveModuleOffsetXCoordinate + frontRightXChange
+                frontRightYCoordinate = self.currentY + swerveModuleOffsetYCoordinate + frontRightYChange
+                print("fr: pc: ", positionChange, "na: ", newAngle, "frx: ", frontRightXCoordinate, "fry: ", frontRightYCoordinate)
             elif(key == 'rear_left'):
-                rearLeftXChange = positionChange * math.sin(newAngle)
-                rearLeftYChange = positionChange * math.cos(newAngle)
-                print("rl: pc: ", positionChange, "na: ", newAngle, "rlx: ", rearLeftXChange, "rly: ", rearLeftYChange)
+                baseAngle = (rearLeftPsi + currentGyroAngle) % 360
+                newCombinedAngle = (baseAngle + newAngle) % 360
+                rearLeftXChange = positionChange * math.sin(newCombinedAngle)
+                rearLeftYChange = positionChange * math.cos(newCombinedAngle)
+                swerveModuleOffsetXCoordinate = hypotenuse * math.sin(baseAngle)
+                swerveModuleOffsetYCoordinate = hypotenuse * math.cos(baseAngle) 
+                rearLeftXCoordinate = self.currentX + swerveModuleOffsetXCoordinate + rearLeftXChange
+                rearLeftYCoordinate = self.currentY + swerveModuleOffsetYCoordinate + rearLeftYChange
+                print("rl: pc: ", positionChange, "na: ", newAngle, "rlx: ", rearLeftXCoordinate, "rly: ", rearLeftYCoordinate)
             else: # (key == 'front_left')
-                rearRightXChange = positionChange * math.sin(newAngle)
-                rearRightYChange = positionChange * math.cos(newAngle)
-                print("rr: pc: ", positionChange, "na: ", newAngle, "rrx: ", rearRightXChange, "rry: ", rearRightYChange)
+                baseAngle = (frontLeftPsi + currentGyroAngle) % 360
+                newCombinedAngle = (baseAngle + newAngle) % 360
+                rearRightXChange = positionChange * math.sin(newCombinedAngle)
+                rearRightYChange = positionChange * math.cos(newCombinedAngle)
+                swerveModuleOffsetXCoordinate = hypotenuse * math.sin(baseAngle)
+                swerveModuleOffsetYCoordinate = hypotenuse * math.cos(baseAngle) 
+                rearRightXCoordinate = self.currentX + swerveModuleOffsetXCoordinate + rearRightXChange
+                rearRightYCoordinate = self.currentY + swerveModuleOffsetYCoordinate + rearRightYChange
+                print("rr: pc: ", positionChange, "na: ", newAngle, "rrx: ", rearRightXCoordinate, "rry: ", rearRightYCoordinate)
         
-        #print("flx: ", frontLeftXChange, " fly: ", frontLeftYChange, " frx: ", frontRightXChange, " fry: ", frontRightYChange, "rlx: ", rearLeftXChange, " rly: ", rearLeftYChange, " rrx: ", rearRightXChange, " rry: ", rearRightYChange)
-
-        frontLeftXCoordinate = self.currentX - self.swerveModuleOffsetX + frontLeftXChange
-        frontLeftYCoordinate = self.currentY + self.swerveModuleOffsetY + frontLeftYChange
-
-        frontRightXCoordinate = self.currentX + self.swerveModuleOffsetX + frontRightXChange
-        frontRightYCoordinate = self.currentY + self.swerveModuleOffsetY + frontRightYChange
-
-        rearLeftXCoordinate = self.currentX - self.swerveModuleOffsetX + rearLeftXChange
-        rearLeftYCoordinate = self.currentY - self.swerveModuleOffsetY + rearLeftYChange
-        
-        rearRightXCoordinate = self.currentX + self.swerveModuleOffsetX + rearRightXChange
-        rearRightYCoordinate = self.currentY - self.swerveModuleOffsetY + rearRightYChange
-
         midpointX1 = (frontLeftXCoordinate + rearRightXCoordinate)/2
         midpointY1 = (frontLeftYCoordinate + rearRightYCoordinate)/2
 
@@ -92,7 +117,7 @@ class Swervometer:
         midpointY = (midpointY1 + midpointY2)/2
 
         print("old x: ", self.currentX, " old y: ", self.currentY)
-        print("change x: ", midpointX, " change y: ", midpointY)
+        print("draftchange x1:", midpointX1, "draftchange x2:", midpointX2, "change x: ", midpointX, "draftchange y1:", midpointY1, "draftchange y2:", midpointY2, " change y: ", midpointY)
 
         self.currentX = midpointX
         self.currentY = midpointY
