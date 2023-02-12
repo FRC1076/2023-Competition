@@ -125,45 +125,7 @@ class Swervometer:
         
         return self.currentX, self.currentY, self.currentRCW
 
-    def OLDcalculateCOF(self, modules, currentGyroAngle):
-        for key in modules:
-            positionChange = modules[key].positionChange
-            newAngle = (modules[key].newAngle + 0) % 360
-            
-            if(key == 'front_left'):
-                frontLeftXChange = positionChange * math.sin(newAngle)
-                frontLeftYChange = positionChange * math.cos(newAngle)
-                print("fl: pc: ", positionChange, "na: ", newAngle, "flx: ", frontLeftXChange, "fly: ", frontLeftYChange)
-            elif(key == 'front_right'):
-                frontRightXChange = positionChange * math.sin(newAngle)
-                frontRightYChange = positionChange * math.cos(newAngle)
-                print("fr: pc: ", positionChange, "na: ", newAngle, "frx: ", frontRightXChange, "fry: ", frontRightYChange)
-            elif(key == 'rear_left'):
-                rearLeftXChange = positionChange * math.sin(newAngle)
-                rearLeftYChange = positionChange * math.cos(newAngle)
-                print("rl: pc: ", positionChange, "na: ", newAngle, "rlx: ", rearLeftXChange, "rly: ", rearLeftYChange)
-            else: # (key == 'front_left')
-                rearRightXChange = positionChange * math.sin(newAngle)
-                rearRightYChange = positionChange * math.cos(newAngle)
-                print("rr: pc: ", positionChange, "na: ", newAngle, "rrx: ", rearRightXChange, "rry: ", rearRightYChange)
-        
-        #print("flx: ", frontLeftXChange, " fly: ", frontLeftYChange, " frx: ", frontRightXChange, " fry: ", frontRightYChange, "rlx: ", rearLeftXChange, " rly: ", rearLeftYChange, " rrx: ", rearRightXChange, " rry: ", rearRightYChange)
-
-        midpointX1 = (frontLeftXChange + rearRightXChange)/2
-        midpointY1 = (frontLeftYChange + rearRightYChange)/2
-
-        midpointX2 = (frontRightXChange + rearLeftXChange)/2
-        midpointY2 = (frontRightYChange + rearLeftYChange)/2
-
-        print("old x: ", self.currentX, " old y: ", self.currentY)
-        print("change x: ", (midpointX1 + midpointX2)/2, " change y: ", (midpointY1 + midpointY2)/2)
-
-        self.currentX += (midpointX1 + midpointX2)/2
-        self.currentY += (midpointY1 + midpointY2)/2
-        self.currentRCW = currentGyroAngle
-        
-        return self.currentX, self.currentY, self.currentRCW
-
+    
     def setMovingToTarget(self, _movingToTarget):
         self.movingToTarget = _movingToTarget
 
