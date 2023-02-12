@@ -48,10 +48,13 @@ class Swervometer:
 
     def calculateCOF(self, modules, currentGyroAngle):
 
-        # currentGyroAngle is the rotation of the bot as determined by the gyro
+        # The bot is assumed to orient so that "0 degrees" faces "north" along the Y-axis of the frame in the forward direction.
+        
+        # currentGyroAngle is the clockwise rotation of the bot as determined by the gyro.
 
-        # psi is the angle from the front of the bot to the first corner. Mod 360 shouldn't be needed.
-        # although we recalculate it here, psi and the hypotenuse are constants
+        # psi is the fixed angle from the front of the bot to the front right corner.
+        # Mod 360 shouldn't be needed.
+        # Although we recalculate it here, each psi and the hypotenuse are constants.
 
         frontRightPsi = math.arctan(self.swerveModuleOffsetX / self.swerveModuleOffsetY) % 360
         rearRightPsi = (frontRightPsi + 90) % 360
@@ -60,6 +63,7 @@ class Swervometer:
         hypotenuse = math.sqrt(math.sqr(self.swerveModuleOffsetX) + math.sqr(self.swerveModuleOffsetY))
         
         for key in modules:
+            # positionChange is the amount the wheel moved forward
             positionChange = modules[key].positionChange
 
             # newAngle is the angle of the module wheel relative to the frame of the bot
