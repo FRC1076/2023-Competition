@@ -105,6 +105,42 @@ class SwerveDrive:
         self.sd.putNumber('Balance Yaw kI', self.balance_yaw_pid_controller.getI())
         self.sd.putNumber('Balance Yaw kD', self.balance_yaw_pid_controller.getD())
 
+    def reset(self):
+        print("In swervedrive reset")
+        
+        # Set all inputs to zero
+        self._requested_vectors = {
+            'fwd': 0,
+            'strafe': 0,
+            'rcw': 0
+        }
+
+        self._requested_angles = {
+            'front_left': 0,
+            'front_right': 0,
+            'rear_left': 0,
+            'rear_right': 0
+        }
+
+        self._requested_speeds = {
+            'front_left': 0,
+            'front_right': 0,
+            'rear_left': 0,
+            'rear_right': 0
+        }
+        # Variables that allow enabling and disabling of features in code
+        self.squared_inputs = False
+        self.threshold_input_vectors = True
+
+        # Variable that tracks whether robot is en route to destination
+        self.swervometer.setMovingToTarget(False)
+
+        self.wheel_lock = False
+        
+        for key in self.modules:
+            self.modules[key].reset()
+
+
     @property
     def chassis_dimension(self):
         return (self.width, self.length)
@@ -393,10 +429,10 @@ class SwerveDrive:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defence)
 
-                    self._requested_angles['front_left'] = 0 #45
-                    self._requested_angles['front_right'] = 0 #-45
-                    self._requested_angles['rear_left'] = 0 #-45
-                    self._requested_angles['rear_right'] = 0 #45
+                    self._requested_angles['front_left'] = 90 #45
+                    self._requested_angles['front_right'] = 90 #-45
+                    self._requested_angles['rear_left'] = 90 #-45
+                    self._requested_angles['rear_right'] = 90 #45
 
                     #self.wheel_lock = False
                     #print("testing wheel lock")

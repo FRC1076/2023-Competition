@@ -26,6 +26,7 @@ class SwerveModule:
         self.driveEncoder = _driveEncoder
         self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
+        self.positionSign = 1
 
         #self.currentPosition = self.driveEncoder.getPosition()
 
@@ -60,7 +61,22 @@ class SwerveModule:
         self.sd.putNumber('Heading kP', self.heading_pid_controller.getP())
         self.sd.putNumber('Heading kI', self.heading_pid_controller.getI())
         self.sd.putNumber('Heading kD', self.heading_pid_controller.getD())
-        
+
+    def reset(self):
+        print("In swervemodule reset")
+
+        self.driveEncoder.setPosition(0)
+        self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
+        print("in module reset: position: ", self.driveEncoder.getPosition())
+        self.positionSign = 1
+        #self.moduleFlipped = False
+        # Motor
+        #self.driveMotor.setInverted(self.inverted)
+        #self.rotateMotor.setInverted(False)
+
+        #self._requested_angle = 0 # change this to something like 'requested angle' or 'requested encoder value', whatever makes more sense
+        #self._requested_speed = 0 #class variable which execute() passes to the drive motor at the end of the robot loop
+
     def get_current_velocity(self):
         velocity = self.driveEncoder.getVelocity()
         #multiply by ratio (inches / rotation)
@@ -74,6 +90,7 @@ class SwerveModule:
 
         if self.moduleFlipped:
             angle = (angle + 180) % 360
+            self.positionSign *= -1
 
         return angle
 
@@ -201,7 +218,8 @@ class SwerveModule:
         #print("Angle: ", self.get_current_angle(), " Absolute Position: ", self.sd_prefix, " ", self.encoder.getAbsolutePosition(), self.encoder_zero, self.encoder.getAbsolutePosition() - self.encoder_zero)
 
         #self.positionChange = self.driveEncoder.getPosition() - self.currentPosition
-        self.positionChange = self.driveEncoder.getPosition()
+        self.positionChange = -1 * self.driveEncoder.getPosition() * self.positionSign
+        print("position: ", self.driveEncoder.getPosition())
         self.newAngle = self.get_current_angle()
 
         #self.currentPosition = self.driveEncoder.getPosition()

@@ -75,6 +75,11 @@ class MyRobot(wpilib.TimedRobot):
             self.tester.initTestTeleop()
             self.tester.testCodePaths()
 
+    def disabledExit(self):
+        print("no longer disabled")
+        self.drivetrain.reset()
+        self.drivetrain.resetGyro()
+
     def initControllers(self, config):
         ctrls = {}
         print(config)
@@ -89,7 +94,7 @@ class MyRobot(wpilib.TimedRobot):
         return ctrls
 
     def initSwervometer(self, config):
-        print("in initSwervometer")
+        print("initSwervometer ran")
         
         if (config['TEAM_IS_RED']):
             team_is_red = True
@@ -184,7 +189,7 @@ class MyRobot(wpilib.TimedRobot):
         return swervometer
 
     def initDrivetrain(self, config):
-
+        print("initDrivetrain ran")
         self.drive_type = config['DRIVETYPE']  # side effect!
 
         self.rotationCorrection = config['ROTATION_CORRECTION']
@@ -282,7 +287,7 @@ class MyRobot(wpilib.TimedRobot):
         # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
 
         self.drivetrain.move(x, y, rcw)
-
+        
     def teleopDrivetrain(self):
         # if (not self.drivetrain):
         #     return

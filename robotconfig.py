@@ -64,8 +64,8 @@ swervometerConfig = { # All positions measured in inches
     'FIELD_TAG7_Y': 500.0, # Y-Coordinate of Tag ID 7
     'FIELD_TAG8_X': 500.0, # X-Coordinate of Tag ID 8
     'FIELD_TAG8_Y': 500.0, # Y-Coordinate of Tag ID 8
-    'ROBOT_FRAME_DIMENSION_X': 26.0, # X-coordinate length of robot frame
-    'ROBOT_FRAME_DIMENSION_Y': 34.0, # Y-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_X': 30, #26.0, # X-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_Y': 30, #34.0, # Y-coordinate length of robot frame
     'ROBOT_BUMPER_DIMENSION_X': 4.0, # Width of bumper (X-axis)
     'ROBOT_BUMPER_DIMENSION_Y': 4.0, # Width of bumper (Y-axis)
     'ROBOT_COM_OFFSET_X': 15.0, #13.0, # X-offset of center of mass (assume half frame dimension)
@@ -74,8 +74,8 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_GYRO_OFFSET_Y': 5.0, # Y-offset of center of gyro (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
-    'ROBOT_SWERVE_MODULE_OFFSET_X': 9.75, # X-offset of swerve module center from COM
-    'ROBOT_SWERVE_MODULE_OFFSET_Y': 13.75, # X-offset of swerve module center from COM
+    'ROBOT_SWERVE_MODULE_OFFSET_X': 11.75, #9.75, # X-offset of swerve module center from COM
+    'ROBOT_SWERVE_MODULE_OFFSET_Y': 11.75, #13.75, # X-offset of swerve module center from COM
 }
 
 drivetrainConfig = {
