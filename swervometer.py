@@ -47,17 +47,20 @@ class Swervometer:
         self.currentRCW = rcw
 
     def calculateModuleCoordinates(self, psi, currentGyroAngle, hypotenuse, positionChange, wheelAngle):
-        baseAngle = (psi + currentGyroAngle) % 360
-        combinedAngle = (baseAngle + wheelAngle) % 360
-        XChange = positionChange * math.sin(combinedAngle)
-        YChange = positionChange * math.cos(combinedAngle)
-        swerveModuleOffsetXCoordinate = hypotenuse * math.sin(baseAngle)
-        swerveModuleOffsetYCoordinate = hypotenuse * math.cos(baseAngle) 
-        XCoordinate = self.currentX + swerveModuleOffsetXCoordinate + XChange
-        YCoordinate = self.currentY + swerveModuleOffsetYCoordinate + YChange
+        baseAngle = (psi + currentGyroAngle) % 360 # angle of the module
+        swerveModuleOffsetXCoordinate = hypotenuse * math.sin(baseAngle) # X-position of the module
+        swerveModuleOffsetYCoordinate = hypotenuse * math.cos(baseAngle) # Y-position of the module
+        
+        combinedAngle = (baseAngle + wheelAngle) % 360 # angle of the wheel
+        XChange = positionChange * math.sin(combinedAngle) # change in X-position of the module
+        YChange = positionChange * math.cos(combinedAngle) # change in Y-position of the module
+        
+        XCoordinate = self.currentX + swerveModuleOffsetXCoordinate + XChange # current X-coordinate of COF plus swerve module offset plus movement
+        YCoordinate = self.currentY + swerveModuleOffsetYCoordinate + YChange # current Y-coordinate of COF plus swerve module offset plus movement
+
         return XCoordinate, YCoordinate
 
-    def calculateCOF(self, modules, currentGyroAngle):
+    def calculateCOFTuple(self, modules, currentGyroAngle):
 
         # The bot is assumed to orient so that "0 degrees" faces "north" along the Y-axis of the frame in the forward direction.
         
@@ -81,19 +84,20 @@ class Swervometer:
             wheelAngle = (modules[key].newAngle + 0) % 360
             
             # Each of these calculations is different because positionChange, newAngle, and psi are different for each corner
-            if(key == 'front_left'):
-                frontLeftXCoordinate, frontLeftYCoordinate = self.calculateModuleCoordinates(frontLeftPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("fl: pc: ", positionChange, "na: ", newAngle, "flx: ", frontLeftXCoordinate, "fly: ", frontLeftYCoordinate)
-            elif(key == 'front_right'):
+            if (key == 'front_right'):
                 frontRightXCoordinate, frontRightYCoordinate = self.calculateModuleCoordinates(frontRightPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("fr: pc: ", positionChange, "na: ", newAngle, "frx: ", frontRightXCoordinate, "fry: ", frontRightYCoordinate)
-            elif(key == 'rear_left'):
-                rearLeftXCoordinate, rearLeftYCoordinate = self.calculateModuleCoordinates(rearLeftPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("rl: pc: ", positionChange, "na: ", newAngle, "rlx: ", rearLeftXCoordinate, "rly: ", rearLeftYCoordinate)
-            else: # (key == 'rear_right')
+                print("fr: pc: ", positionChange, " psi: ", frontRightPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "frx: ", frontRightXCoordinate, "fry: ", frontRightYCoordinate)
+            elif (key == 'rear_right'):
                 rearRightXCoordinate, rearRightYCoordinate = self.calculateModuleCoordinates(rearRightPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("rr: pc: ", positionChange, "na: ", newAngle, "rrx: ", rearRightXCoordinate, "rry: ", rearRightYCoordinate)
-        
+                print("rr: pc: ", positionChange, " psi: ", rearRightPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "rrx: ", rearRightXCoordinate, "rry: ", rearRightYCoordinate)
+            elif (key == 'rear_left'):
+                rearLeftXCoordinate, rearLeftYCoordinate = self.calculateModuleCoordinates(rearLeftPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
+                print("rl: pc: ", positionChange, " psi: ", rearLeftPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "rlx: ", rearLeftXCoordinate, "rly: ", rearLeftYCoordinate)
+            else: # (key == 'front_left'):
+                frontLeftXCoordinate, frontLeftYCoordinate = self.calculateModuleCoordinates(frontLeftPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
+                print("fl: pc: ", positionChange, " psi: ", frontLeftPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "flx: ", frontLeftXCoordinate, "fly: ", frontLeftYCoordinate)
+            
+        # Find average COF XY-coordinates of bot
         midpointX1 = (frontLeftXCoordinate + rearRightXCoordinate)/2
         midpointY1 = (frontLeftYCoordinate + rearRightYCoordinate)/2
 
@@ -106,54 +110,24 @@ class Swervometer:
         print("old x: ", self.currentX, " old y: ", self.currentY)
         print("draftchange x1:", midpointX1, "draftchange x2:", midpointX2, "change x: ", midpointX, "draftchange y1:", midpointY1, "draftchange y2:", midpointY2, " change y: ", midpointY)
 
+        # Reset pose of bot.
         self.currentX = midpointX
         self.currentY = midpointY
         self.currentRCW = currentGyroAngle
         
         return self.currentX, self.currentY, self.currentRCW
-
     
     def setMovingToTarget(self, _movingToTarget):
         self.movingToTarget = _movingToTarget
 
-    def setCurrentPositionTuple(self, x, y, rcw):
+    def setPositionTuple(self, x, y, rcw):
         self.currentX = x
         self.currentY = y
         self.currentRCW = rcw
 
-    def getNewPositionTuple(self):
+    def getPositionTuple(self):
         return self.currentX, self.currentY, self.currentRCW
         
-    def setNewPositionTuple(self, x, y, rcw):
-        self.currentX = x
-        self.currentY = y
-        self.currentRCW = rcw
-
-    def getCurrentPositionTuple(self):
-        return self.currentX, self.currentY, self.currentRCW
-    
-    def calcTranslationalAndRotationalXandY(self, x_input, y_input, rcw, old_heading, distance, frameX, frameY):
-        
-        # theta is the angle from zero that robot heads without rotation
-        theta = numpy.arctan(x_input / y_input)
-
-        # find the amount of translational movement
-        x_translational = distance * numpy.sin(theta)
-        y_translational = distance * numpy.cos(theta)
-
-        # r is the radius of the frame
-        r = math.sqrt((frameX * frameX) + (frameY + frameY))
-
-        # psi is the angle __
-        psi = (rcw + old_heading) % 360
-
-        # find the amount of rotational movement
-        rotational_distance = r * numpy.tan(psi)
-        x_rotational = rotational_distance * numpy.cos(psi)
-        y_rotational = rotational_distance * numpy.sin(psi)
-
-        return x_translational, y_translational, x_rotational, y_rotational
-
     def updatePositionTupleFromCamera(self, tagNumber, relativePositionTuple):
         tagNum = tagNumber
         x,y,rcw = relativePositionTuple

@@ -107,7 +107,7 @@ class SwerveDrive:
 
     def reset(self):
         print("In swervedrive reset")
-        
+
         # Set all inputs to zero
         self._requested_vectors = {
             'fwd': 0,
@@ -517,7 +517,7 @@ class SwerveDrive:
         for key in self.modules:
             self.modules[key].execute()
 
-        COFX, COFY, COFAngle = self.swervometer.calculateCOF(self.modules, self.getGyroAngle())
+        COFX, COFY, COFAngle = self.swervometer.calculateCOFPose(self.modules, self.getGyroAngle())
         print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 
     def idle(self):
