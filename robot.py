@@ -287,6 +287,7 @@ class MyRobot(wpilib.TimedRobot):
         # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
 
         self.drivetrain.move(x, y, rcw)
+        #self.drivetrain.move(0, y, 0)
         
     def teleopDrivetrain(self):
         # if (not self.drivetrain):

@@ -22,24 +22,33 @@ class SwerveModule:
         
         self.cfg = _config
 
+        self.rotateMotor = _rotateMotor
+        self.rotateEncoder = _rotateEncoder
+
         self.driveMotor = _driveMotor
         self.driveEncoder = _driveEncoder
         self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
-        self.positionSign = 1
+
+        self.encoder_zero = self.cfg.zero or 0 #idk the point of this, maybe useful for other encoder type
+        angle = (self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360
+        self.moduleFlipped = False
+        if angle >= 90 and angle <= 270:
+            self.positionSign = 1
+        else:
+            self.positionSign = -1
 
         #self.currentPosition = self.driveEncoder.getPosition()
 
-        self.rotateMotor = _rotateMotor
-        self.rotateEncoder = _rotateEncoder
+        self.driveMotor.setOpenLoopRampRate(1)
+        print("Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
 
         # Config -- change this to reflect how our config is formatted. We will upon testing of the entire drivetrain figure out which need to be inverted.
         self.sd_prefix = self.cfg.sd_prefix or 'Module'
-        self.encoder_zero = self.cfg.zero or 0 #idk the point of this, maybe useful for other encoder type
         self.inverted = self.cfg.inverted or False 
         self.allow_reverse = self.cfg.allow_reverse or True #def allow reverse always, so you can maybe remove this
 
-        self.moduleFlipped = False
+        
 
         # SmartDashboard
         self.sd = NetworkTables.getTable('SmartDashboard')
@@ -68,8 +77,14 @@ class SwerveModule:
         self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
         print("in module reset: position: ", self.driveEncoder.getPosition())
-        self.positionSign = 1
-        #self.moduleFlipped = False
+
+        angle = (self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360
+        self.moduleFlipped = False
+        if angle >= 90 and angle <= 270:
+            self.positionSign = 1
+        else:
+            self.positionSign = -1
+        
         # Motor
         #self.driveMotor.setInverted(self.inverted)
         #self.rotateMotor.setInverted(False)
@@ -218,8 +233,8 @@ class SwerveModule:
         #print("Angle: ", self.get_current_angle(), " Absolute Position: ", self.sd_prefix, " ", self.encoder.getAbsolutePosition(), self.encoder_zero, self.encoder.getAbsolutePosition() - self.encoder_zero)
 
         #self.positionChange = self.driveEncoder.getPosition() - self.currentPosition
-        self.positionChange = -1 * self.driveEncoder.getPosition() * self.positionSign
-        print("position: ", self.driveEncoder.getPosition())
+        self.positionChange = self.driveEncoder.getPosition() * self.positionSign
+        print("Raw Position: ", self.driveEncoder.getPosition(), " Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
         self.newAngle = self.get_current_angle()
 
         #self.currentPosition = self.driveEncoder.getPosition()

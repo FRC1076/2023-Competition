@@ -1,5 +1,4 @@
 import math
-#import numpy
 import wpilib
 from collections import namedtuple
 
@@ -60,7 +59,7 @@ class Swervometer:
 
         return XCoordinate, YCoordinate
 
-    def calculateCOFTuple(self, modules, currentGyroAngle):
+    def calculateCOFPose(self, modules, currentGyroAngle):
 
         # The bot is assumed to orient so that "0 degrees" faces "north" along the Y-axis of the frame in the forward direction.
         
@@ -70,11 +69,11 @@ class Swervometer:
         # Mod 360 shouldn't be needed.
         # Although we recalculate it here, each psi and the hypotenuse are constants.
 
-        frontRightPsi = math.arctan(self.swerveModuleOffsetX / self.swerveModuleOffsetY) % 360
+        frontRightPsi = math.atan(self.swerveModuleOffsetX / self.swerveModuleOffsetY) % 360
         rearRightPsi = (frontRightPsi + 90) % 360
         rearLeftPsi = (frontRightPsi + 180) % 360
         frontLeftPsi = (frontRightPsi + 270) % 360
-        hypotenuse = math.sqrt(math.sqr(self.swerveModuleOffsetX) + math.sqr(self.swerveModuleOffsetY))
+        hypotenuse = math.sqrt((self.swerveModuleOffsetX ** 2) + (self.swerveModuleOffsetY ** 2))
         
         for key in modules:
             # positionChange is the amount the wheel moved forward
