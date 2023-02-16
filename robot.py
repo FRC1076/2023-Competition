@@ -16,6 +16,7 @@ from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
 from swervemodule import ModuleConfig
 from swervedrive import BalanceConfig
+from swervedrive import TargetConfig
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
@@ -195,6 +196,7 @@ class MyRobot(wpilib.TimedRobot):
         self.rotationCorrection = config['ROTATION_CORRECTION']
 
         balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
+        target_cfg = TargetConfig(sd_prefix='Target_Module', target_kP=config['TARGET_KP'], target_kI=config['TARGET_KI'], target_kD=config['TARGET_KD'])
 
         flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.0, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
         frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=152.0, inverted=False, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
@@ -212,12 +214,6 @@ class MyRobot(wpilib.TimedRobot):
         rlModule_driveMotor_encoder = rlModule_driveMotor.getEncoder()
         rrModule_driveMotor = rev.CANSparkMax(config['REARRIGHT_DRIVEMOTOR'], motor_type)
         rrModule_driveMotor_encoder = rrModule_driveMotor.getEncoder()
-
-        # Set ramp rates of drive motors
-        #flModule_driveMotor.setClosedLoopRampRate(0.5)
-        #frModule_driveMotor.setClosedLoopRampRate(0.5)
-        #rlModule_driveMotor.setClosedLoopRampRate(0.5)
-        #rrModule_driveMotor.setClosedLoopRampRate(0.5)
 
         # Rotate motors
         flModule_rotateMotor = rev.CANSparkMax(config['FRONTLEFT_ROTATEMOTOR'], motor_type)
@@ -237,7 +233,7 @@ class MyRobot(wpilib.TimedRobot):
 
         gyro = AHRS.create_spi()
         
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg)
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg, target_cfg)
 
         return swerve
 
@@ -348,7 +344,7 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.drivetrain:
             return
-        if not self.servometer:
+        if not self.swervometer:
             return
 
         self.autonTimer = wpilib.Timer()
@@ -359,11 +355,11 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.drivetrain:
             return
-        if not self.servometer:
+        if not self.swervometer:
             return
 
         print("autonomousPeriodic")
-        self.drivetrain.goToPosition(100, 100, 90)
+        self.drivetrain.goToPose(0, 100, 0)
 
     def deadzoneCorrection(self, val, deadzone):
         """

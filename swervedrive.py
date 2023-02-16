@@ -13,6 +13,7 @@ from wpimath.controller import PIDController
 from swervometer import Swervometer
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
+TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
 
 class SwerveDrive:
 
@@ -22,7 +23,7 @@ class SwerveDrive:
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _gyro, _balance_cfg):
+    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _gyro, _balance_cfg, _target_cfg):
         
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
@@ -104,6 +105,13 @@ class SwerveDrive:
         self.sd.putNumber('Balance Yaw kP', self.balance_yaw_pid_controller.getP())
         self.sd.putNumber('Balance Yaw kI', self.balance_yaw_pid_controller.getI())
         self.sd.putNumber('Balance Yaw kD', self.balance_yaw_pid_controller.getD())
+
+        self.target_config = _target_cfg
+        self.target_kP = self.target_config.target_kP
+        self.target_kI = self.target_config.target_kI
+        self.target_kD = self.target_config.target_kD
+        self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
+        self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
 
     def reset(self):
         print("In swervedrive reset")
@@ -394,8 +402,14 @@ class SwerveDrive:
 
         self.set_rcw(rcw)
     
-    def goToPosition(x, y, rcw):
+    def goToPose(self, x, y, rcw):
         self.swervometer.setTarget(x, y, rcw)
+        currentX, currentY, currentRCW = self.swervometer.getCOF()
+        x_error = self.target_x_pid_controller.calculate(currentX, x)
+        y_error = self.target_y_pid_controller.calculate(currentY, y) 
+        self.move(x_error, y_error, rcw)
+        self.update_smartdash()
+        self.execute()
         return
 
     def _calculate_vectors(self):

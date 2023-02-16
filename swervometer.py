@@ -119,6 +119,14 @@ class Swervometer:
     def setMovingToTarget(self, _movingToTarget):
         self.movingToTarget = _movingToTarget
 
+    def setTarget(self, x, y, rcw):
+        self.targetX = x
+        self.targetY = y
+        self.targetRCW = rcw
+
+    def getTarget(self):
+        return self.targetX, self.targetY, self.targetRCW
+
     def setPositionTuple(self, x, y, rcw):
         self.currentX = x
         self.currentY = y

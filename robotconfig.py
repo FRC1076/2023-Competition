@@ -102,6 +102,9 @@ drivetrainConfig = {
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
+    'TARGET_KP': 0.005,
+    'TARGET_KI': 0.00001,
+    'TARGET_KD': 0.00001,
     'ROBOT_INCHES_PER_ROTATION': 1.793, # Inches per rotation of wheels
 }
 
