@@ -277,15 +277,15 @@ class MyRobot(wpilib.TimedRobot):
         # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
 
         if self.cliffdetector:
-            if self.cliffdetector == -1:
+            if self.cliffdetector.atCliff() == -1:
                 print("Warning: At Left Cliff!!!")
-            elif self.cliffdetector == 1:
+            elif self.cliffdetector.atCliff() == 1:
                 print("Warning: At Right Cliff!!!")
-            elif self.cliffdetector == 0:
+            elif self.cliffdetector.atCliff() == 0:
                 print("Coast is clear. Not near a cliff.")
             else:
                 print("Bogus result from cliff detector. Ignore danger.")
-                
+
         self.drivetrain.move(x, y, rcw)
 
     def teleopDrivetrain(self):
