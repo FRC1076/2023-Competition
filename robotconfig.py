@@ -112,6 +112,12 @@ visionConfig = {
     'CAMERA_PITCH': 0,
 }
 
+cliffDetectorConfig = {
+    'LEFT_CLIFF_DETECTOR': 51, # CAN ID
+    'RIGHT_CLIFF_DETECTOR': 52, # CAN ID
+    'CLIFF_TOLERANCE': 2, # Centimeters?
+}
+
 autonConfig = {
     'SCORE_EXISTING': True,
     'PICKUP_NEW': False,
@@ -126,6 +132,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
+    'CLIFFDETECTOR': cliffDetectorConfig,
     'AUTON': autonConfig,
 }
 
@@ -133,6 +140,7 @@ showbot = {
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
+    'CLIFFDETECTOR': cliffDetectorConfig,
     'AUTON': autonConfig,
 }
 

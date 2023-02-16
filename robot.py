@@ -19,6 +19,7 @@ from swervedrive import BalanceConfig
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
+from cliffdetector import CliffDetector
 from tester import Tester
 from networktables import NetworkTables
 
@@ -61,6 +62,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.drivetrain = self.initDrivetrain(config)
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
+            if key == 'CLIFFDETECTOR':
+                self.cliffDetector = self.initCliffDetector(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
@@ -237,6 +240,10 @@ class MyRobot(wpilib.TimedRobot):
         self.balanceBot = config['BALANCE_BOT']
         return True
 
+    def initCliffDetector(self, config):
+        cliffDetector = CliffDetector(config['LEFT_CLIFF_DETECTOR'], config['RIGHT_CLIFF_DETECTOR'], config['CLIFF_TOLERANCE'])
+        return cliffDetector
+
     def robotPeriodic(self):
         return True
 
@@ -269,6 +276,16 @@ class MyRobot(wpilib.TimedRobot):
         # print('DRIVE_TARGET = ' + str(rcw) + ', PIVOT_TARGET = ' + str(degrees) + ", ENCODER_TICK = " + str(self.testingModule.get_current_angle()))
         # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
 
+        if self.cliffdetector:
+            if self.cliffdetector == -1:
+                print("Warning: At Left Cliff!!!")
+            elif self.cliffdetector == 1:
+                print("Warning: At Right Cliff!!!")
+            elif self.cliffdetector == 0:
+                print("Coast is clear. Not near a cliff.")
+            else:
+                print("Bogus result from cliff detector. Ignore danger.")
+                
         self.drivetrain.move(x, y, rcw)
 
     def teleopDrivetrain(self):
