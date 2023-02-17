@@ -232,6 +232,7 @@ class MyRobot(wpilib.TimedRobot):
         rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_rotateMotor_encoder, rrModule_cfg)
 
         gyro = AHRS.create_spi()
+        #gyro = AHRS.create_spi(SPI.port.kMXP, 500000, 66) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
         swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg, target_cfg)
 
