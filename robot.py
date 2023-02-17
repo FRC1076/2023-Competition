@@ -40,6 +40,7 @@ class MyRobot(wpilib.TimedRobot):
         self.driver = None
         self.operator = None
         self.tester = None
+        self.cliffDetector = None
         self.auton = None
 
         # Even if no drivetrain, defaults to drive phase
@@ -60,10 +61,10 @@ class MyRobot(wpilib.TimedRobot):
                 self.swervometer = self.initSwervometer(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
-            if key == 'AUTON':
-                self.auton = self.initAuton(config)
             if key == 'CLIFFDETECTOR':
                 self.cliffDetector = self.initCliffDetector(config)
+            if key == 'AUTON':
+                self.auton = self.initAuton(config)
 
         self.dashboard = NetworkTables.getTable('SmartDashboard')
         self.periods = 0
