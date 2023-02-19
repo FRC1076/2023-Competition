@@ -11,9 +11,15 @@ class CliffDetector:
         self.Rsensor.setAutomaticMode(True)
 
     def atCliff(self):
-        #return -1 # at Left Cliff
+        leftDistance = self.Lsensor.getRange()
+        rightDistance = self.Rsensor.getRange()
+        difference = leftDistance - rightDistance
+        if difference > self.cliffTolerance:
+            return -1 # at Left Cliff
+        if difference < -self.cliffTolerance:
+            return 1 # at Right Cliff
         return 0 # not at Cliff
-        #return 1 # at Right Cliff
+
     def update(self):
         print(self.Lsensor.getRange())
         print(self.Rsensor.getRange())
