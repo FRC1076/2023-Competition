@@ -73,9 +73,6 @@ class SwerveDrive:
         self.squared_inputs = False
         self.threshold_input_vectors = True
 
-        # Variable that tracks whether robot is en route to destination
-        self.swervometer.setMovingToTarget(False)
-
         self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
         self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
 
@@ -111,8 +108,10 @@ class SwerveDrive:
         self.target_kI = self.target_config.target_kI
         self.target_kD = self.target_config.target_kD
         self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
+        self.target_x_pid_controller.setTolerance(0.5, 0.5)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-
+        self.target_y_pid_controller.setTolerance(0.5, 0.5)
+        
     def reset(self):
         print("In swervedrive reset")
 
@@ -147,6 +146,8 @@ class SwerveDrive:
         
         for key in self.modules:
             self.modules[key].reset()
+
+        self.resetGyro()
 
 
     @property
@@ -403,14 +404,19 @@ class SwerveDrive:
         self.set_rcw(rcw)
     
     def goToPose(self, x, y, rcw):
-        self.swervometer.setTarget(x, y, rcw)
+
         currentX, currentY, currentRCW = self.swervometer.getCOF()
         x_error = self.target_x_pid_controller.calculate(currentX, x)
-        y_error = self.target_y_pid_controller.calculate(currentY, y) 
-        self.move(x_error, y_error, rcw)
-        self.update_smartdash()
-        self.execute()
-        return
+        y_error = self.target_y_pid_controller.calculate(currentY, y)
+
+        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
+            self.update_smartdash()
+            return True
+        else:
+            self.move(x_error, y_error, rcw)
+            self.update_smartdash()
+            self.execute()
+            return False
 
     def _calculate_vectors(self):
         """

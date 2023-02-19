@@ -29,13 +29,17 @@ class Swervometer:
     def __init__(self, field_cfg, robot_property_cfg):
         self.field = field_cfg
         self.robotProperty = robot_property_cfg
+        print("field.orgin_x", self.field.origin_x, " field.origin_y", self.field.origin_y)
+        print("field.start_position_x: ", self.field.start_position_x, " field.start_position_y: ", self.field.start_position_y)
+        print("bumper_dimension_x: ", self.robotProperty.bumper_dimension_x, " bumper_dimension_y: ", self.robotProperty.bumper_dimension_y)
+        print("com_offset_x: ", self.robotProperty.com_offset_x, " com_offset_y: ", self.robotProperty.com_offset_y)
         self.currentX = self.field.origin_x + self.field.start_position_x + self.robotProperty.bumper_dimension_x + self.robotProperty.com_offset_x
         self.currentY = self.field.origin_y + self.field.start_position_y + self.robotProperty.bumper_dimension_y + self.robotProperty.com_offset_y
         self.currentRCW = self.field.start_angle
         self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
         self.movingToTarget = False
-        print("init current X: ", self.currentX, " init current y: ", self.currentY)
+        print("init current X: ", self.currentX, " init current y: ", self.currentY, " init current rcw: ", self.currentRCW)
     
     def getCOF(self):
         return self.currentX, self.currentY, self.currentRCW
@@ -46,16 +50,21 @@ class Swervometer:
         self.currentRCW = rcw
 
     def calculateModuleCoordinates(self, psi, currentGyroAngle, hypotenuse, positionChange, wheelAngle):
+        print("calcModCoord: psi: ", psi, " currentGyroAngle: ", currentGyroAngle, " hypo: ", hypotenuse, " posChg: ", positionChange, " wheelAngle: ", wheelAngle)
+        
         baseAngle = (psi + currentGyroAngle) % 360 # angle of the module
-        swerveModuleOffsetXCoordinate = hypotenuse * math.sin(baseAngle) # X-position of the module
-        swerveModuleOffsetYCoordinate = hypotenuse * math.cos(baseAngle) # Y-position of the module
-        
+        swerveModuleOffsetXCoordinate = hypotenuse * math.sin(math.radians(baseAngle)) # X-position of the module
+        swerveModuleOffsetYCoordinate = hypotenuse * math.cos(math.radians(baseAngle)) # Y-position of the module
+        #print("baseAngle: ", baseAngle, " swerveModuleOffsetXCoordinate: ", swerveModuleOffsetXCoordinate, " swerveModuleOffsetYCoordinate: ", swerveModuleOffsetYCoordinate)
+
         combinedAngle = (baseAngle + wheelAngle) % 360 # angle of the wheel
-        XChange = positionChange * math.sin(combinedAngle) # change in X-position of the module
-        YChange = positionChange * math.cos(combinedAngle) # change in Y-position of the module
-        
+        XChange = positionChange * math.sin(math.radians(combinedAngle)) # change in X-position of the module
+        YChange = positionChange * math.cos(math.radians(combinedAngle)) # change in Y-position of the module
+        print("combinedAngle: ", combinedAngle, "sin(rad(combinedAngle)): ", math.sin(math.radians(combinedAngle)), "cos(rad(combinedAngle)): ", math.cos(math.radians(combinedAngle)), " XChange: ", XChange, " YChange: ", YChange)
+
         XCoordinate = self.currentX + swerveModuleOffsetXCoordinate + XChange # current X-coordinate of COF plus swerve module offset plus movement
         YCoordinate = self.currentY + swerveModuleOffsetYCoordinate + YChange # current Y-coordinate of COF plus swerve module offset plus movement
+        #print("XCoordinate: ", XCoordinate, " YCoordinate: ", YCoordinate)
 
         return XCoordinate, YCoordinate
 
@@ -69,18 +78,20 @@ class Swervometer:
         # Mod 360 shouldn't be needed.
         # Although we recalculate it here, each psi and the hypotenuse are constants.
 
-        frontRightPsi = math.atan(self.swerveModuleOffsetX / self.swerveModuleOffsetY) % 360
+        frontRightPsi = math.degrees(math.atan(self.swerveModuleOffsetX / self.swerveModuleOffsetY)) % 360
         rearRightPsi = (frontRightPsi + 90) % 360
         rearLeftPsi = (frontRightPsi + 180) % 360
         frontLeftPsi = (frontRightPsi + 270) % 360
         hypotenuse = math.sqrt((self.swerveModuleOffsetX ** 2) + (self.swerveModuleOffsetY ** 2))
-        
+
+        #print("hypotenuse: ", hypotenuse)
+
         for key in modules:
             # positionChange is the amount the wheel moved forward
             positionChange = modules[key].positionChange
 
             # wheelAngle is the angle of the module wheel relative to the frame of the bot
-            wheelAngle = (modules[key].newAngle + 0) % 360
+            wheelAngle = (modules[key].newAngle - 90) % 360
             
             # Each of these calculations is different because positionChange, newAngle, and psi are different for each corner
             if (key == 'front_right'):
@@ -107,7 +118,7 @@ class Swervometer:
         midpointY = (midpointY1 + midpointY2)/2
 
         print("old x: ", self.currentX, " old y: ", self.currentY)
-        print("draftchange x1:", midpointX1, "draftchange x2:", midpointX2, "change x: ", midpointX, "draftchange y1:", midpointY1, "draftchange y2:", midpointY2, " change y: ", midpointY)
+        print("draft x1:", midpointX1, "draft x2:", midpointX2, "draft x: ", midpointX, "draft y1:", midpointY1, "draft y2:", midpointY2, " draft y: ", midpointY)
 
         # Reset pose of bot.
         self.currentX = midpointX
@@ -116,26 +127,7 @@ class Swervometer:
         
         return self.currentX, self.currentY, self.currentRCW
     
-    def setMovingToTarget(self, _movingToTarget):
-        self.movingToTarget = _movingToTarget
-
-    def setTarget(self, x, y, rcw):
-        self.targetX = x
-        self.targetY = y
-        self.targetRCW = rcw
-
-    def getTarget(self):
-        return self.targetX, self.targetY, self.targetRCW
-
-    def setPositionTuple(self, x, y, rcw):
-        self.currentX = x
-        self.currentY = y
-        self.currentRCW = rcw
-
-    def getPositionTuple(self):
-        return self.currentX, self.currentY, self.currentRCW
-        
-    def updatePositionTupleFromCamera(self, tagNumber, relativePositionTuple):
+    def updatePoseFromCamera(self, tagNumber, relativePositionTuple):
         tagNum = tagNumber
         x,y,rcw = relativePositionTuple
 

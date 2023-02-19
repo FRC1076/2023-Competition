@@ -79,7 +79,6 @@ class MyRobot(wpilib.TimedRobot):
     def disabledExit(self):
         print("no longer disabled")
         self.drivetrain.reset()
-        self.drivetrain.resetGyro()
 
     def initControllers(self, config):
         ctrls = {}
@@ -106,6 +105,8 @@ class MyRobot(wpilib.TimedRobot):
 
         self.dashboard.putBoolean('Team is Red', team_is_red)
 
+        print("FIELD_START_POSITION:", config['FIELD_START_POSITION'])
+
         if (config['FIELD_START_POSITION'] == 'A'):
             self.dashboard.putString('Field Start Position', 'A')
             if team_is_red:
@@ -116,7 +117,7 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_x = config['FIELD_BLU_A_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_A_START_ANGLE']
-        if (config['FIELD_START_POSITION'] == 'B'):
+        elif (config['FIELD_START_POSITION'] == 'B'):
             self.dashboard.putString('Field Start Position', 'B')
             if team_is_red:
                 starting_position_x = config['FIELD_RED_B_START_POSITION_X']
@@ -232,6 +233,7 @@ class MyRobot(wpilib.TimedRobot):
         rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_rotateMotor_encoder, rrModule_cfg)
 
         gyro = AHRS.create_spi()
+        #gyro = AHRS.create_spi(wpilib._wpilib.SerialPort.Port, 500000, 50)
         
         swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg, target_cfg)
 
@@ -350,6 +352,8 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTimer = wpilib.Timer()
         self.autonTimer.start()
 
+        self.resetGyro()
+
     def autonomousPeriodic(self):
         if not self.auton:
             return
@@ -358,9 +362,20 @@ class MyRobot(wpilib.TimedRobot):
         if not self.swervometer:
             return
 
-        print("autonomousPeriodic")
-        self.drivetrain.goToPose(0, 100, 0)
-
+        #print("autonomousPeriodic")
+        x, y, rcw = self.swervometer.getCOF()
+        print("auton: old position: x:", x, " y: ", y, " rcw: ", rcw)
+        
+        if (self.drivetrain.goToPose(15, 25, 0) == True):
+            print("AUTON: Completed move to target.")
+            x, y, rcw = self.swervometer.getCOF()
+            print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)
+        else:
+            print("AUTON: Not yet at target.") 
+            x, y, rcw = self.swervometer.getCOF()
+            print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)
+        print("============================================")
+        
     def deadzoneCorrection(self, val, deadzone):
         """
         Given the deadzone value x, the deadzone both eliminates all
