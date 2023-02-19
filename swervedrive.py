@@ -394,9 +394,14 @@ class SwerveDrive:
     def goToPose(self, x, y, rcw):
 
         currentX, currentY, currentRCW = self.swervometer.getCOF()
-        x_error = self.target_x_pid_controller.calculate(currentX, x)
+        x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
 
+        if self.target_x_pid_controller.atSetpoint():
+            print("X at set point")
+        if self.target_y_pid_controller.atSetpoint():
+            print("Y at set point")
+            
         if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
@@ -404,6 +409,9 @@ class SwerveDrive:
             self.move(x_error, y_error, rcw)
             self.update_smartdash()
             self.execute()
+            print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError())
+            print("xPositionTolerance: ", self.target_x_pid_controller.getPositionError(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance())
+            print("currentX: ", currentX, " x: ", x, "x_error: ", x_error, " currentY: ", currentY, " y: ", y, " y_error: ", y_error)
             return False
 
     def _calculate_vectors(self):

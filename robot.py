@@ -232,8 +232,8 @@ class MyRobot(wpilib.TimedRobot):
         rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_driveMotor_encoder, rlModule_rotateMotor, rlModule_rotateMotor_encoder, rlModule_cfg)
         rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_rotateMotor_encoder, rrModule_cfg)
 
-        gyro = AHRS.create_spi()
-        #gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
+        #gyro = AHRS.create_spi()
+        gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
         swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg, target_cfg)
 
@@ -366,7 +366,7 @@ class MyRobot(wpilib.TimedRobot):
         x, y, rcw = self.swervometer.getCOF()
         print("auton: old position: x:", x, " y: ", y, " rcw: ", rcw)
         
-        if (self.drivetrain.goToPose(15, 25, 0) == True):
+        if (self.drivetrain.goToPose(15, 15, 0) == True):
             print("AUTON: Completed move to target.")
             x, y, rcw = self.swervometer.getCOF()
             print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)

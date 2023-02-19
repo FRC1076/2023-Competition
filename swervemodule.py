@@ -35,13 +35,13 @@ class SwerveModule:
         self.encoder_zero = self.cfg.zero or 0 #idk the point of this, maybe useful for other encoder type
         angle = ((self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360) +90
         if angle >= 90 and angle <= 270:
-            self.positionSign = 1 
+            self.positionSign = +1 
             self.moduleFlipped = False
-            print("SwerveModule Init (90 <= theta <= 270): positionSign: ", self.positionSign, " angle: ", angle)
+            #print("SwerveModule Init (90 <= theta <= 270): positionSign: ", self.positionSign, " angle: ", angle)
         else:
             self.positionSign = -1
             self.moduleFlipped = True
-            print("SwerveModule Init (theta < 90 or theta > 270): positionSign: ", self.positionSign, " angle: ", angle)
+            #print("SwerveModule Init (theta < 90 or theta > 270): positionSign: ", self.positionSign, " angle: ", angle)
 
         self.driveMotor.setOpenLoopRampRate(1)
         #print("Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
@@ -75,13 +75,14 @@ class SwerveModule:
         self.sd.putNumber('Heading kD', self.heading_pid_controller.getD())
 
     def reset(self):
-        print("In swervemodule reset")
+        
+        #print("In swervemodule reset")
 
         self.driveEncoder.setPosition(0)
         self.driveEncoder.setPositionConversionFactor(self.cfg.position_conversion)
         self.lastPosition = self.driveEncoder.getPosition()
 
-        print("in module reset: position: ", self.lastPosition * self.positionSign)
+        #print("in module reset: position: ", self.lastPosition * self.positionSign)
 
         #angle = (self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360
         #self.moduleFlipped = False
@@ -246,7 +247,7 @@ class SwerveModule:
 
         self.newPosition = self.driveEncoder.getPosition()
         self.positionChange = (self.newPosition - self.lastPosition) * self.positionSign
-        print("Position Change: ", self.PositionChange, " Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
+        #print("Position Change: ", self.positionChange, " New: ", self.newPosition, " Last: ", self.lastPosition, " Sign: ", self.positionSign)
         self.newAngle = self.get_current_angle()
         self.lastPosition = self.newPosition # save it for next time
 

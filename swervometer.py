@@ -54,17 +54,17 @@ class Swervometer:
         self.currentRCW = rcw
 
     def calculateModuleCoordinates(self, psi, currentGyroAngle, hypotenuse, positionChange, wheelAngle):
-        print("calcModCoord: psi: ", psi, " currentGyroAngle: ", currentGyroAngle, " hypo: ", hypotenuse, " posChg: ", positionChange, " wheelAngle: ", wheelAngle)
+        #print("calcModCoord: psi: ", psi, " currentGyroAngle: ", currentGyroAngle, " hypo: ", hypotenuse, " posChg: ", positionChange, " wheelAngle: ", wheelAngle)
         
         baseAngle = (psi + currentGyroAngle) % 360 # angle of the module
         swerveModuleOffsetXCoordinate = hypotenuse * math.sin(math.radians(baseAngle)) # X-position of the module
         swerveModuleOffsetYCoordinate = hypotenuse * math.cos(math.radians(baseAngle)) # Y-position of the module
         #print("baseAngle: ", baseAngle, " swerveModuleOffsetXCoordinate: ", swerveModuleOffsetXCoordinate, " swerveModuleOffsetYCoordinate: ", swerveModuleOffsetYCoordinate)
 
-        combinedAngle = (baseAngle + wheelAngle) % 360 # angle of the wheel
+        combinedAngle = (currentGyroAngle + wheelAngle) % 360 # angle of the wheel
         XChange = positionChange * math.sin(math.radians(combinedAngle)) # change in X-position of the module
         YChange = positionChange * math.cos(math.radians(combinedAngle)) # change in Y-position of the module
-        print("combinedAngle: ", combinedAngle, "sin(rad(combinedAngle)): ", math.sin(math.radians(combinedAngle)), "cos(rad(combinedAngle)): ", math.cos(math.radians(combinedAngle)), " XChange: ", XChange, " YChange: ", YChange)
+        #print("combinedAngle: ", combinedAngle, "sin(rad(combinedAngle)): ", math.sin(math.radians(combinedAngle)), "cos(rad(combinedAngle)): ", math.cos(math.radians(combinedAngle)), " XChange: ", XChange, " YChange: ", YChange)
 
         XCoordinate = self.currentX + swerveModuleOffsetXCoordinate + XChange # current X-coordinate of COF plus swerve module offset plus movement
         YCoordinate = self.currentY + swerveModuleOffsetYCoordinate + YChange # current Y-coordinate of COF plus swerve module offset plus movement
@@ -95,21 +95,21 @@ class Swervometer:
             positionChange = modules[key].positionChange
 
             # wheelAngle is the angle of the module wheel relative to the frame of the bot
-            wheelAngle = (modules[key].newAngle - 90) % 360
+            wheelAngle = (modules[key].newAngle - 90) % 360 # The 90 is because the orientation of the swervemodules seems to be 90 degrees off from the orientation of the bot.
             
             # Each of these calculations is different because positionChange, newAngle, and psi are different for each corner
             if (key == 'front_right'):
                 frontRightXCoordinate, frontRightYCoordinate = self.calculateModuleCoordinates(frontRightPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("fr: pc: ", positionChange, " psi: ", frontRightPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "frx: ", frontRightXCoordinate, "fry: ", frontRightYCoordinate)
+                #print("fr: pc: ", positionChange, " psi: ", frontRightPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "frx: ", frontRightXCoordinate, "fry: ", frontRightYCoordinate)
             elif (key == 'rear_right'):
                 rearRightXCoordinate, rearRightYCoordinate = self.calculateModuleCoordinates(rearRightPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("rr: pc: ", positionChange, " psi: ", rearRightPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "rrx: ", rearRightXCoordinate, "rry: ", rearRightYCoordinate)
+                #print("rr: pc: ", positionChange, " psi: ", rearRightPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "rrx: ", rearRightXCoordinate, "rry: ", rearRightYCoordinate)
             elif (key == 'rear_left'):
                 rearLeftXCoordinate, rearLeftYCoordinate = self.calculateModuleCoordinates(rearLeftPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("rl: pc: ", positionChange, " psi: ", rearLeftPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "rlx: ", rearLeftXCoordinate, "rly: ", rearLeftYCoordinate)
+                #print("rl: pc: ", positionChange, " psi: ", rearLeftPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "rlx: ", rearLeftXCoordinate, "rly: ", rearLeftYCoordinate)
             else: # (key == 'front_left'):
                 frontLeftXCoordinate, frontLeftYCoordinate = self.calculateModuleCoordinates(frontLeftPsi, currentGyroAngle, hypotenuse, positionChange, wheelAngle)
-                print("fl: pc: ", positionChange, " psi: ", frontLeftPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "flx: ", frontLeftXCoordinate, "fly: ", frontLeftYCoordinate)
+                #print("fl: pc: ", positionChange, " psi: ", frontLeftPsi, " bot angle: ", currentGyroAngle, " wheel angle: ", wheelAngle, "flx: ", frontLeftXCoordinate, "fly: ", frontLeftYCoordinate)
             
         # Find average COF XY-coordinates of bot
         midpointX1 = (frontLeftXCoordinate + rearRightXCoordinate)/2
@@ -121,8 +121,8 @@ class Swervometer:
         midpointX = (midpointX1 + midpointX2)/2
         midpointY = (midpointY1 + midpointY2)/2
 
-        print("old x: ", self.currentX, " old y: ", self.currentY)
-        print("draft x1:", midpointX1, "draft x2:", midpointX2, "draft x: ", midpointX, "draft y1:", midpointY1, "draft y2:", midpointY2, " draft y: ", midpointY)
+        #print("old x: ", self.currentX, " old y: ", self.currentY)
+        #print("draft x1:", midpointX1, "draft x2:", midpointX2, "draft x: ", midpointX, "draft y1:", midpointY1, "draft y2:", midpointY2, " draft y: ", midpointY)
 
         # Reset pose of bot.
         self.currentX = midpointX
