@@ -353,7 +353,7 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTimer = wpilib.Timer()
         self.autonTimer.start()
 
-        self.resetGyro()
+        self.drivetrain.resetGyro()
 
     def autonomousPeriodic(self):
         if not self.auton:

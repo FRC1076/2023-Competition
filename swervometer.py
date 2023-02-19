@@ -38,9 +38,13 @@ class Swervometer:
         self.currentRCW = self.field.start_angle
         self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
-        self.movingToTarget = False
+        self.frame_dimension_x = self.robotProperty.frame_dimension_x
+        self.frame_dimension_y = self.robotProperty.frame_dimension_y
         print("init current X: ", self.currentX, " init current y: ", self.currentY, " init current rcw: ", self.currentRCW)
     
+    def getFrameDimensions(self):
+        return self.frame_dimension_x, self.frame_dimension_y
+
     def getCOF(self):
         return self.currentX, self.currentY, self.currentRCW
 

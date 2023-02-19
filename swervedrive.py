@@ -73,8 +73,8 @@ class SwerveDrive:
         self.squared_inputs = False
         self.threshold_input_vectors = True
 
-        self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
-        self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
+        #self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
+        #self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
 
         self.wheel_lock = False
         
@@ -139,9 +139,6 @@ class SwerveDrive:
         self.squared_inputs = False
         self.threshold_input_vectors = True
 
-        # Variable that tracks whether robot is en route to destination
-        self.swervometer.setMovingToTarget(False)
-
         self.wheel_lock = False
         
         for key in self.modules:
@@ -149,15 +146,6 @@ class SwerveDrive:
 
         self.resetGyro()
 
-
-    @property
-    def chassis_dimension(self):
-        return (self.width, self.length)
-
-    @chassis_dimension.setter
-    def chassis_dimension(self, dimension):
-        self.width = dimension[0]
-        self.length = dimension[1]
 
     @staticmethod
     def square_input(input):
@@ -458,13 +446,14 @@ class SwerveDrive:
                     #print("testing wheel lock")
                 return
         
-        ratio = math.hypot(self.length, self.width)
+        frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
+        ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
         # Velocities per quadrant
-        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
-        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
-        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
-        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
+        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
         frontLeft_speed = math.hypot(frontX, rightY)
