@@ -65,10 +65,8 @@ class MyRobot(wpilib.TimedRobot):
                 controllers = self.initControllers(config)
                 self.driver = controllers[0]
                 self.operator = controllers[1]
-            if key == 'DRIVETRAIN':
-                self.drivetrain = self.initDrivetrain(config)
             if key == 'AUTON':
-                self.auton = self.initAuton(config
+                self.auton = self.initAuton(config)
             if key == 'VISION':
                 self.vision = self.initVision(config)
             if key == 'SWERVOMETER':
@@ -77,6 +75,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.grabber = self.initGrabber(config)
             if key == 'INTAKE':
                 self.intake = self.initIntake(config)
+            if key == 'DRIVETRAIN':
+                self.drivetrain = self.initDrivetrain(config)
 
         self.periods = 0
 
@@ -202,10 +202,18 @@ class MyRobot(wpilib.TimedRobot):
         swervometer = Swervometer(field_cfg, robot_cfg)
 
         return swervometer
+
+    
+    def initVision(self, config):
+        vision = Vision(NetworkTables.getTable('limelight'))
+
+        return vision
+
         
     def initGrabber(self, config):
         grabber = Grabber(config['RIGHT_I'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
         return grabber
+
 
     def initAuton(self, config):
         self.autonHookUpTime = config['HOOK_UP_TIME']
@@ -260,7 +268,7 @@ class MyRobot(wpilib.TimedRobot):
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg, target_cfg)
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg)
 
         return swerve
 
@@ -276,10 +284,6 @@ class MyRobot(wpilib.TimedRobot):
 
         return True
 
-    def initVision(self, config):
-        vision = Vision(NetworkTables.getTable('limelight'))
-
-        return vision
 
     def robotPeriodic(self):
         return True
@@ -358,7 +362,6 @@ class MyRobot(wpilib.TimedRobot):
         #elif self.gamempad.getPOV() == 270:
         #    self.drive.set_raw_strafe(-0.35)
         return
-    
 
 
     def teleopGrabber(self):
