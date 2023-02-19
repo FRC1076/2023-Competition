@@ -23,6 +23,61 @@ controllerConfig = {
     }
 }
 
+
+swervometerConfig = { # All positions measured in inches
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
+    'HAS_BUMPERS_ATTACHED': False, # Does the robot currently have bumpers attached?
+    'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (lower left from red start)
+    'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (lower left from red start)
+    'FIELD_RED_A_START_POSITION_X': 0.0, #159.0, # X-Coordinate of starting position A when on red team
+    'FIELD_RED_A_START_POSITION_Y': 0.0, #54.25, # Y-Coordinate of starting postion A when on red team
+    'FIELD_RED_A_START_ANGLE': 0.0, # Heading angle of starting position A when on red team
+    'FIELD_RED_B_START_POSITION_X': 225.0, # X-Coordinate of starting position B when on red team
+    'FIELD_RED_B_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion B when on red team
+    'FIELD_RED_B_START_ANGLE': 0.0, # Heading angle of starting position B when on red team
+    'FIELD_RED_C_START_POSITION_X': 291.0, # X-Coordinate of starting position C when on red team
+    'FIELD_RED_C_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion C when on red team
+    'FIELD_RED_C_START_ANGLE': 0.0, # Heading angle of starting position C when on red team
+    'FIELD_BLU_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on blue team
+    'FIELD_BLU_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on blue team
+    'FIELD_BLU_A_START_ANGLE': 180.0, # Heading angle of starting position A when on blue team
+    'FIELD_BLU_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on blue team
+    'FIELD_BLU_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on blue team
+    'FIELD_BLU_B_START_ANGLE': 180.0, # Heading angle of starting position B when on blue team
+    'FIELD_BLU_C_START_POSITION_X': 100.0, # X-Coordinate of starting position C when on blue team
+    'FIELD_BLU_C_START_POSITION_Y': 800.0, # Y-Coordinate of starting postion C when on blue team
+    'FIELD_BLU_C_START_ANGLE': 180.0, # Heading angle of starting position C when on blue team
+    'FIELD_TAG1_X': 500.0, # X-Coordinate of Tag ID 1
+    'FIELD_TAG1_Y': 500.0, # Y-Coordinate of Tag ID 1
+    'FIELD_TAG2_X': 500.0, # X-Coordinate of Tag ID 2
+    'FIELD_TAG2_Y': 500.0, # Y-Coordinate of Tag ID 2
+    'FIELD_TAG3_X': 500.0, # X-Coordinate of Tag ID 3
+    'FIELD_TAG3_Y': 500.0, # Y-Coordinate of Tag ID 3
+    'FIELD_TAG4_X': 500.0, # X-Coordinate of Tag ID 4
+    'FIELD_TAG4_Y': 500.0, # Y-Coordinate of Tag ID 4
+    'FIELD_TAG5_X': 500.0, # X-Coordinate of Tag ID 5
+    'FIELD_TAG5_Y': 500.0, # Y-Coordinate of Tag ID 5
+    'FIELD_TAG6_X': 500.0, # X-Coordinate of Tag ID 6
+    'FIELD_TAG6_Y': 500.0, # Y-Coordinate of Tag ID 6
+    'FIELD_TAG7_X': 500.0, # X-Coordinate of Tag ID 7
+    'FIELD_TAG7_Y': 500.0, # Y-Coordinate of Tag ID 7
+    'FIELD_TAG8_X': 500.0, # X-Coordinate of Tag ID 8
+    'FIELD_TAG8_Y': 500.0, # Y-Coordinate of Tag ID 8
+    'ROBOT_FRAME_DIMENSION_X': 30, #26.0, # X-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_Y': 30, #34.0, # Y-coordinate length of robot frame
+    'ROBOT_BUMPER_DIMENSION_X': 4.0, # Width of bumper (X-axis)
+    'ROBOT_BUMPER_DIMENSION_Y': 4.0, # Width of bumper (Y-axis)
+    'ROBOT_COM_OFFSET_X': 15.0, #13.0, # X-offset of center of mass (assume half frame dimension)
+    'ROBOT_COM_OFFSET_Y': 15.0, #17.0, # Y-offset of center of mass (assume half frame dimension)
+    'ROBOT_GYRO_OFFSET_X': 10.0, # X-offset of center of gyro (relative to lower left frame)
+    'ROBOT_GYRO_OFFSET_Y': 5.0, # Y-offset of center of gyro (relative to lower left frame)
+    'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_SWERVE_MODULE_OFFSET_X': 11.75, #9.75, # X-offset of swerve module center from COM
+    'ROBOT_SWERVE_MODULE_OFFSET_Y': 11.75, #13.75, # X-offset of swerve module center from COM
+}
+
 drivetrainConfig = {
     'FRONTLEFT_DRIVEMOTOR': 1,
     'FRONTRIGHT_DRIVEMOTOR': 2,
@@ -38,6 +93,19 @@ drivetrainConfig = {
     'REARLEFT_ENCODER': 24,
     'DRIVETYPE': SWERVE,
     'ROTATION_CORRECTION': 0.0,
+    'HEADING_KP': 0.005, #0.005 - reverted to this
+    'HEADING_KI': 0.00001, #0.00001 - reverted to this
+    'HEADING_KD':  0.00001, #0.00001 - reverted to this
+    'BALANCE_PITCH_KP': 0.01,
+    'BALANCE_PITCH_KI': 0.00001,
+    'BALANCE_PITCH_KD':  0.0005,
+    'BALANCE_YAW_KP': 0.005,
+    'BALANCE_YAW_KI': 0.00001,
+    'BALANCE_YAW_KD': 0.00001,
+    'TARGET_KP': 0.005,
+    'TARGET_KI': 0.00001,
+    'TARGET_KD': 0.0001,
+    'ROBOT_INCHES_PER_ROTATION': 1.793, # Inches per rotation of wheels
 }
 
 shooterConfig = {
@@ -47,9 +115,7 @@ shooterConfig = {
 
 intakeConfig = {
     # Update IDs when known
-    'INTAKE_MOTOR_ID': 17,
-    'INTAKE_SOLENOID_FORWARD_ID': 1,
-    'INTAKE_SOLENOID_REVERSE_ID': 2,
+    'INTAKE_MOTOR_ID': -1
 }
 
 feederConfig = {
@@ -81,44 +147,19 @@ visionConfig = {
 }
 
 autonConfig = {
-    'HOOK_UP_TIME': 0.5,
-    'DRIVE_FORWARD_TIME': 0.75,
-    'HOOK_DOWN_TIME': 2.0,
-    'DRIVE_BACKWARD_TIME': 2.5,
-    'AUTON_SPEED_FORWARD': 0.8,
-    'AUTON_SPEED_BACKWARD': 0.5,
+    'SCORE_EXISTING': True,
+    'PICKUP_NEW': False,
+    'SCORE_NEW': False,
+    'BALANCE_BOT': True,
 }
 
-climberConfig = {
-    'WINCH_LEFT_ID': 6,
-    'WINCH_RIGHT_ID': 14,
-    # Pneumatic board IDs
-    'SOLENOID_FORWARD_ID': 6,
-    'SOLENOID_REVERSE_ID': 0,
-    # DIO pin numbers
-    'LEFT_LIMIT_ID': 0,
-    'RIGHT_LIMIT_ID': 1,
-    'CABLE_WRAPPED': 'UNDER',
-    # Both speeds positive.
-    # Extend speed must be lower than natural extend rate
-    'EXTEND_SPEED': 0.2,
-    'RETRACT_SPEED': 0.5,
-}
-
-hooksConfig = {
-    'FRONT_HOOK_ID': 5,
-    'BACK_HOOK_ID': 6,
-    'LEFT_HOOK_ID': 7,
-    'RIGHT_HOOK_ID': 8,
-
-    'FRONT_TOP_PORT': 0,
-    'FRONT_BOTTOM_PORT': 1,
-    'BACK_TOP_PORT': 2,
-    'BACK_BOTTOM_PORT': 3,
-    'LEFT_TOP_PORT': 4,
-    'LEFT_BOTTOM_PORT': 5,
-    'RIGHT_TOP_PORT': 6,
-    'RIGHT_BOTTOM_PORT': 7
+grabberConfig = {
+    'RIGHT_ID': -1,
+    'LEFT_ID': -1,
+    'INTAKE_TOP_ID': -1,
+    'INTAKE_BOTTOM_ID': -1,
+    'SOLENOID_FORWARD_ID': -1,
+    'SOLENOID_REVERSE_ID': -1
 }
 
 visionConfig = {
@@ -130,51 +171,24 @@ visionConfig = {
 #######################
 testbot = { # Always used for unit tests ($ python robot.py sim)
     'CONTROLLERS': controllerConfig,
+    'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'SHOOTER': shooterConfig,
-    'INTAKE': intakeConfig,
-    'FEEDER': feederConfig,
-    'TILTSHOOTER': tiltShooterConfig,
-    'AIMER': aimerConfig,
     'VISION': visionConfig,
     'AUTON': autonConfig,
-    'CLIMBER': climberConfig,
-    'HOOKS': hooksConfig
-}
-
-gull_lake = {
-    'CONTROLLERS': controllerConfig,
-    'DRIVETRAIN': drivetrainConfig,
-    'AIMER': aimerConfig,
-    'VISION': visionConfig,
-    'TILTSHOOTER': tiltShooterConfig,
-    'SHOOTER': shooterConfig,
-    'FEEDER': feederConfig,
-    'AUTON': autonConfig,
-    'CLIMBER': climberConfig,
-    'HOOKS': hooksConfig
+    'GRABBER': grabberConfig,
+    'INTAKE': intakeConfig
 }
 
 showbot = {
     'CONTROLLERS': controllerConfig,
+    'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'AIMER': aimerConfig,
-    'VISION': visionConfig,
-    'SHOOTER': shooterConfig,
-    'HOOKS': hooksConfig
+    'AUTON': autonConfig,
 }
 
-testBot = {
-    'CONTROLLERS': controllerConfig,
-    'DRIVETRAIN': drivetrainConfig,
-    'HOOKS': hooksConfig,
-    'VISION': visionConfig,
-    'AUTON': autonConfig
-}
-
-showbot['SHOOTER']['SHOOTER_ID'] = 10 # how to override just one thing
+#showbot['DRIVETRAIN']['FRONTLEFT_DRIVEMOTOR'] = 1 # how to override just one thing
 
 ##########################
 ###  CONFIG TO DEPLOY  ###
 ##########################
-robotconfig = testBot
+robotconfig = testbot
