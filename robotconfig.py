@@ -113,8 +113,10 @@ visionConfig = {
 }
 
 cliffDetectorConfig = {
-    'LEFT_CLIFF_DETECTOR': 51, # CAN ID
-    'RIGHT_CLIFF_DETECTOR': 52, # CAN ID
+    'LEFT_CLIFF_DETECTOR_ECHOID': 1,
+    'LEFT_CLIFF_DETECTOR_PINGID': 0,
+    'RIGHT_CLIFF_DETECTOR_ECHOID': 3,
+    'RIGHT_CLIFF_DETECTOR_PINGID': 2,
     'CLIFF_TOLERANCE': 2, # Centimeters?
 }
 

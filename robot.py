@@ -242,10 +242,18 @@ class MyRobot(wpilib.TimedRobot):
         return True
 
     def initCliffDetector(self, config):
-        cliffDetector = CliffDetector(config['LEFT_CLIFF_DETECTOR'], config['RIGHT_CLIFF_DETECTOR'], config['CLIFF_TOLERANCE'])
+        print(config)
+        cliffDetector = CliffDetector(
+            config['LEFT_CLIFF_DETECTOR_PINGID'], 
+            config['LEFT_CLIFF_DETECTOR_ECHOID'], 
+            config['RIGHT_CLIFF_DETECTOR_PINGID'],
+            config['RIGHT_CLIFF_DETECTOR_ECHOID'],
+            config['CLIFF_TOLERANCE'])
         return cliffDetector
 
     def robotPeriodic(self):
+        print('hi')
+        self.cliffDetector.update()
         return True
 
     def teleopInit(self):
