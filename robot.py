@@ -211,7 +211,7 @@ class MyRobot(wpilib.TimedRobot):
 
         
     def initGrabber(self, config):
-        grabber = Grabber(config['RIGHT_I'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+        grabber = Grabber(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
         return grabber
 
 
@@ -254,6 +254,12 @@ class MyRobot(wpilib.TimedRobot):
         rlModule_driveMotor_encoder = rlModule_driveMotor.getEncoder()
         rrModule_driveMotor = rev.CANSparkMax(config['REARRIGHT_DRIVEMOTOR'], motor_type)
         rrModule_driveMotor_encoder = rrModule_driveMotor.getEncoder()
+
+        # Rotate motors
+        flModule_rotateMotor = rev.CANSparkMax(config['FRONTLEFT_ROTATEMOTOR'], motor_type)
+        frModule_rotateMotor = rev.CANSparkMax(config['FRONTRIGHT_ROTATEMOTOR'], motor_type)
+        rlModule_rotateMotor = rev.CANSparkMax(config['REARLEFT_ROTATEMOTOR'], motor_type)
+        rrModule_rotateMotor = rev.CANSparkMax(config['REARRIGHT_ROTATEMOTOR'], motor_type)
 
         flModule_rotateMotor_encoder = ctre.CANCoder(config['FRONTLEFT_ENCODER'])
         frModule_rotateMotor_encoder = ctre.CANCoder(config['FRONTRIGHT_ENCODER'])
