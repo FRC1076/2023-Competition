@@ -111,6 +111,8 @@ class SwerveDrive:
         self.target_x_pid_controller.setTolerance(0.5, 0.5)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         self.target_y_pid_controller.setTolerance(0.5, 0.5)
+        self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
+        self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
         
     def reset(self):
         print("In swervedrive reset")
@@ -399,22 +401,25 @@ class SwerveDrive:
         currentX, currentY, currentRCW = self.swervometer.getCOF()
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
+        rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
 
         if self.target_x_pid_controller.atSetpoint():
             print("X at set point")
         if self.target_y_pid_controller.atSetpoint():
             print("Y at set point")
+        if self.target_rcw_pid_controller.atSetpoint():
+            print("RCW at set point")
             
-        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
+        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
         else:
             self.move(x_error, y_error, rcw)
             self.update_smartdash()
             self.execute()
-            print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError())
-            print("xPositionTolerance: ", self.target_x_pid_controller.getPositionError(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance())
-            print("currentX: ", currentX, " x: ", x, "x_error: ", x_error, " currentY: ", currentY, " y: ", y, " y_error: ", y_error)
+            print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
+            print("xPositionTolerance: ", self.target_x_pid_controller.getPositionError(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
+            print("currentX: ", currentX, " x: ", x, "x_error: ", x_error, " currentY: ", currentY, " y: ", y, " y_error: ", y_error, " currentRCW: ", currentRCW, " rcw: ", rcw, " rcw_error: ", rcw_error)
             return False
 
     def _calculate_vectors(self):
