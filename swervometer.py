@@ -18,9 +18,11 @@ FieldConfig = namedtuple('FieldConfig', ['sd_prefix',
 # Create the structure of the robot property config: 
 RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',
                                                          'is_red_team',
+                                                         'team_gyro_adjustment',
+                                                         'team_move_adjustment',
                                                          'frame_dimension_x', 'frame_dimension_y',
                                                          'bumper_dimension_x', 'bumper_dimension_y',
-                                                         'com_offset_x', 'com_offset_y',
+                                                         'cof_offset_x', 'cof_offset_y',
                                                          'gyro_offset_x', 'gyro_offset_y',
                                                          'camera_offset_x', 'camera_offset_y',
                                                          'swerve_module_offset_x', 'swerve_module_offset_y'])
@@ -29,12 +31,14 @@ class Swervometer:
     def __init__(self, field_cfg, robot_property_cfg):
         self.field = field_cfg
         self.robotProperty = robot_property_cfg
+        self.teamGyroAdjustment=self.robotProperty.team_gyro_adjustment
+        self.teamMoveAdjustment=self.robotProperty.team_move_adjustment
         print("field.orgin_x", self.field.origin_x, " field.origin_y", self.field.origin_y)
         print("field.start_position_x: ", self.field.start_position_x, " field.start_position_y: ", self.field.start_position_y)
         print("bumper_dimension_x: ", self.robotProperty.bumper_dimension_x, " bumper_dimension_y: ", self.robotProperty.bumper_dimension_y)
-        print("com_offset_x: ", self.robotProperty.com_offset_x, " com_offset_y: ", self.robotProperty.com_offset_y)
-        self.currentX = self.field.origin_x + self.field.start_position_x + self.robotProperty.bumper_dimension_x + self.robotProperty.com_offset_x
-        self.currentY = self.field.origin_y + self.field.start_position_y + self.robotProperty.bumper_dimension_y + self.robotProperty.com_offset_y
+        print("cof_offset_x: ", self.robotProperty.cof_offset_x, " cof_offset_y: ", self.robotProperty.cof_offset_y)
+        self.currentX = self.field.origin_x + self.field.start_position_x + self.robotProperty.bumper_dimension_x + self.robotProperty.cof_offset_x
+        self.currentY = self.field.origin_y + self.field.start_position_y + self.robotProperty.bumper_dimension_y + self.robotProperty.cof_offset_y
         self.currentRCW = self.field.start_angle
         self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
@@ -44,6 +48,12 @@ class Swervometer:
     
     def getFrameDimensions(self):
         return self.frame_dimension_x, self.frame_dimension_y
+
+    def getTeamGyroAdjustment(self):
+        return self.teamGyroAdjustment
+
+    def getTeamMoveAdjustment(self):
+        return self.teamMoveAdjustment
 
     def getCOF(self):
         return self.currentX, self.currentY, self.currentRCW
@@ -137,8 +147,8 @@ class Swervometer:
 
         tagX, tagY = self.getTagPosition(tagNum)
 
-        self.currentX = tagX - x - (self.field.camera_offset_x - self.field.com_offset_x)
-        self.currentY = tagY - y - (self.field.camera_offset_y - self.field.com_offset_y)
+        self.currentX = tagX - x - (self.field.camera_offset_x - self.field.cof_offset_x)
+        self.currentY = tagY - y - (self.field.camera_offset_y - self.field.cof_offset_y)
         self.currentRCW = rcw
         return self.currentX, self.currentY, self.currentRCW
 

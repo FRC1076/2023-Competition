@@ -245,7 +245,8 @@ class SwerveModule:
 
         #print("Angle: ", self.get_current_angle(), " Absolute Position: ", self.sd_prefix, " ", self.encoder.getAbsolutePosition(), self.encoder_zero, self.encoder.getAbsolutePosition() - self.encoder_zero)
 
-        self.newPosition = self.driveEncoder.getPosition()
+        self.newPosition = self.driveEncoder.getPosition() * 1.79
+        #print("FACTOR: ", self.driveEncoder.getPositionConversionFactor())
         self.positionChange = (self.newPosition - self.lastPosition) * self.positionSign
         #print("Position Change: ", self.positionChange, " New: ", self.newPosition, " Last: ", self.lastPosition, " Sign: ", self.positionSign)
         self.newAngle = self.get_current_angle()
