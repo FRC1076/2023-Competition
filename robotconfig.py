@@ -28,8 +28,8 @@ swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': False, # Does the robot currently have bumpers attached?
-    'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (lower left from red start)
-    'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (lower left from red start)
+    'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
+    'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_RED_A_START_POSITION_X': 0.0, #159.0, # X-Coordinate of starting position A when on red team
     'FIELD_RED_A_START_POSITION_Y': 0.0, #54.25, # Y-Coordinate of starting postion A when on red team
     'FIELD_RED_A_START_ANGLE': 0.0, # Heading angle of starting position A when on red team
@@ -64,18 +64,18 @@ swervometerConfig = { # All positions measured in inches
     'FIELD_TAG7_Y': 500.0, # Y-Coordinate of Tag ID 7
     'FIELD_TAG8_X': 500.0, # X-Coordinate of Tag ID 8
     'FIELD_TAG8_Y': 500.0, # Y-Coordinate of Tag ID 8
-    'ROBOT_FRAME_DIMENSION_X': 30, #26.0, # X-coordinate length of robot frame
-    'ROBOT_FRAME_DIMENSION_Y': 30, #34.0, # Y-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_X': 34.0, # X-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_Y': 26.0, # Y-coordinate length of robot frame
     'ROBOT_BUMPER_DIMENSION_X': 4.0, # Width of bumper (X-axis)
     'ROBOT_BUMPER_DIMENSION_Y': 4.0, # Width of bumper (Y-axis)
-    'ROBOT_COM_OFFSET_X': 15.0, #13.0, # X-offset of center of mass (assume half frame dimension)
-    'ROBOT_COM_OFFSET_Y': 15.0, #17.0, # Y-offset of center of mass (assume half frame dimension)
-    'ROBOT_GYRO_OFFSET_X': 10.0, # X-offset of center of gyro (relative to lower left frame)
-    'ROBOT_GYRO_OFFSET_Y': 5.0, # Y-offset of center of gyro (relative to lower left frame)
+    'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
+    'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
+    'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
+    'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
-    'ROBOT_SWERVE_MODULE_OFFSET_X': 11.75, #9.75, # X-offset of swerve module center from COM
-    'ROBOT_SWERVE_MODULE_OFFSET_Y': 11.75, #13.75, # X-offset of swerve module center from COM
+    'ROBOT_SWERVE_MODULE_OFFSET_X': 13.75, # X-offset of swerve module center from COF
+    'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
 }
 
 drivetrainConfig = {
@@ -105,7 +105,7 @@ drivetrainConfig = {
     'TARGET_KP': 0.005,
     'TARGET_KI': 0.00001,
     'TARGET_KD': 0.0001,
-    'ROBOT_INCHES_PER_ROTATION': 1.793, # Inches per rotation of wheels
+    'ROBOT_INCHES_PER_ROTATION': 1.0 #1.793, # Inches per rotation of wheels
 }
 
 visionConfig = {
