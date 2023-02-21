@@ -67,13 +67,13 @@ class Swervometer:
         #print("calcModCoord: psi: ", psi, " currentGyroAngle: ", currentGyroAngle, " hypo: ", hypotenuse, " posChg: ", positionChange, " wheelAngle: ", wheelAngle)
         
         baseAngle = (psi + currentGyroAngle) % 360 # angle of the module
-        swerveModuleOffsetXCoordinate = hypotenuse * math.sin(math.radians(baseAngle)) # X-position of the module
-        swerveModuleOffsetYCoordinate = hypotenuse * math.cos(math.radians(baseAngle)) # Y-position of the module
+        swerveModuleOffsetXCoordinate = hypotenuse * math.cos(math.radians(baseAngle)) # X-position of the module
+        swerveModuleOffsetYCoordinate = hypotenuse * math.sin(math.radians(baseAngle)) # Y-position of the module
         #print("baseAngle: ", baseAngle, " swerveModuleOffsetXCoordinate: ", swerveModuleOffsetXCoordinate, " swerveModuleOffsetYCoordinate: ", swerveModuleOffsetYCoordinate)
 
         combinedAngle = (currentGyroAngle + wheelAngle) % 360 # angle of the wheel
-        XChange = positionChange * math.sin(math.radians(combinedAngle)) # change in X-position of the module
-        YChange = positionChange * math.cos(math.radians(combinedAngle)) # change in Y-position of the module
+        XChange = positionChange * math.cos(math.radians(combinedAngle)) # change in X-position of the module
+        YChange = positionChange * math.sin(math.radians(combinedAngle)) # change in Y-position of the module
         #print("combinedAngle: ", combinedAngle, "sin(rad(combinedAngle)): ", math.sin(math.radians(combinedAngle)), "cos(rad(combinedAngle)): ", math.cos(math.radians(combinedAngle)), " XChange: ", XChange, " YChange: ", YChange)
 
         XCoordinate = self.currentX + swerveModuleOffsetXCoordinate + XChange # current X-coordinate of COF plus swerve module offset plus movement
@@ -92,7 +92,7 @@ class Swervometer:
         # Mod 360 shouldn't be needed.
         # Although we recalculate it here, each psi and the hypotenuse are constants.
 
-        frontRightPsi = math.degrees(math.atan(self.swerveModuleOffsetX / self.swerveModuleOffsetY)) % 360
+        frontRightPsi = math.degrees(math.atan(self.swerveModuleOffsetY / self.swerveModuleOffsetX)) % 360
         rearRightPsi = (frontRightPsi + 90) % 360
         rearLeftPsi = (frontRightPsi + 180) % 360
         frontLeftPsi = (frontRightPsi + 270) % 360
@@ -105,7 +105,7 @@ class Swervometer:
             positionChange = modules[key].positionChange
 
             # wheelAngle is the angle of the module wheel relative to the frame of the bot
-            wheelAngle = (modules[key].newAngle - 90) % 360 # The 90 is because the orientation of the swervemodules seems to be 90 degrees off from the orientation of the bot.
+            wheelAngle = (modules[key].newAngle - 90) % 360 # The -90 is because the orientation of the swervemodules seems to be negative 90 degrees off from the orientation of the bot.
             
             # Each of these calculations is different because positionChange, newAngle, and psi are different for each corner
             if (key == 'front_right'):
