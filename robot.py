@@ -97,43 +97,46 @@ class MyRobot(wpilib.TimedRobot):
         print("initSwervometer ran")
         
         if (config['TEAM_IS_RED']):
-            team_is_red = True
-            team_is_blu = False
+            self.team_is_red = True
+            self.team_is_blu = False
         else:
-            team_is_red = False
-            team_is_blu = True
+            self.team_is_red = False
+            self.team_is_blu = True
 
-        self.dashboard.putBoolean('Team is Red', team_is_red)
+        self.dashboard.putBoolean('Team is Red', self.team_is_red)
 
         print("FIELD_START_POSITION:", config['FIELD_START_POSITION'])
 
         if (config['FIELD_START_POSITION'] == 'A'):
             self.dashboard.putString('Field Start Position', 'A')
-            if team_is_red:
+            self.fieldStartPosition = 'A'
+            if self.team_is_red:
                 starting_position_x = config['FIELD_RED_A_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_A_START_POSITION_Y']
                 starting_angle = config['FIELD_RED_A_START_ANGLE']
-            else: # team_is_blu
+            else: # self.team_is_blu
                 starting_position_x = config['FIELD_BLU_A_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_A_START_ANGLE']
         elif (config['FIELD_START_POSITION'] == 'B'):
             self.dashboard.putString('Field Start Position', 'B')
-            if team_is_red:
+            self.fieldStartPosition = 'B'
+            if self.team_is_red:
                 starting_position_x = config['FIELD_RED_B_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_B_START_POSITION_Y']
                 starting_angle = config['FIELD_RED_B_START_ANGLE']
-            else: # team_is_blu
+            else: # self.team_is_blu
                 starting_position_x = config['FIELD_BLU_B_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_B_START_ANGLE']
         else: # config['FIELD_START_POSITION'] == 'C'
             self.dashboard.putString('Field Start Position', 'C')
-            if team_is_red:
+            self.fieldStartPosition = 'C'
+            if self.team_is_red:
                 starting_position_x = config['FIELD_RED_C_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_C_START_POSITION_Y']
                 starting_angle = config['FIELD_RED_C_START_ANGLE']
-            else: # team_is_blu
+            else: # self.team_is_blu
                 starting_position_x = config['FIELD_BLU_C_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_C_START_ANGLE']
@@ -172,7 +175,7 @@ class MyRobot(wpilib.TimedRobot):
                                 tag8_y=config['FIELD_TAG8_Y'])
         
         robot_cfg = RobotPropertyConfig(sd_prefix='Robot_Property_Module',
-                                is_red_team=team_is_red,
+                                is_red_team=self.team_is_red,
                                 frame_dimension_x=config['ROBOT_FRAME_DIMENSION_X'],
                                 frame_dimension_y=config['ROBOT_FRAME_DIMENSION_Y'],
                                 bumper_dimension_x=actual_bumper_dimension_x,
@@ -249,6 +252,15 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard.putNumber('Auton Pickup New Element', self.autonPickupNew)
         self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
         self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
+
+        if (self.team_is_red
+            and self.autonScoreExisting
+            and self.fieldStartPosition == 'B'
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+            self.autonPath = config['RED_B_TFFT']
+            self.drivetrain.followPath(self.autonPath)
 
         return True
 
@@ -362,11 +374,13 @@ class MyRobot(wpilib.TimedRobot):
         if not self.swervometer:
             return
 
-        #print("autonomousPeriodic")
+        #self.drivetrain.followPath(self.autonPath)
+
+        print("autonomousPeriodic")
         x, y, rcw = self.swervometer.getCOF()
         print("auton: old position: x:", x, " y: ", y, " rcw: ", rcw)
         
-        if (self.drivetrain.goToPose(15, 15, 0) == True):
+        if (self.drivetrain.goToPose(27, 13, 0) == True):
             print("AUTON: Completed move to target.")
             x, y, rcw = self.swervometer.getCOF()
             print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)

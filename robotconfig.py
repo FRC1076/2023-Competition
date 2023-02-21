@@ -103,7 +103,7 @@ drivetrainConfig = {
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
     'TARGET_KP': 0.005,
-    'TARGET_KI': 0.00001,
+    'TARGET_KI': 0.0025,
     'TARGET_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.793, # Inches per rotation of wheels
 }
@@ -122,6 +122,7 @@ autonConfig = {
     'PICKUP_NEW': False,
     'SCORE_NEW': False,
     'BALANCE_BOT': True,
+    'RED_B_TFFT': [[15, 45, 0], [15, 30, 0]]
 }
 
 #######################

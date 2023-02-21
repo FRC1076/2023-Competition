@@ -77,6 +77,8 @@ class SwerveDrive:
         #self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
 
         self.wheel_lock = False
+
+        self.poseCounter = 0
         
         self.balance_config = _balance_cfg
         self.balance_pitch_kP = self.balance_config.balance_pitch_kP
@@ -414,6 +416,35 @@ class SwerveDrive:
             print("currentX: ", currentX, " x: ", x, "x_error: ", x_error, " currentY: ", currentY, " y: ", y, " y_error: ", y_error)
             return False
 
+    def setPoseCounter(self, _poseCounter):
+        self.poseCounter = _poseCounter
+
+    def followPath(self, listOfPoses):
+        
+        if self.poseCounter < 0 or self.poseCounter >= len(listOfPoses):
+            return True, True # Path must be complete or weird error condition. Assume we are done with path.
+        
+        pose = listOfPoses[self.poseCounter]
+
+        if not pose:
+            return True, True # Weird error condition. Assume we are done with path.
+
+        if len(pose) != 3:
+            return True, True # Weird error condition. Assume we are done with path.
+
+        x = pose[0]
+        y = pose[1]
+        rcw = pose[2]
+
+        if (self.goToPose(x, y, rcw) == True):
+            self.poseCounter +=1 # Go to next pose in list.
+            if self.poseCounter == len(listOfPoses):
+                return True, True # At set point for pose, and done with list of poses.
+            else:
+                return True, False # At set point for pose, but not done with list of poses.
+        else:
+            return False, False # Not yet at pose.
+        
     def _calculate_vectors(self):
         """
         Calculate the requested speed and angle of each modules from self._requested_vectors and store them in
