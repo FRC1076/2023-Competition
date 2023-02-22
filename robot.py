@@ -112,9 +112,13 @@ class MyRobot(wpilib.TimedRobot):
         if (config['TEAM_IS_RED']):
             team_is_red = True
             team_is_blu = False
+            teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
+            teamMoveAdjustment = -1 # Red Team needs to flip the controls as well.
         else:
             team_is_red = False
             team_is_blu = True
+            teamGyroAdjustment = 0 # Blue Team faces 0 degrees at start.
+            teamMoveAdjustment = 1 # Blue Team does not need to flip controlls.
 
         self.dashboard.putBoolean('Team is Red', team_is_red)
 
@@ -186,12 +190,14 @@ class MyRobot(wpilib.TimedRobot):
         
         robot_cfg = RobotPropertyConfig(sd_prefix='Robot_Property_Module',
                                 is_red_team=team_is_red,
+                                team_gyro_adjustment=teamGyroAdjustment,
+                                team_move_adjustment=teamMoveAdjustment,
                                 frame_dimension_x=config['ROBOT_FRAME_DIMENSION_X'],
                                 frame_dimension_y=config['ROBOT_FRAME_DIMENSION_Y'],
                                 bumper_dimension_x=actual_bumper_dimension_x,
                                 bumper_dimension_y=actual_bumper_dimension_y,
-                                com_offset_x=config['ROBOT_COM_OFFSET_X'],
-                                com_offset_y=config['ROBOT_COM_OFFSET_Y'],
+                                cof_offset_x=config['ROBOT_COF_OFFSET_X'],
+                                cof_offset_y=config['ROBOT_COF_OFFSET_Y'],
                                 gyro_offset_x=config['ROBOT_GYRO_OFFSET_X'],
                                 gyro_offset_y=config['ROBOT_GYRO_OFFSET_Y'],
                                 camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],
@@ -407,7 +413,7 @@ class MyRobot(wpilib.TimedRobot):
         x, y, rcw = self.swervometer.getCOF()
         print("auton: old position: x:", x, " y: ", y, " rcw: ", rcw)
         
-        if (self.drivetrain.goToPose(15, 15, 0) == True):
+        if (self.drivetrain.goToPose(27, 23, 0) == True):
             print("AUTON: Completed move to target.")
             x, y, rcw = self.swervometer.getCOF()
             print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)
