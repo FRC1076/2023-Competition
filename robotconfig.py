@@ -25,7 +25,7 @@ controllerConfig = {
 
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': False, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -39,8 +39,8 @@ swervometerConfig = { # All positions measured in inches
     'FIELD_RED_C_START_POSITION_X': 291.0, # X-Coordinate of starting position C when on red team
     'FIELD_RED_C_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion C when on red team
     'FIELD_RED_C_START_ANGLE': 0.0, # Heading angle of starting position C when on red team
-    'FIELD_BLU_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on blue team
-    'FIELD_BLU_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on blue team
+    'FIELD_BLU_A_START_POSITION_X': 0.0, # X-Coordinate of starting position A when on blue team
+    'FIELD_BLU_A_START_POSITION_Y': 0.0, # Y-Coordinate of starting postion A when on blue team
     'FIELD_BLU_A_START_ANGLE': 180.0, # Heading angle of starting position A when on blue team
     'FIELD_BLU_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on blue team
     'FIELD_BLU_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on blue team
@@ -103,7 +103,7 @@ drivetrainConfig = {
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
     'TARGET_KP': 0.005,
-    'TARGET_KI': 0.00001,
+    'TARGET_KI': 0.0025,
     'TARGET_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0 #1.793, # Inches per rotation of wheels
 }

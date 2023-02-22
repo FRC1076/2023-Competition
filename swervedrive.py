@@ -414,7 +414,7 @@ class SwerveDrive:
             self.update_smartdash()
             return True
         else:
-            self.move(x_error, y_error, rcw)
+            self.move(y_error, x_error, rcw)
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())

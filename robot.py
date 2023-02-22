@@ -372,7 +372,7 @@ class MyRobot(wpilib.TimedRobot):
         x, y, rcw = self.swervometer.getCOF()
         print("auton: old position: x:", x, " y: ", y, " rcw: ", rcw)
         
-        if (self.drivetrain.goToPose(15, 15, 0) == True):
+        if (self.drivetrain.goToPose(27, 23, 0) == True):
             print("AUTON: Completed move to target.")
             x, y, rcw = self.swervometer.getCOF()
             print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)
