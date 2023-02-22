@@ -25,7 +25,7 @@ controllerConfig = {
 
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': False, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -151,6 +151,18 @@ autonConfig = {
     'PICKUP_NEW': False,
     'SCORE_NEW': False,
     'BALANCE_BOT': True,
+    'TASK_RED_A_TFFT': [['ELEVATE'],
+                        ['MOVE', 27, 13, 0],
+                        ['MOVE', 27, 20, 0],
+                        ['BALANCE']],
+    'TASK_RED_B_TFFT': [['ELEVATE'],
+                        ['MOVE', 45, 23, 0],
+                        ['MOVE', 16, 17, 0],
+                        ['BALANCE']],
+    'TASK_BLUE_A_TFFT': [['ELEVATE'],
+                        ['MOVE', 45, 23, 0],
+                        ['MOVE', 16, 17, 0],
+                        ['BALANCE']],
 }
 
 grabberConfig = {
