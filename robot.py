@@ -211,32 +211,15 @@ class MyRobot(wpilib.TimedRobot):
         swervometer = Swervometer(field_cfg, robot_cfg)
 
         return swervometer
-
     
     def initVision(self, config):
-        vision = Vision(NetworkTables.getTable('limelight'))
+        vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
 
         return vision
 
-        
     def initGrabber(self, config):
         grabber = Grabber(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
         return grabber
-
-
-    def initAuton(self, config):
-        self.autonHookUpTime = config['HOOK_UP_TIME']
-        self.autonDriveForwardTime = config['DRIVE_FORWARD_TIME']
-        self.autonHookDownTime = config['HOOK_DOWN_TIME']
-        self.autonDriveBackwardTime = config['DRIVE_BACKWARD_TIME']
-        self.autonForwardSpeed = config['AUTON_SPEED_FORWARD']
-        self.autonBackwardSpeed = config['AUTON_SPEED_BACKWARD']
-        self.autonScoreExisting = config['SCORE_EXISTING']
-        self.autonPickupNew = config['PICKUP_NEW']
-        self.scoreNew = config['SCORE_NEW']
-        self.balanceBot = config['BALANCE_BOT']
-        return True
-
 
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
@@ -297,8 +280,10 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
         self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
 
+        # Reset task counter.
         self.autonTaskCounter = 0
 
+        # Figure out task list
         if (self.team_is_red
             and self.fieldStartPosition == 'A'
             and self.autonScoreExisting
@@ -342,7 +327,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def move(self, x, y, rcw):
         """
-        This function is ment to be used by the teleOp.
+        This function is meant to be used by the teleOp.
         :param x: Velocity in x axis [-1, 1]
         :param y: Velocity in y axis [-1, 1]
         :param rcw: Velocity in z axis [-1, 1]
@@ -352,8 +337,10 @@ class MyRobot(wpilib.TimedRobot):
         self.drivetrain.execute()
 
     def teleopDrivetrain(self):
-        # if (not self.drivetrain):
-        #     return
+        if (not self.drivetrain):
+            return
+        if (not self.driver):
+            return
 
         driver = self.driver.xboxController
         deadzone = self.driver.deadzone
@@ -405,7 +392,6 @@ class MyRobot(wpilib.TimedRobot):
         #    self.drive.set_raw_strafe(-0.35)
         return
 
-
     def teleopGrabber(self):
         operator = self.operator.xboxController
         #deadzone
@@ -426,11 +412,13 @@ class MyRobot(wpilib.TimedRobot):
         if not self.swervometer:
             return
 
-        self.autonTimer = wpilib.Timer()
-        self.autonTimer.start()
+        # Nothing in auton uses a timer.
+        #self.autonTimer = wpilib.Timer()
+        #self.autonTimer.start()
 
         self.drivetrain.resetGyro()
 
+        # Reset the task counter
         self.autonTaskCounter = 0
 
     def autonomousPeriodic(self):

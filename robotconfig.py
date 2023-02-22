@@ -167,15 +167,15 @@ autonConfig = {
 
 grabberConfig = {
     'RIGHT_ID': -1,
-    'LEFT_ID': -1,
-    'INTAKE_TOP_ID': -1,
-    'INTAKE_BOTTOM_ID': -1,
-    'SOLENOID_FORWARD_ID': -1,
-    'SOLENOID_REVERSE_ID': -1
+    'LEFT_ID': -2,
+    'INTAKE_TOP_ID': -3,
+    'INTAKE_BOTTOM_ID': -4,
+    'SOLENOID_FORWARD_ID': -5,
+    'SOLENOID_REVERSE_ID': -6
 }
 
 visionConfig = {
-    
+    'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
 #######################
@@ -184,8 +184,8 @@ visionConfig = {
 testbot = { # Always used for unit tests ($ python robot.py sim)
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
+    'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'VISION': visionConfig,
     'AUTON': autonConfig,
     'GRABBER': grabberConfig,
     'INTAKE': intakeConfig
@@ -194,6 +194,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
 showbot = {
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
+    #'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'AUTON': autonConfig,
 }
@@ -203,4 +204,4 @@ showbot = {
 ##########################
 ###  CONFIG TO DEPLOY  ###
 ##########################
-robotconfig = testbot
+robotconfig = showbot

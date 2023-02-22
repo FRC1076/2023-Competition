@@ -548,13 +548,16 @@ class SwerveDrive:
         for key in self.modules:
             self.modules[key].execute()
 
-        
-
         COFX, COFY, COFAngle = self.swervometer.calculateCOFPose(self.modules, self.getGyroAngle())
 
-        if self.vision.getPipeline() == 0 and self.vision.hasTargets():
-            pose = self.vision.getPose()
-            print("Vision reports position: (" + pose[0] + ", " + pose[1] + ") with rotation of " + self.vision.getOrientation[2] + " degrees.")
+        if self.vision:
+            if self.vision.getPipeline() == 0 and self.vision.hasTargets():
+                pose = self.vision.getPose()
+                orientation = self.vision.getOrientation()
+                if self.vision.shouldUpdatePose():
+                    self.swervometer.setCOF(pose[0], pose[1], orientation[2])
+                else:
+                    print("Vision reports position: (" + pose[0] + ", " + pose[1] + ") with rotation of " + orientation[2] + " degrees.")
 
         print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 

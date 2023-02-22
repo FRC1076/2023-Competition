@@ -4,10 +4,14 @@ APRILTAGS = 0
 RETROREFLECTIVE = 1
 
 class Vision:
-    def __init__(self, _table):
+    def __init__(self, _table, _shouldUpdatePose):
         self.table = _table
         self.pipeline = APRILTAGS
         self.table.putNumber('pipeline', APRILTAGS) # default to AprilTags pipeline
+        self.shouldUpdatePose = _shouldUpdatePose
+
+    def shouldUpdatePose(self):
+        return self.shouldUpdatePose
         
     def getPipeline(self):
         self.pipeline = self.table.getNumber('getpipe')
