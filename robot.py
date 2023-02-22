@@ -326,8 +326,8 @@ class MyRobot(wpilib.TimedRobot):
         return cliffDetector
 
     def robotPeriodic(self):
-        print('hi')
-        self.cliffDetector.update()
+        if self.clffDetector:
+            self.cliffDetector.update()
         return True
 
     def teleopInit(self):
