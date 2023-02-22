@@ -97,47 +97,50 @@ class MyRobot(wpilib.TimedRobot):
         print("initSwervometer ran")
         
         if (config['TEAM_IS_RED']):
-            team_is_red = True
-            team_is_blu = False
+            self.team_is_red = True
+            self.team_is_blu = False
             teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
             teamMoveAdjustment = -1 # Red Team needs to flip the controls as well.
         else:
-            team_is_red = False
-            team_is_blu = True
+            self.team_is_red = False
+            self.team_is_blu = True
             teamGyroAdjustment = 0 # Blue Team faces 0 degrees at start.
             teamMoveAdjustment = 1 # Blue Team does not need to flip controlls.
 
-        self.dashboard.putBoolean('Team is Red', team_is_red)
+        self.dashboard.putBoolean('Team is Red', self.team_is_red)
 
         print("FIELD_START_POSITION:", config['FIELD_START_POSITION'])
 
         if (config['FIELD_START_POSITION'] == 'A'):
             self.dashboard.putString('Field Start Position', 'A')
-            if team_is_red:
+            self.fieldStartPosition = 'A'
+            if self.team_is_red:
                 starting_position_x = config['FIELD_RED_A_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_A_START_POSITION_Y']
                 starting_angle = config['FIELD_RED_A_START_ANGLE']
-            else: # team_is_blu
+            else: # self.team_is_blu
                 starting_position_x = config['FIELD_BLU_A_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_A_START_ANGLE']
         elif (config['FIELD_START_POSITION'] == 'B'):
             self.dashboard.putString('Field Start Position', 'B')
-            if team_is_red:
+            self.fieldStartPosition = 'B'
+            if self.team_is_red:
                 starting_position_x = config['FIELD_RED_B_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_B_START_POSITION_Y']
                 starting_angle = config['FIELD_RED_B_START_ANGLE']
-            else: # team_is_blu
+            else: # self.team_is_blu
                 starting_position_x = config['FIELD_BLU_B_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_B_START_ANGLE']
         else: # config['FIELD_START_POSITION'] == 'C'
             self.dashboard.putString('Field Start Position', 'C')
-            if team_is_red:
+            self.fieldStartPosition = 'C'
+            if self.team_is_red:
                 starting_position_x = config['FIELD_RED_C_START_POSITION_X']
                 starting_position_y = config['FIELD_RED_C_START_POSITION_Y']
                 starting_angle = config['FIELD_RED_C_START_ANGLE']
-            else: # team_is_blu
+            else: # self.team_is_blu
                 starting_position_x = config['FIELD_BLU_C_START_POSITION_X']
                 starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_C_START_ANGLE']
@@ -176,7 +179,7 @@ class MyRobot(wpilib.TimedRobot):
                                 tag8_y=config['FIELD_TAG8_Y'])
         
         robot_cfg = RobotPropertyConfig(sd_prefix='Robot_Property_Module',
-                                is_red_team=team_is_red,
+                                is_red_team=self.team_is_red,
                                 team_gyro_adjustment=teamGyroAdjustment,
                                 team_move_adjustment=teamMoveAdjustment,
                                 frame_dimension_x=config['ROBOT_FRAME_DIMENSION_X'],
@@ -255,6 +258,19 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard.putNumber('Auton Pickup New Element', self.autonPickupNew)
         self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
         self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
+
+        self.autonTaskCounter = 0
+
+        if (self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_A_TFFT']
+        else: # No matching task list
+            self.autonTaskCounter = -1
+            self.autonTaskList = []
 
         return True
 
@@ -360,6 +376,8 @@ class MyRobot(wpilib.TimedRobot):
 
         self.drivetrain.resetGyro()
 
+        self.autonTaskCounter = 0
+
     def autonomousPeriodic(self):
         if not self.auton:
             return
@@ -367,6 +385,44 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.swervometer:
             return
+
+        if self.autonTaskCounter < 0:
+            return # No tasks assigned.
+
+        if self.autonTaskCounter >= len(self.autonTaskList):
+            return # No tasks remaining.
+            
+        autonTask = self.autonTaskList[self.autonTaskCounter]
+
+        if (autonTask[0] == 'ELEVATE'):
+            print("Elevate: ", self.autonTaskCounter)
+            self.autonTaskCounter += 1
+        elif (autonTask[0] == 'MOVE'):
+            x = autonTask[1]
+            y = autonTask[2]
+            rcw = autonTask[3]
+            print("Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " rcw: ", rcw)
+            if self.drivetrain.goToPose(x, y, rcw):
+                self.autonTaskCounter += 1 # Move on to next task.
+                print("Move: Reached target: x: ", x, " y: ", y, " rcw: ", rcw)
+            else:
+                # Leave self.autonTaskCounter unchanged. Repeat this task.
+                print("Move: Not at target: x: ", x, " y: ", y, " rcw: ", rcw)
+        elif (autonTask[0] == 'BALANCE'):
+            print("BALANCE: ", self.autonTaskCounter)
+            if self.drivetrain.balance():
+                self.autonTaskCounter += 1 # Move on to next task.
+                print("Balance: Leveled and oriented")
+            else:
+                # Leave self.autonTaskCounter unchanged. Repeat this task.
+                print("Balance: Keep balancing and orienting")
+        else:
+            print("UNKNOWN TASK", self.autonTaskCounter)
+            self.autonTaskCounter += 1   
+         
+        return
+
+        # OLD STUFF BELOW
 
         #print("autonomousPeriodic")
         x, y, rcw = self.swervometer.getCOF()
