@@ -171,7 +171,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
     'GRABBER': grabberConfig,
-    'INTAKE': intakeConfig
+    'INTAKE': intakeConfig,
     'AUTON': autonConfig,
 }
 
