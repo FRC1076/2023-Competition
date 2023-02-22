@@ -194,7 +194,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
 showbot = {
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
-    #'VISION': visionConfig, # Must be BEFORE drivetrain
+    'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'AUTON': autonConfig,
 }

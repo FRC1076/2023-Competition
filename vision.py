@@ -25,28 +25,28 @@ class Vision:
             print('Invalid pipeline input: ' + pl)
 
     def hasTargets(self):
-        return bool(table.getNumber('tv'))
+        return bool(self.table.getNumber('tv'))
 
-    def shouldUpdatePosition(self):
-        if (self.pipeline == 0 and self.hasTargets):
+    def canUpdatePose(self):
+        if (self.pipeline == 0 and self.hasTargets()):
             return True
         return False
 
     def getTargetOffsetX(self):
         if self.hasTargets():
-            return table.getNumber('tx')
+            return self.table.getNumber('tx')
         else:
             print('No vision target.')
 
     def getTargetOffsetY(self):
         if self.hasTargets():
-            return table.getNumber('ty')
+            return self.table.getNumber('ty')
         else:
             print('No vision target.')
 
     def getTargetArea(self):
         if self.hasTargets():
-            return table.getNumber('ta')
+            return self.table.getNumber('ta')
         else:
             print('No vision target.')
     
@@ -54,10 +54,10 @@ class Vision:
         """
         Returns the robot's calculated field position (x, y, z) in inches relative to the center of the field.
         """
-        pose = table.getNumberArray('botpose') # returns [x, y, z, roll, pitch, yaw]
+        pose = self.table.getNumberArray('botpose') # returns [x, y, z, roll, pitch, yaw]
         s = 39.37 # scalar to convert meters to inches
         return (pose[0] * s, pose[1] * s, pose[2] * s)
 
     def getOrientation(self):
-        pose = table.getNumberArray('botpose') # returns [x, y, z, roll, pitch, yaw]
+        pose = self.table.getNumberArray('botpose') # returns [x, y, z, roll, pitch, yaw]
         return (pose[3], pose[4], pose[5])
