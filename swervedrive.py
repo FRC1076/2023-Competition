@@ -13,16 +13,17 @@ from wpimath.controller import PIDController
 from swervometer import Swervometer
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
+TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
 
 class SwerveDrive:
 
     # Get some config options from the dashboard.
-    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
+    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.001)
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _gyro, _balance_cfg):
+    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _vision, _gyro, _balance_cfg, _target_cfg):
         
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
@@ -38,6 +39,7 @@ class SwerveDrive:
         }
 
         self.swervometer = _swervometer
+        self.vision = _vision
         self.gyro = _gyro
         self.gyro_angle_zero = 0.0
         #assuming balanced at initialization
@@ -70,12 +72,12 @@ class SwerveDrive:
 
         # Variables that allow enabling and disabling of features in code
         self.squared_inputs = False
-        self.threshold_input_vectors = False
+        self.threshold_input_vectors = True
 
-        self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
-        self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
+        #self.width = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
+        #self.length = (30 / 12) / 2 # (Inch / 12 = Foot) / 2
 
-        self.request_wheel_lock = False
+        self.wheel_lock = False
         
         self.balance_config = _balance_cfg
         self.balance_pitch_kP = self.balance_config.balance_pitch_kP
@@ -102,14 +104,51 @@ class SwerveDrive:
         self.sd.putNumber('Balance Yaw kI', self.balance_yaw_pid_controller.getI())
         self.sd.putNumber('Balance Yaw kD', self.balance_yaw_pid_controller.getD())
 
-    @property
-    def chassis_dimension(self):
-        return (self.width, self.length)
+        self.target_config = _target_cfg
+        self.target_kP = self.target_config.target_kP
+        self.target_kI = self.target_config.target_kI
+        self.target_kD = self.target_config.target_kD
+        self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
+        self.target_x_pid_controller.setTolerance(0.5, 0.5)
+        self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
+        self.target_y_pid_controller.setTolerance(0.5, 0.5)
+        self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
+        self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
+        
+    def reset(self):
+        print("In swervedrive reset")
 
-    @chassis_dimension.setter
-    def chassis_dimension(self, dimension):
-        self.width = dimension[0]
-        self.length = dimension[1]
+        # Set all inputs to zero
+        self._requested_vectors = {
+            'fwd': 0,
+            'strafe': 0,
+            'rcw': 0
+        }
+
+        self._requested_angles = {
+            'front_left': 0,
+            'front_right': 0,
+            'rear_left': 0,
+            'rear_right': 0
+        }
+
+        self._requested_speeds = {
+            'front_left': 0,
+            'front_right': 0,
+            'rear_left': 0,
+            'rear_right': 0
+        }
+        # Variables that allow enabling and disabling of features in code
+        self.squared_inputs = False
+        self.threshold_input_vectors = True
+
+        self.wheel_lock = False
+        
+        for key in self.modules:
+            self.modules[key].reset()
+
+        self.resetGyro()
+
 
     @staticmethod
     def square_input(input):
@@ -149,8 +188,8 @@ class SwerveDrive:
 
     #angle off of gyro zero
     def getGyroAngle(self):
-        angle = (self.gyro.getAngle() - self.gyro_angle_zero) % 360
-
+        angle = (self.gyro.getAngle() - self.gyro_angle_zero + self.swervometer.getTeamGyroAdjustment()) % 360
+        print ("Gyro Adjustment", self.swervometer.getTeamGyroAdjustment())
         return angle
         
     def getGyroBalance(self):
@@ -284,10 +323,14 @@ class SwerveDrive:
         
         #self.printGyro()
 
-        if(self.getGyroYaw() <= 90 or self.getGyroYaw() >= 270):
+        yawSign = -1
+
+        if(self.getGyroYaw() >= -90 and self.getGyroYaw() <= 90):
             BALANCED_YAW = 0.0
+            yawSign = +1
         else:
             BALANCED_YAW = 180.0
+            yawSign = -1
         BALANCED_PITCH = 0.0
 
         print("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
@@ -313,13 +356,18 @@ class SwerveDrive:
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
         self.sd.putNumber('Balance yaw output', yaw_output)
-        self.move(0.0, -pitch_output, yaw_output)
+        self.move(0.0, yawSign * pitch_output, yaw_output)
         
         self.update_smartdash()
 
         self.execute()
 
-    def move(self, fwd, strafe, rcw):
+        if self.balance_pitch_pid_controller.atSetpoint() and self.balance_yaw_pid_controller.atSetpoint():
+            return True
+        else:
+            return False
+
+    def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw):
         """
         Calulates the speed and angle for each wheel given the requested movement
         Positive fwd value = Forward robot movement\n
@@ -330,6 +378,9 @@ class SwerveDrive:
         :param strafe: the requested movement in the X direction of the 2D plane
         :param rcw: the requestest magnatude of the rotational vector of a 2D plane
         """
+
+        fwd = non_adjusted_fwd * self.swervometer.getTeamMoveAdjustment()
+        strafe = non_adjusted_strafe * self.swervometer.getTeamMoveAdjustment()
 
         #Convert field-oriented translate to chassis-oriented translate
         current_angle = self.getGyroAngle() % 360
@@ -350,48 +401,81 @@ class SwerveDrive:
         # self.set_strafe(strafe)
 
         self.set_rcw(rcw)
+    
+    def goToPose(self, x, y, rcw):
+
+        currentX, currentY, currentRCW = self.swervometer.getCOF()
+        x_error = -self.target_x_pid_controller.calculate(currentX, x)
+        y_error = self.target_y_pid_controller.calculate(currentY, y)
+        rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
+
+        if self.target_x_pid_controller.atSetpoint():
+            print("X at set point")
+        if self.target_y_pid_controller.atSetpoint():
+            print("Y at set point")
+        if self.target_rcw_pid_controller.atSetpoint():
+            print("RCW at set point")
+            
+        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): # and self.target_rcw_pid_controller.atSetpoint(): 
+            self.update_smartdash()
+            return True
+        else:
+            self.move(y_error, x_error, rcw)
+            self.update_smartdash()
+            self.execute()
+            print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
+            print("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
+            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentRCW: ", currentRCW, " targetRCW: ", rcw, " rcw_error: ", rcw_error)
+            return False
 
     def _calculate_vectors(self):
         """
         Calculate the requested speed and angle of each modules from self._requested_vectors and store them in
         self._requested_speeds and self._requested_angles dictionaries.
         """
+        print("in _calculate_vectors")
         self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw'] = self.normalize([self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw']])
 
         # Does nothing if the values are lower than the input thresh
         if self.threshold_input_vectors:
+            #print("checking thresholds: fwd: ", self._requested_vectors['fwd'], "strafe: ", self._requested_vectors['strafe'], "rcw: ", self._requested_vectors['rcw'])
             if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
+                #print("forward = 0")
                 self._requested_vectors['fwd'] = 0
 
             if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
+                #print("strafe = 0")
                 self._requested_vectors['strafe'] = 0
 
             if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
+                #print("rcw = 0")
                 self._requested_vectors['rcw'] = 0
 
             if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0:  # Prevents a useless loop.
+                #print("all three zero")
                 self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
 
-                if self.request_wheel_lock:
+                if self.wheel_lock:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defence)
 
-                    self._requested_angles['front_left'] = 45
-                    self._requested_angles['front_right'] = -45
-                    self._requested_angles['rear_left'] = -45
-                    self._requested_angles['rear_right'] = 45
+                    self._requested_angles['front_left'] = 90 #45
+                    self._requested_angles['front_right'] = 90 #-45
+                    self._requested_angles['rear_left'] = 90 #-45
+                    self._requested_angles['rear_right'] = 90 #45
 
-                    self.request_wheel_lock = False
-
+                    #self.wheel_lock = False
+                    #print("testing wheel lock")
                 return
         
-        ratio = math.hypot(self.length, self.width)
+        frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
+        ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
         # Velocities per quadrant
-        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
-        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
-        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
-        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
+        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
         frontLeft_speed = math.hypot(frontX, rightY)
@@ -422,6 +506,13 @@ class SwerveDrive:
         self._requested_vectors['fwd'] = 0.0
         self._requested_vectors['strafe'] = 0.0
         self._requested_vectors['rcw'] = 0.0
+
+    def setWheelLock(self, isLocked):
+        #print("is locked", isLocked)
+        self.wheel_lock = isLocked
+    
+    def getWheelLock(self):
+        return self.wheel_lock
 
     def debug(self, debug_modules=False):
         """
@@ -456,13 +547,20 @@ class SwerveDrive:
         first_module = True
         for key in self.modules:
             self.modules[key].execute()
-            if self.swervometer and first_module:
-                first_module = False
-                x, y, rcw = self.swervometer.getPositionTuple()
-                print("Original Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
-                x, y, rcw = self.swervometer.updatePositionTupleFromWheels(self.modules[key].get_current_velocity(), 0, self.modules[key].get_current_angle())
-                #x, y, rcw = self.swervometer.getPositionTuple()
-                print("Updated Swervometer: x: ", x, " y: ", y, " rcw: ", rcw)
+
+        COFX, COFY, COFAngle = self.swervometer.calculateCOFPose(self.modules, self.getGyroAngle())
+
+        if self.vision:
+            if self.vision.canUpdatePose():
+                pose = self.vision.getPose()
+                orientation = self.vision.getOrientation()
+                if self.vision.shouldUpdatePose():
+                    self.swervometer.setCOF(pose[0], pose[1], orientation[2])
+                    print("Vision updated position: (" + pose[0] + ", " + pose[1] + ") with rotation of " + orientation[2] + " degrees.")
+                else:
+                    print("Vision reports position: (" + pose[0] + ", " + pose[1] + ") with rotation of " + orientation[2] + " degrees.")
+
+        print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 
     def idle(self):
         for key in self.modules:

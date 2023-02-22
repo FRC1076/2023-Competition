@@ -27,20 +27,20 @@ controllerConfig = {
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
-    'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
-    'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (lower left from red start)
-    'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (lower left from red start)
-    'FIELD_RED_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on red team
-    'FIELD_RED_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on red team
+    'HAS_BUMPERS_ATTACHED': False, # Does the robot currently have bumpers attached?
+    'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
+    'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
+    'FIELD_RED_A_START_POSITION_X': 0.0, #159.0, # X-Coordinate of starting position A when on red team
+    'FIELD_RED_A_START_POSITION_Y': 0.0, #54.25, # Y-Coordinate of starting postion A when on red team
     'FIELD_RED_A_START_ANGLE': 0.0, # Heading angle of starting position A when on red team
-    'FIELD_RED_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on red team
-    'FIELD_RED_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on red team
+    'FIELD_RED_B_START_POSITION_X': 225.0, # X-Coordinate of starting position B when on red team
+    'FIELD_RED_B_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion B when on red team
     'FIELD_RED_B_START_ANGLE': 0.0, # Heading angle of starting position B when on red team
-    'FIELD_RED_C_START_POSITION_X': 100.0, # X-Coordinate of starting position C when on red team
-    'FIELD_RED_C_START_POSITION_Y': 800.0, # Y-Coordinate of starting postion C when on red team
+    'FIELD_RED_C_START_POSITION_X': 291.0, # X-Coordinate of starting position C when on red team
+    'FIELD_RED_C_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion C when on red team
     'FIELD_RED_C_START_ANGLE': 0.0, # Heading angle of starting position C when on red team
-    'FIELD_BLU_A_START_POSITION_X': 100.0, # X-Coordinate of starting position A when on blue team
-    'FIELD_BLU_A_START_POSITION_Y': 100.0, # Y-Coordinate of starting postion A when on blue team
+    'FIELD_BLU_A_START_POSITION_X': 0.0, # X-Coordinate of starting position A when on blue team
+    'FIELD_BLU_A_START_POSITION_Y': 0.0, # Y-Coordinate of starting postion A when on blue team
     'FIELD_BLU_A_START_ANGLE': 180.0, # Heading angle of starting position A when on blue team
     'FIELD_BLU_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on blue team
     'FIELD_BLU_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on blue team
@@ -64,17 +64,18 @@ swervometerConfig = { # All positions measured in inches
     'FIELD_TAG7_Y': 500.0, # Y-Coordinate of Tag ID 7
     'FIELD_TAG8_X': 500.0, # X-Coordinate of Tag ID 8
     'FIELD_TAG8_Y': 500.0, # Y-Coordinate of Tag ID 8
-    'ROBOT_FRAME_DIMENSION_X': 26.0, # X-coordinate length of robot frame
-    'ROBOT_FRAME_DIMENSION_Y': 34.0, # Y-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_X': 34.0, # X-coordinate length of robot frame
+    'ROBOT_FRAME_DIMENSION_Y': 26.0, # Y-coordinate length of robot frame
     'ROBOT_BUMPER_DIMENSION_X': 4.0, # Width of bumper (X-axis)
     'ROBOT_BUMPER_DIMENSION_Y': 4.0, # Width of bumper (Y-axis)
-    'ROBOT_COM_OFFSET_X': 13.0, # X-offset of center of mass (assume half frame dimension)
-    'ROBOT_COM_OFFSET_Y': 17.0, # Y-offset of center of mass (assume half frame dimension)
-    'ROBOT_GYRO_OFFSET_X': 10.0, # X-offset of center of gyro (relative to lower left frame)
-    'ROBOT_GYRO_OFFSET_Y': 5.0, # Y-offset of center of gyro (relative to lower left frame)
+    'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
+    'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
+    'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
+    'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
-    'ROBOT_INCHES_PER_ROTATION': 1.8035068937, # Inches / Rotation
+    'ROBOT_SWERVE_MODULE_OFFSET_X': 13.75, # X-offset of swerve module center from COF
+    'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
 }
 
 drivetrainConfig = {
@@ -95,12 +96,45 @@ drivetrainConfig = {
     'HEADING_KP': 0.005, #0.005 - reverted to this
     'HEADING_KI': 0.00001, #0.00001 - reverted to this
     'HEADING_KD':  0.00001, #0.00001 - reverted to this
-    'BALANCE_PITCH_KP': 0.0125,
+    'BALANCE_PITCH_KP': 0.01,
     'BALANCE_PITCH_KI': 0.00001,
-    'BALANCE_PITCH_KD':  0.00175,
+    'BALANCE_PITCH_KD':  0.0005,
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
+    'TARGET_KP': 0.005,
+    'TARGET_KI': 0.0025,
+    'TARGET_KD': 0.0001,
+    'ROBOT_INCHES_PER_ROTATION': 1.0 #1.793, # Inches per rotation of wheels
+}
+
+shooterConfig = {
+    'SHOOTER_ID': 10,
+    'SHOOTER_RPM': 3500,
+}
+
+intakeConfig = {
+    # Update IDs when known
+    'INTAKE_MOTOR_ID': -1
+}
+
+feederConfig = {
+    'FEEDER_ID' : 9,
+    'FEEDER_SPEED': 0.8,
+}
+
+tiltShooterConfig = {
+    'TILTSHOOTER_ID': 1,
+    'ROTATIONS_PER_360': 75,
+    'MIN_DEGREES': 5,
+    'MAX_DEGREES': 25,
+    'BUFFER_DEGREES': 2,
+    'SPEED': 0.1,
+}
+
+aimerConfig = {
+    'AIMING_ROTATION_SPEED': 0.6,
+    'AIMING_ACCURACY_DEGREES': 3,
 }
 
 visionConfig = {
@@ -125,6 +159,31 @@ autonConfig = {
     'PICKUP_NEW': False,
     'SCORE_NEW': False,
     'BALANCE_BOT': True,
+    'TASK_RED_A_TFFT': [['ELEVATE'],
+                        ['MOVE', 27, 13, 0],
+                        ['MOVE', 27, 20, 0],
+                        ['BALANCE']],
+    'TASK_RED_B_TFFT': [['ELEVATE'],
+                        ['MOVE', 45, 23, 0],
+                        ['MOVE', 16, 17, 0],
+                        ['BALANCE']],
+    'TASK_BLUE_A_TFFT': [['ELEVATE'],
+                        ['MOVE', 45, 23, 0],
+                        ['MOVE', 16, 17, 0],
+                        ['BALANCE']],
+}
+
+grabberConfig = {
+    'RIGHT_ID': -1,
+    'LEFT_ID': -2,
+    'INTAKE_TOP_ID': -3,
+    'INTAKE_BOTTOM_ID': -4,
+    'SOLENOID_FORWARD_ID': -5,
+    'SOLENOID_REVERSE_ID': -6
+}
+
+visionConfig = {
+    'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
 #######################
@@ -133,14 +192,18 @@ autonConfig = {
 testbot = { # Always used for unit tests ($ python robot.py sim)
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
+    'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
     'AUTON': autonConfig,
+    'GRABBER': grabberConfig,
+    'INTAKE': intakeConfig
 }
 
 showbot = {
     'CONTROLLERS': controllerConfig,
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
+    'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
     'AUTON': autonConfig,
@@ -151,4 +214,4 @@ showbot = {
 ##########################
 ###  CONFIG TO DEPLOY  ###
 ##########################
-robotconfig = testbot
+robotconfig = showbot
