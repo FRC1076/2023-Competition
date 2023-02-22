@@ -23,7 +23,7 @@ class SwerveDrive:
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _gyro, _balance_cfg, _target_cfg):
+    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _vision, _gyro, _balance_cfg, _target_cfg):
         
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
@@ -39,6 +39,7 @@ class SwerveDrive:
         }
 
         self.swervometer = _swervometer
+        self.vision = _vision
         self.gyro = _gyro
         self.gyro_angle_zero = 0.0
         #assuming balanced at initialization
@@ -542,7 +543,14 @@ class SwerveDrive:
         for key in self.modules:
             self.modules[key].execute()
 
+        
+
         COFX, COFY, COFAngle = self.swervometer.calculateCOFPose(self.modules, self.getGyroAngle())
+
+        if self.vision.getPipeline() == 0 and self.vision.hasTargets():
+            pose = self.vision.getPose()
+            print("Vision reports position: (" + pose[0] + ", " + pose[1] + ") with rotation of " + self.vision.getOrientation[2] + " degrees.")
+
         print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 
     def idle(self):

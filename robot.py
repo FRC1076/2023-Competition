@@ -15,6 +15,7 @@ from controller import Controller
 from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
 from swervemodule import ModuleConfig
+
 from swervedrive import BalanceConfig
 from swervedrive import TargetConfig
 from swervometer import FieldConfig
@@ -22,6 +23,10 @@ from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
 from tester import Tester
 from networktables import NetworkTables
+
+from grabber import Grabber
+from vision import Vision
+from intake import Intake
 
 # Drive Types
 ARCADE = 1
@@ -41,6 +46,8 @@ class MyRobot(wpilib.TimedRobot):
         self.operator = None
         self.tester = None
         self.auton = None
+        self.vision = None
+        self.grabber = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -58,12 +65,18 @@ class MyRobot(wpilib.TimedRobot):
                 controllers = self.initControllers(config)
                 self.driver = controllers[0]
                 self.operator = controllers[1]
-            if key == 'SWERVOMETER':
-                self.swervometer = self.initSwervometer(config)
-            if key == 'DRIVETRAIN':
-                self.drivetrain = self.initDrivetrain(config)
             if key == 'AUTON':
                 self.auton = self.initAuton(config)
+            if key == 'VISION':
+                self.vision = self.initVision(config)
+            if key == 'SWERVOMETER':
+                self.swervometer = self.initSwervometer(config)
+            if key == 'GRABBER':
+                self.grabber = self.initGrabber(config)
+            if key == 'INTAKE':
+                self.intake = self.initIntake(config)
+            if key == 'DRIVETRAIN':
+                self.drivetrain = self.initDrivetrain(config)
 
         self.periods = 0
 
@@ -196,6 +209,32 @@ class MyRobot(wpilib.TimedRobot):
 
         return swervometer
 
+    
+    def initVision(self, config):
+        vision = Vision(NetworkTables.getTable('limelight'))
+
+        return vision
+
+        
+    def initGrabber(self, config):
+        grabber = Grabber(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+        return grabber
+
+
+    def initAuton(self, config):
+        self.autonHookUpTime = config['HOOK_UP_TIME']
+        self.autonDriveForwardTime = config['DRIVE_FORWARD_TIME']
+        self.autonHookDownTime = config['HOOK_DOWN_TIME']
+        self.autonDriveBackwardTime = config['DRIVE_BACKWARD_TIME']
+        self.autonForwardSpeed = config['AUTON_SPEED_FORWARD']
+        self.autonBackwardSpeed = config['AUTON_SPEED_BACKWARD']
+        self.autonScoreExisting = config['SCORE_EXISTING']
+        self.autonPickupNew = config['PICKUP_NEW']
+        self.scoreNew = config['SCORE_NEW']
+        self.balanceBot = config['BALANCE_BOT']
+        return True
+
+
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
         self.drive_type = config['DRIVETYPE']  # side effect!
@@ -241,7 +280,7 @@ class MyRobot(wpilib.TimedRobot):
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, gyro, balance_cfg, target_cfg)
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg)
 
         return swerve
 
@@ -250,13 +289,13 @@ class MyRobot(wpilib.TimedRobot):
         self.autonPickupNew = config['PICKUP_NEW']
         self.autonScoreNew = config['SCORE_NEW']
         self.autonBalanceRobot = config['BALANCE_BOT']
-
         self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
         self.dashboard.putNumber('Auton Pickup New Element', self.autonPickupNew)
         self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
         self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
 
         return True
+
 
     def robotPeriodic(self):
         return True
@@ -267,6 +306,8 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
+        self.teleopGrabber()
+        self.teleopIntake()
         return True
 
     def move(self, x, y, rcw):
@@ -277,22 +318,9 @@ class MyRobot(wpilib.TimedRobot):
         :param rcw: Velocity in z axis [-1, 1]
         """
 
-        #print("move: x: ", x, "y: ", y, "rcw: ", rcw)
-        # if self.driver.getLeftBumper():
-        #     # If the button is pressed, lower the rotate speed.
-        #     rcw *= 0.7
-
-        # degrees = (math.atan2(y, x) * 180 / math.pi) + 180
-
-        # self.testingModule.move(rcw, degrees)
-        # self.testingModule.execute()
-
-        # print('DRIVE_TARGET = ' + str(rcw) + ', PIVOT_TARGET = ' + str(degrees) + ", ENCODER_TICK = " + str(self.testingModule.get_current_angle()))
-        # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
-
         self.drivetrain.move(x, y, rcw)
-        #self.drivetrain.move(0, y, 0)
-        
+        self.drivetrain.execute()
+
     def teleopDrivetrain(self):
         # if (not self.drivetrain):
         #     return
@@ -346,7 +374,20 @@ class MyRobot(wpilib.TimedRobot):
         #elif self.gamempad.getPOV() == 270:
         #    self.drive.set_raw_strafe(-0.35)
         return
+
+
+    def teleopGrabber(self):
+        operator = self.operator.xboxController
+        #deadzone
+        self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
+        if operator.getYButtonReleased():
+            self.grabber.toggle()
     
+    def teleopIntake(self):
+        operator = self.operator.xboxController
+        if operator.getXButtonReleased():
+            self.intake.toggle()
+        
     def autonomousInit(self):
         if not self.auton:
             return
