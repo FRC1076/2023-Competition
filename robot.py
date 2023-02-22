@@ -21,6 +21,7 @@ from swervedrive import TargetConfig
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
+from cliffdetector import CliffDetector
 from tester import Tester
 from networktables import NetworkTables
 
@@ -45,6 +46,7 @@ class MyRobot(wpilib.TimedRobot):
         self.driver = None
         self.operator = None
         self.tester = None
+        self.cliffDetector = None
         self.auton = None
         self.vision = None
         self.grabber = None
@@ -77,6 +79,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.intake = self.initIntake(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
+            if key == 'CLIFFDETECTOR':
+                self.cliffDetector = self.initCliffDetector(config)
 
         self.periods = 0
 
@@ -311,8 +315,19 @@ class MyRobot(wpilib.TimedRobot):
 
         return True
 
+    def initCliffDetector(self, config):
+        print(config)
+        cliffDetector = CliffDetector(
+            config['LEFT_CLIFF_DETECTOR_PINGID'], 
+            config['LEFT_CLIFF_DETECTOR_ECHOID'], 
+            config['RIGHT_CLIFF_DETECTOR_PINGID'],
+            config['RIGHT_CLIFF_DETECTOR_ECHOID'],
+            config['CLIFF_TOLERANCE'])
+        return cliffDetector
 
     def robotPeriodic(self):
+        print('hi')
+        self.cliffDetector.update()
         return True
 
     def teleopInit(self):
@@ -332,6 +347,29 @@ class MyRobot(wpilib.TimedRobot):
         :param y: Velocity in y axis [-1, 1]
         :param rcw: Velocity in z axis [-1, 1]
         """
+        
+        #print("move: x: ", x, "y: ", y, "rcw: ", rcw)
+        # if self.driver.getLeftBumper():
+        #     # If the button is pressed, lower the rotate speed.
+        #     rcw *= 0.7
+
+        # degrees = (math.atan2(y, x) * 180 / math.pi) + 180
+
+        # self.testingModule.move(rcw, degrees)
+        # self.testingModule.execute()
+
+        # print('DRIVE_TARGET = ' + str(rcw) + ', PIVOT_TARGET = ' + str(degrees) + ", ENCODER_TICK = " + str(self.testingModule.get_current_angle()))
+        # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
+
+        if self.cliffdetector:
+            if self.cliffdetector.atCliff() == -1:
+                print("Warning: At Left Cliff!!!")
+            elif self.cliffdetector.atCliff() == 1:
+                print("Warning: At Right Cliff!!!")
+            elif self.cliffdetector.atCliff() == 0:
+                print("Coast is clear. Not near a cliff.")
+            else:
+                print("Bogus result from cliff detector. Ignore danger.")
 
         self.drivetrain.move(x, y, rcw)
         self.drivetrain.execute()
