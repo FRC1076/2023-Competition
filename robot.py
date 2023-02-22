@@ -268,6 +268,20 @@ class MyRobot(wpilib.TimedRobot):
             and not self.autonScoreNew
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_A_TFFT']
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_B_TFFT']     
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_A_TFFT']
         else: # No matching task list
             self.autonTaskCounter = -1
             self.autonTaskList = []

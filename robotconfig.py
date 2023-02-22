@@ -126,6 +126,14 @@ autonConfig = {
                         ['MOVE', 27, 13, 0],
                         ['MOVE', 27, 20, 0],
                         ['BALANCE']],
+    'TASK_RED_B_TFFT': [['ELEVATE'],
+                        ['MOVE', 45, 23, 0],
+                        ['MOVE', 16, 17, 0],
+                        ['BALANCE']],
+    'TASK_BLUE_A_TFFT': [['ELEVATE'],
+                        ['MOVE', 45, 23, 0],
+                        ['MOVE', 16, 17, 0],
+                        ['BALANCE']],
 }
 
 #######################
