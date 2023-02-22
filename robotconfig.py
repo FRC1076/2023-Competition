@@ -77,10 +77,6 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
 }
 
-visionConfig = {
-    'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
-}
-
 drivetrainConfig = {
     'FRONTLEFT_DRIVEMOTOR': 1,
     'FRONTRIGHT_DRIVEMOTOR': 2,
@@ -123,6 +119,7 @@ visionConfig = {
     'SHOOTER_OFFSET': 1,
     'CAMERA_HEIGHT': 4,
     'CAMERA_PITCH': 0,
+    'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
 cliffDetectorConfig = {
