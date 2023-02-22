@@ -23,7 +23,6 @@ controllerConfig = {
     }
 }
 
-
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
@@ -78,6 +77,10 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
 }
 
+visionConfig = {
+    'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
+}
+
 drivetrainConfig = {
     'FRONTLEFT_DRIVEMOTOR': 1,
     'FRONTRIGHT_DRIVEMOTOR': 2,
@@ -108,33 +111,9 @@ drivetrainConfig = {
     'ROBOT_INCHES_PER_ROTATION': 1.0 #1.793, # Inches per rotation of wheels
 }
 
-shooterConfig = {
-    'SHOOTER_ID': 10,
-    'SHOOTER_RPM': 3500,
-}
-
 intakeConfig = {
     # Update IDs when known
     'INTAKE_MOTOR_ID': -1
-}
-
-feederConfig = {
-    'FEEDER_ID' : 9,
-    'FEEDER_SPEED': 0.8,
-}
-
-tiltShooterConfig = {
-    'TILTSHOOTER_ID': 1,
-    'ROTATIONS_PER_360': 75,
-    'MIN_DEGREES': 5,
-    'MAX_DEGREES': 25,
-    'BUFFER_DEGREES': 2,
-    'SPEED': 0.1,
-}
-
-aimerConfig = {
-    'AIMING_ROTATION_SPEED': 0.6,
-    'AIMING_ACCURACY_DEGREES': 3,
 }
 
 visionConfig = {
@@ -152,6 +131,15 @@ cliffDetectorConfig = {
     'RIGHT_CLIFF_DETECTOR_PINGID': 2,
     'RIGHT_CLIFF_DETECTOR_ECHOID': 3,
     'CLIFF_TOLERANCE': 2, # Centimeters?
+}
+
+grabberConfig = {
+    'RIGHT_ID': -1,
+    'LEFT_ID': -2,
+    'INTAKE_TOP_ID': -3,
+    'INTAKE_BOTTOM_ID': -4,
+    'SOLENOID_FORWARD_ID': -5,
+    'SOLENOID_REVERSE_ID': -6
 }
 
 autonConfig = {
@@ -173,19 +161,6 @@ autonConfig = {
                         ['BALANCE']],
 }
 
-grabberConfig = {
-    'RIGHT_ID': -1,
-    'LEFT_ID': -2,
-    'INTAKE_TOP_ID': -3,
-    'INTAKE_BOTTOM_ID': -4,
-    'SOLENOID_FORWARD_ID': -5,
-    'SOLENOID_REVERSE_ID': -6
-}
-
-visionConfig = {
-    'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
-}
-
 #######################
 ###  ROBOT CONFIGS  ###
 #######################
@@ -195,9 +170,9 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
-    'AUTON': autonConfig,
     'GRABBER': grabberConfig,
     'INTAKE': intakeConfig
+    'AUTON': autonConfig,
 }
 
 showbot = {
@@ -205,7 +180,6 @@ showbot = {
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'CLIFFDETECTOR': cliffDetectorConfig,
     'AUTON': autonConfig,
 }
 
