@@ -114,6 +114,7 @@ class SwerveDrive:
         self.target_y_pid_controller.setTolerance(0.5, 0.5)
         self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
+        self.target_rcw_pid_controller.enableContinuousInput(0, 360)
         
     def reset(self):
         print("In swervedrive reset")
