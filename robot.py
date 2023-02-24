@@ -326,8 +326,8 @@ class MyRobot(wpilib.TimedRobot):
         return cliffDetector
 
     def robotPeriodic(self):
-        if self.cliffDetector:
-            self.cliffDetector.update()
+        #if self.cliffDetector:
+        #    self.cliffDetector.update()
         return True
 
     def teleopInit(self):
@@ -361,15 +361,15 @@ class MyRobot(wpilib.TimedRobot):
         # print('DRIVE_TARGET = ' + str(rcw) + ', PIVOT_TARGET = ' + str(degrees) + ", ENCODER_TICK = " + str(self.testingModule.get_current_angle()))
         # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
 
-        if self.cliffdetector:
-            if self.cliffdetector.atCliff() == -1:
-                print("Warning: At Left Cliff!!!")
-            elif self.cliffdetector.atCliff() == 1:
-                print("Warning: At Right Cliff!!!")
-            elif self.cliffdetector.atCliff() == 0:
-                print("Coast is clear. Not near a cliff.")
-            else:
-                print("Bogus result from cliff detector. Ignore danger.")
+        #if self.cliffdetector:
+        #    if self.cliffdetector.atCliff() == -1:
+        #        print("Warning: At Left Cliff!!!")
+        #    elif self.cliffdetector.atCliff() == 1:
+        #        print("Warning: At Right Cliff!!!")
+        #    elif self.cliffdetector.atCliff() == 0:
+        #        print("Coast is clear. Not near a cliff.")
+        #    else:
+        #        print("Bogus result from cliff detector. Ignore danger.")
 
         self.drivetrain.move(x, y, rcw)
         self.drivetrain.execute()
@@ -431,6 +431,7 @@ class MyRobot(wpilib.TimedRobot):
         return
 
     def teleopGrabber(self):
+        return
         operator = self.operator.xboxController
         #deadzone
         self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
@@ -438,6 +439,7 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.toggle()
     
     def teleopIntake(self):
+        return
         operator = self.operator.xboxController
         if operator.getXButtonReleased():
             self.intake.toggle()

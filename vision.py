@@ -25,7 +25,7 @@ class Vision:
             print('Invalid pipeline input: ' + pl)
 
     def hasTargets(self):
-        return bool(self.table.getNumber('tv', False))
+        return bool(self.table.getNumber('tv', 0))
 
     def canUpdatePose(self):
         if (self.pipeline == 0 and self.hasTargets()):
