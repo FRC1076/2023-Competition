@@ -79,8 +79,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.intake = self.initIntake(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
-            if key == 'CLIFFDETECTOR':
-                self.cliffDetector = self.initCliffDetector(config)
+            #if key == 'CLIFFDETECTOR':
+            #    self.cliffDetector = self.initCliffDetector(config)
 
         self.periods = 0
 
@@ -217,7 +217,7 @@ class MyRobot(wpilib.TimedRobot):
         return swervometer
     
     def initVision(self, config):
-        vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
+        vision = Vision(NetworkTables.getTable('limelight-foobar'), config['UPDATE_POSE'])
 
         return vision
 
@@ -326,8 +326,8 @@ class MyRobot(wpilib.TimedRobot):
         return cliffDetector
 
     def robotPeriodic(self):
-        if self.cliffDetector:
-            self.cliffDetector.update()
+        #if self.cliffDetector:
+        #    self.cliffDetector.update()
         return True
 
     def teleopInit(self):
@@ -336,8 +336,8 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
-        self.teleopGrabber()
-        self.teleopIntake()
+        #self.teleopGrabber()
+        #self.teleopIntake()
         return True
 
     def move(self, x, y, rcw):
@@ -361,19 +361,18 @@ class MyRobot(wpilib.TimedRobot):
         # print('DRIVE_TARGET = ' + str(rcw) + ', PIVOT_TARGET = ' + str(degrees) + ", ENCODER_TICK = " + str(self.testingModule.get_current_angle()))
         # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
 
-        if self.cliffdetector:
-            if self.cliffdetector.atCliff() == -1:
-                print("Warning: At Left Cliff!!!")
-            elif self.cliffdetector.atCliff() == 1:
-                print("Warning: At Right Cliff!!!")
-            elif self.cliffdetector.atCliff() == 0:
-                print("Coast is clear. Not near a cliff.")
-            else:
-                print("Bogus result from cliff detector. Ignore danger.")
+        #if self.cliffdetector:
+        #    if self.cliffdetector.atCliff() == -1:
+        #        print("Warning: At Left Cliff!!!")
+        #    elif self.cliffdetector.atCliff() == 1:
+        #        print("Warning: At Right Cliff!!!")
+        #    elif self.cliffdetector.atCliff() == 0:
+        #        print("Coast is clear. Not near a cliff.")
+        #    else:
+        #        print("Bogus result from cliff detector. Ignore danger.")
 
         self.drivetrain.move(x, y, rcw)
-        self.drivetrain.execute()
-
+        
     def teleopDrivetrain(self):
         if (not self.drivetrain):
             return
@@ -387,6 +386,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.dashboard.putNumber('ctrl right x', driver.getRightX())
         self.dashboard.putNumber('ctrl right y', driver.getRightY())
+        #print("dashboard: ", self.dashboard.getNumber('ctrl right y', -1))
         
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
         if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):

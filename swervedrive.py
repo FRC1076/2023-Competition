@@ -552,7 +552,9 @@ class SwerveDrive:
         COFX, COFY, COFAngle = self.swervometer.calculateCOFPose(self.modules, self.getGyroAngle())
 
         if self.vision:
+            print("Vision started")
             if self.vision.canUpdatePose():
+                print("Vision: canupdatepose")
                 pose = self.vision.getPose()
                 orientation = self.vision.getOrientation()
                 if self.vision.shouldUpdatePose():
