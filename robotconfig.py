@@ -29,23 +29,23 @@ swervometerConfig = { # All positions measured in inches
     'HAS_BUMPERS_ATTACHED': False, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
-    'FIELD_RED_A_START_POSITION_X': 0.0, #159.0, # X-Coordinate of starting position A when on red team
-    'FIELD_RED_A_START_POSITION_Y': 0.0, #54.25, # Y-Coordinate of starting postion A when on red team
+    'FIELD_RED_A_START_POSITION_X': 231, #159.0, # X-Coordinate of starting position A when on red team
+    'FIELD_RED_A_START_POSITION_Y': 22.4, #54.25, # Y-Coordinate of starting postion A when on red team
     'FIELD_RED_A_START_ANGLE': 0.0, # Heading angle of starting position A when on red team
-    'FIELD_RED_B_START_POSITION_X': 225.0, # X-Coordinate of starting position B when on red team
-    'FIELD_RED_B_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion B when on red team
+    'FIELD_RED_B_START_POSITION_X': 231, # X-Coordinate of starting position B when on red team
+    'FIELD_RED_B_START_POSITION_Y': -65.7, # Y-Coordinate of starting postion B when on red team
     'FIELD_RED_B_START_ANGLE': 0.0, # Heading angle of starting position B when on red team
-    'FIELD_RED_C_START_POSITION_X': 291.0, # X-Coordinate of starting position C when on red team
-    'FIELD_RED_C_START_POSITION_Y': 54.25, # Y-Coordinate of starting postion C when on red team
+    'FIELD_RED_C_START_POSITION_X': 231, # X-Coordinate of starting position C when on red team
+    'FIELD_RED_C_START_POSITION_Y': -137.7, # Y-Coordinate of starting postion C when on red team
     'FIELD_RED_C_START_ANGLE': 0.0, # Heading angle of starting position C when on red team
-    'FIELD_BLU_A_START_POSITION_X': 0.0, # X-Coordinate of starting position A when on blue team
-    'FIELD_BLU_A_START_POSITION_Y': 0.0, # Y-Coordinate of starting postion A when on blue team
+    'FIELD_BLU_A_START_POSITION_X': -231, # X-Coordinate of starting position A when on blue team
+    'FIELD_BLU_A_START_POSITION_Y': 22.4, # Y-Coordinate of starting postion A when on blue team
     'FIELD_BLU_A_START_ANGLE': 180.0, # Heading angle of starting position A when on blue team
-    'FIELD_BLU_B_START_POSITION_X': 100.0, # X-Coordinate of starting position B when on blue team
-    'FIELD_BLU_B_START_POSITION_Y': 400.0, # Y-Coordinate of starting postion B when on blue team
+    'FIELD_BLU_B_START_POSITION_X': -231, # X-Coordinate of starting position B when on blue team
+    'FIELD_BLU_B_START_POSITION_Y': -65.7, # Y-Coordinate of starting postion B when on blue team
     'FIELD_BLU_B_START_ANGLE': 180.0, # Heading angle of starting position B when on blue team
-    'FIELD_BLU_C_START_POSITION_X': 100.0, # X-Coordinate of starting position C when on blue team
-    'FIELD_BLU_C_START_POSITION_Y': 800.0, # Y-Coordinate of starting postion C when on blue team
+    'FIELD_BLU_C_START_POSITION_X': -231, # X-Coordinate of starting position C when on blue team
+    'FIELD_BLU_C_START_POSITION_Y': -137.7, # Y-Coordinate of starting postion C when on blue team
     'FIELD_BLU_C_START_ANGLE': 180.0, # Heading angle of starting position C when on blue team
     'FIELD_TAG1_X': 500.0, # X-Coordinate of Tag ID 1
     'FIELD_TAG1_Y': 500.0, # Y-Coordinate of Tag ID 1
