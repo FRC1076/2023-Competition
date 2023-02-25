@@ -1,5 +1,7 @@
 # https://docs.limelightvision.io/en/latest/networktables_api.html for NetworkTable values
 
+from networktables import NetworkTables
+
 APRILTAGS = 0
 RETROREFLECTIVE = 1
 
@@ -8,10 +10,10 @@ class Vision:
         self.table = _table
         self.pipeline = APRILTAGS
         self.table.putNumber('pipeline', APRILTAGS) # default to AprilTags pipeline
-        self.shouldUpdatePose = _shouldUpdatePose
+        self.updatePose = _shouldUpdatePose
 
     def shouldUpdatePose(self):
-        return self.shouldUpdatePose
+        return self.updatePose
         
     def getPipeline(self):
         self.pipeline = self.table.getNumber('getpipe', 0)
@@ -26,6 +28,7 @@ class Vision:
 
     def hasTargets(self):
         print("Vision: ", self.table.getNumber('tv', 0))
+        print("Bot Pose: ", self.table.getNumberArray('botpose', None))
         return bool(self.table.getNumber('tv', 0))
 
     def canUpdatePose(self):

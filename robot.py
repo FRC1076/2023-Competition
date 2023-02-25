@@ -59,6 +59,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.config = robotconfig
 
+        NetworkTables.initialize(server='roborio-1076-frc.local')
         self.dashboard = NetworkTables.getTable('SmartDashboard')
 
         print(self.config)
@@ -217,7 +218,7 @@ class MyRobot(wpilib.TimedRobot):
         return swervometer
     
     def initVision(self, config):
-        vision = Vision(NetworkTables.getTable('limelight-foobar'), config['UPDATE_POSE'])
+        vision = Vision(NetworkTables.getTable('limelight-nigel'), config['UPDATE_POSE'])
 
         return vision
 

@@ -559,9 +559,9 @@ class SwerveDrive:
                 orientation = self.vision.getOrientation()
                 if self.vision.shouldUpdatePose():
                     self.swervometer.setCOF(pose[0], pose[1], orientation[2])
-                    print("Vision updated position: (" + pose[0] + ", " + pose[1] + ") with rotation of " + orientation[2] + " degrees.")
+                    print("Vision updated position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
                 else:
-                    print("Vision reports position: (" + pose[0] + ", " + pose[1] + ") with rotation of " + orientation[2] + " degrees.")
+                    print("Vision reports position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
 
         print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 
