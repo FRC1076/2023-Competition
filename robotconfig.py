@@ -24,9 +24,9 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
-    'HAS_BUMPERS_ATTACHED': False, # Does the robot currently have bumpers attached?
+    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
+    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_RED_A_START_POSITION_X': 231, #159.0, # X-Coordinate of starting position A when on red team
@@ -65,14 +65,15 @@ swervometerConfig = { # All positions measured in inches
     'FIELD_TAG8_Y': 500.0, # Y-Coordinate of Tag ID 8
     'ROBOT_FRAME_DIMENSION_X': 34.0, # X-coordinate length of robot frame
     'ROBOT_FRAME_DIMENSION_Y': 26.0, # Y-coordinate length of robot frame
-    'ROBOT_BUMPER_DIMENSION_X': 4.0, # Width of bumper (X-axis)
-    'ROBOT_BUMPER_DIMENSION_Y': 4.0, # Width of bumper (Y-axis)
+    'ROBOT_BUMPER_DIMENSION_X': 3.0, # Width of bumper (X-axis)
+    'ROBOT_BUMPER_DIMENSION_Y': 3.0, # Width of bumper (Y-axis)
     'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
     'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
     'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
     'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)
-    'ROBOT_CAMERA_OFFSET_X': 10.0, # X-offset of center of camera lens (relative to lower left frame)
-    'ROBOT_CAMERA_OFFSET_Y': 20.0, # Y-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_CAMERA_OFFSET_X': 17.0, # X-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_CAMERA_OFFSET_Y': 0.0, # Y-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_CAMERA_HEIGHT': 12.1875, # Height of camera eye relative to gyroscope: 11 3/16+ 2 -1
     'ROBOT_SWERVE_MODULE_OFFSET_X': 13.75, # X-offset of swerve module center from COF
     'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
 }
@@ -102,7 +103,7 @@ drivetrainConfig = {
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
     'TARGET_KP': 0.005,
-    'TARGET_KI': 0.0025,
+    'TARGET_KI': 0.005,
     'TARGET_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0 #1.793, # Inches per rotation of wheels
 }
@@ -144,14 +145,14 @@ autonConfig = {
     'PICKUP_NEW': False,
     'SCORE_NEW': False,
     'BALANCE_BOT': True,
-    'TASK_BLUE_A_TFFT': [['ELEVATE'],
+    'TASK_BLU_A_TFFT': [['ELEVATE'],
                         ['MOVE', -122.6, 27.8, 180],
                         ['MOVE', -238.3, 27.8, 180]],
-    'TASK_BLUE_B_TFFT': [['ELEVATE'],
+    'TASK_BLU_B_TFFT': [['ELEVATE'],
                         ['MOVE', -94.5, -47.4, 180],
                         ['MOVE', -157, -47.4, 180],
                         ['BALANCE']],
-    'TASK_BLUE_C_TFFT': [['ELEVATE'],
+    'TASK_BLU_C_TFFT': [['ELEVATE'],
                         ['MOVE', -92.4, -128.5, 180],
                         ['MOVE', -188.1, -128.5, 180]],
     'TASK_RED_A_TFFT': [['ELEVATE'],

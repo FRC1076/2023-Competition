@@ -43,7 +43,7 @@ class SwerveModule:
             self.moduleFlipped = True
             #print("SwerveModule Init (theta < 90 or theta > 270): positionSign: ", self.positionSign, " angle: ", angle)
 
-        self.driveMotor.setOpenLoopRampRate(1)
+        #self.driveMotor.setOpenLoopRampRate(1)
         #print("Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
 
         # Config -- change this to reflect how our config is formatted. We will upon testing of the entire drivetrain figure out which need to be inverted.

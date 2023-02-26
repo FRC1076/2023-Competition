@@ -109,9 +109,9 @@ class SwerveDrive:
         self.target_kI = self.target_config.target_kI
         self.target_kD = self.target_config.target_kD
         self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_x_pid_controller.setTolerance(0.5, 0.5)
+        self.target_x_pid_controller.setTolerance(5, 5)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_y_pid_controller.setTolerance(0.5, 0.5)
+        self.target_y_pid_controller.setTolerance(5, 5)
         self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
         self.target_rcw_pid_controller.enableContinuousInput(0, 360)
@@ -409,7 +409,7 @@ class SwerveDrive:
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
         rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
-
+        print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
             print("X at set point")
         if self.target_y_pid_controller.atSetpoint():
@@ -417,11 +417,11 @@ class SwerveDrive:
         if self.target_rcw_pid_controller.atSetpoint():
             print("RCW at set point")
             
-        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): # and self.target_rcw_pid_controller.atSetpoint(): 
+        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
         else:
-            self.move(y_error, x_error, rcw)
+            self.move(y_error, x_error, rcw_error)
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
@@ -460,10 +460,10 @@ class SwerveDrive:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defence)
 
-                    self._requested_angles['front_left'] = 90 #45
-                    self._requested_angles['front_right'] = 90 #-45
-                    self._requested_angles['rear_left'] = 90 #-45
-                    self._requested_angles['rear_right'] = 90 #45
+                    self._requested_angles['front_left'] = 45
+                    self._requested_angles['front_right'] = -45
+                    self._requested_angles['rear_left'] = -45
+                    self._requested_angles['rear_right'] = 45
 
                     #self.wheel_lock = False
                     #print("testing wheel lock")

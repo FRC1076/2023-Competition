@@ -27,13 +27,13 @@ class Vision:
             print('Invalid pipeline input: ' + pl)
 
     def hasTargets(self):
-        print("Vision: ", self.table.getNumber('tv', 0))
-        print("Bot Pose: ", self.table.getNumberArray('botpose', None))
+        #print("Vision: ", self.table.getNumber('tv', 0))
+        #print("Bot Pose: ", self.table.getNumberArray('botpose', None))
         return bool(self.table.getNumber('tv', 0))
 
     def canUpdatePose(self):
-        print("Vision: self.pipeline: ", self.pipeline, " self.hasTargets: ", self.hasTargets())
-        print("Vision: getDescription:", self.table.getString('description', 'ABBA'))
+        #print("Vision: self.pipeline: ", self.pipeline, " self.hasTargets: ", self.hasTargets())
+        #print("Vision: getDescription:", self.table.getString('description', 'ABBA'))
         if (self.pipeline == 0 and self.hasTargets()):
             return True
         return False

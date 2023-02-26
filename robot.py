@@ -59,7 +59,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.config = robotconfig
 
-        NetworkTables.initialize(server='roborio-1076-frc.local')
+        NetworkTables.initialize(server='roborio-1076-frc.local') # Necessary for vision to
         self.dashboard = NetworkTables.getTable('SmartDashboard')
 
         print(self.config)
@@ -303,13 +303,34 @@ class MyRobot(wpilib.TimedRobot):
             and not self.autonScoreNew
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_B_TFFT']     
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_C_TFFT']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'A'
             and self.autonScoreExisting
             and not self.autonPickupNew
             and not self.autonScoreNew
             and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_A_TFFT']
+                self.autonTaskList = config['TASK_BLU_A_TFFT']     
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_B_TFFT']
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_C_TFFT']
         else: # No matching task list
             self.autonTaskCounter = -1
             self.autonTaskList = []
@@ -372,7 +393,7 @@ class MyRobot(wpilib.TimedRobot):
         #    else:
         #        print("Bogus result from cliff detector. Ignore danger.")
 
-        self.drivetrain.move(x, y, rcw)
+        self.drivetrain.move(-x, -y, rcw)
         
     def teleopDrivetrain(self):
         if (not self.drivetrain):
@@ -385,8 +406,8 @@ class MyRobot(wpilib.TimedRobot):
 
         speedMulti = 1.0
 
-        self.dashboard.putNumber('ctrl right x', driver.getRightX())
-        self.dashboard.putNumber('ctrl right y', driver.getRightY())
+        self.dashboard.putNumber('ctrl right x', driver.getLeftX())
+        self.dashboard.putNumber('ctrl right y', driver.getLeftY())
         #print("dashboard: ", self.dashboard.getNumber('ctrl right y', -1))
         
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
@@ -407,9 +428,9 @@ class MyRobot(wpilib.TimedRobot):
         if(driver.getAButton()):
             self.drivetrain.balance()
         else:
-            rightXCorrected = self.deadzoneCorrection(-driver.getRightX(), 0.55 * speedMulti)
-            rightYCorrected = self.deadzoneCorrection(driver.getRightY(), 0.55 * speedMulti)
-            leftXCorrected = self.deadzoneCorrection(driver.getLeftX(), 0.55 * speedMulti)
+            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX(), 0.55 * speedMulti)
+            rightYCorrected = self.deadzoneCorrection(driver.getLeftY(), 0.55 * speedMulti)
+            leftXCorrected = self.deadzoneCorrection(driver.getRightX(), 0.55 * speedMulti)
             # check if there's any input at all
             if rightXCorrected != 0 or rightYCorrected != 0 or leftXCorrected != 0:
                 self.move(rightXCorrected, rightYCorrected, leftXCorrected)
