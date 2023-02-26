@@ -515,6 +515,10 @@ class SwerveDrive:
     def getWheelLock(self):
         return self.wheel_lock
 
+    def setOpenLoopRampRates(self, openLoopRampRate):
+        for key in self.modules:
+            self.modules[key].setOpenLoopRampRate(openLoopRampRate)
+        
     def debug(self, debug_modules=False):
         """
         Prints debugging information to log

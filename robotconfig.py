@@ -105,12 +105,13 @@ drivetrainConfig = {
     'TARGET_KP': 0.005,
     'TARGET_KI': 0.005,
     'TARGET_KD': 0.0001,
-    'ROBOT_INCHES_PER_ROTATION': 1.0 #1.793, # Inches per rotation of wheels
+    'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
+    'TELEOP_OPEN_LOOP_RAMP_RATE': 0.0, # Improves maneuverability of bot.
 }
 
 intakeConfig = {
     # Update IDs when known
-    'INTAKE_MOTOR_ID': -1
+    'INTAKE_MOTOR_ID': -1,
 }
 
 visionConfig = {
@@ -145,6 +146,7 @@ autonConfig = {
     'PICKUP_NEW': False,
     'SCORE_NEW': False,
     'BALANCE_BOT': True,
+    'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'TASK_BLU_A_TFFT': [['ELEVATE'],
                         ['MOVE', -122.6, 27.8, 180],
                         ['MOVE', -238.3, 27.8, 180]],
