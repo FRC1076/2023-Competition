@@ -7,26 +7,34 @@ class Grabber:
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type)
         self.left_motor = rev.CANSparkMax(left_id, motor_type)
-        self.solenoid = wpilib.DoubleSolenoid(0, solenoid_forward_id, solenoid_reverse_id)
+        self.right_encoder = self.right_motor.getEncoder()
+        self.left_encoder = self.left_motor.getEncoder()
+        #self.right_encoder.setPosition(0)
+        #self.left_encoder.setPosition(0)
+        self.solenoid = wpilib.DoubleSolenoid(1, wpilib.PneumaticsModuleType.REVPH, solenoid_forward_id, solenoid_reverse_id)
         #assume retracted
-        self.right_motor.getAbsoluteEncoder().setZeroOffset(self.right_motor.getAbsoluteEncoder().getPosition())
-        self.left_motor.getAbsoluteEncoder().setZeroOffset(self.left_motor.getAbsoluteEncoder().getPosition())
+        #self.right_motor.getEncoder().setZeroOffset(self.right_motor.getEncoder().getPosition())
+        #self.left_motor.getEncoder().setZeroOffset(self.left_motor.getEncoder().getPosition())
 
     #1.00917431193 inches per rotation
     def extend(self, value):
         #make sure arm doesn't go past limit
-        if self.right_motor.getAbsoluteEncoder().getPosition() > 35 and value > 0:
+        if self.right_encoder.getPosition() > 34 and value > 0:
+            self.right_motor.set(0)
+            self.left_motor.set(0)
             return
-        if self.right_motor.getAbsoluteEncoder().getPosition() < 0 and value < 0:
+        if self.right_encoder.getPosition() < 2 and value < 0:
+            self.right_motor.set(0)
+            self.left_motor.set(0)
             return
-        self.right_motor.set(value)
-        self.left_motor.set(-value)
+        self.right_motor.set(value * 0.25)
+        self.left_motor.set(value * 0.25)
 
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
-        elif self.solenoid.get() == DoubleSolenoid.Value.kReverse:
+        elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             self.solenoid.set(DoubleSolenoid.Value.kForward)
     
     def getEncoderPosition(self):
-        return self.right_motor.getAbsoluteEncoder().getPosition()
+        return self.right_encoder.getPosition()

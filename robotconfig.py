@@ -47,7 +47,7 @@ shooterConfig = {
 
 intakeConfig = {
     # Update IDs when known
-    'INTAKE_MOTOR_ID': -1
+    'INTAKE_MOTOR_ID': 0
 }
 
 feederConfig = {
@@ -104,10 +104,10 @@ climberConfig = {
 }
 
 hooksConfig = {
-    'FRONT_HOOK_ID': 5,
-    'BACK_HOOK_ID': 6,
-    'LEFT_HOOK_ID': 7,
-    'RIGHT_HOOK_ID': 8,
+    'FRONT_HOOK_ID': 99,
+    'BACK_HOOK_ID': 98,
+    'LEFT_HOOK_ID': 97,
+    'RIGHT_HOOK_ID': 96,
 
     'FRONT_TOP_PORT': 0,
     'FRONT_BOTTOM_PORT': 1,
@@ -120,12 +120,12 @@ hooksConfig = {
 }
 
 grabberConfig = {
-    'RIGHT_ID': -1,
-    'LEFT_ID': -1,
-    'INTAKE_TOP_ID': -1,
-    'INTAKE_BOTTOM_ID': -1,
-    'SOLENOID_FORWARD_ID': -1,
-    'SOLENOID_REVERSE_ID': -1
+    'RIGHT_ID': 6,
+    'LEFT_ID': 10,
+    'INTAKE_TOP_ID': 0,
+    'INTAKE_BOTTOM_ID': 0,
+    'SOLENOID_FORWARD_ID': 4,
+    'SOLENOID_REVERSE_ID': 5
 }
 
 #######################

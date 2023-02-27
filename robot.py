@@ -94,7 +94,8 @@ class MyRobot(wpilib.TimedRobot):
         return ctrls
 
     def initGrabber(self, config):
-        grabber = Grabber(config['RIGHT_I'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+        grabber = Grabber(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+        self.yButtonLastRead = False
         return grabber
 
     def initAuton(self, config):
@@ -284,9 +285,12 @@ class MyRobot(wpilib.TimedRobot):
     def teleopGrabber(self):
         operator = self.operator.xboxController
         #deadzone
-        self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), operator.deadzone))
-        if operator.getYButtonReleased():
+        self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone))
+        print(self.operator.xboxController.getYButton())
+        if self.operator.xboxController.getYButton() and not self.yButtonLastRead:
             self.grabber.toggle()
+        self.yButtonLastRead = self.operator.xboxController.getYButton()
+        print(self.grabber.getEncoderPosition())
     
     def teleopIntake(self):
         operator = self.operator.xboxController
