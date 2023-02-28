@@ -1,6 +1,7 @@
 import rev
 import wpilib
 from wpilib import DoubleSolenoid
+import math
 
 class Grabber:
     def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id):
@@ -29,6 +30,15 @@ class Grabber:
             return
         self.right_motor.set(-value * 0.1)
         self.left_motor.set(-value * 0.1)
+
+    def moveToPos(self, value):
+        if(abs(self.right_encoder.getPosition() - value) < 0.5):
+            print("Reached")
+            self.extend(0)
+            return True
+        else:
+            print("Moving")
+            self.extend(math.copysign(0.5, self.right_encoder.getPosition() - value))
 
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
