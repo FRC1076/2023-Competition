@@ -19,16 +19,16 @@ class Grabber:
     #1.00917431193 inches per rotation
     def extend(self, value):
         #make sure arm doesn't go past limit
-        if self.right_encoder.getPosition() > 34 and value > 0:
+        if self.right_encoder.getPosition() > 34 and value < 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
-        if self.right_encoder.getPosition() < 2 and value < 0:
+        if self.right_encoder.getPosition() < 2 and value > 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
-        self.right_motor.set(value * 0.25)
-        self.left_motor.set(value * 0.25)
+        self.right_motor.set(-value * 0.1)
+        self.left_motor.set(-value * 0.1)
 
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
