@@ -342,8 +342,6 @@ class MyRobot(wpilib.TimedRobot):
             print("move backwards")
             #self.move(0, self.autonBackwardSpeed, 0)
         #self.hooks.update()
-
-        self.grabber.moveToPos(10)
         print(self.grabber.getEncoderPosition())
 
     def deadzoneCorrection(self, val, deadzone):
