@@ -43,15 +43,10 @@ class SwerveModule:
             self.moduleFlipped = True
             #print("SwerveModule Init (theta < 90 or theta > 270): positionSign: ", self.positionSign, " angle: ", angle)
 
-        #self.driveMotor.setOpenLoopRampRate(1)
-        #print("Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
-
         # Config -- change this to reflect how our config is formatted. We will upon testing of the entire drivetrain figure out which need to be inverted.
         self.sd_prefix = self.cfg.sd_prefix or 'Module'
         self.inverted = self.cfg.inverted or False 
         self.allow_reverse = self.cfg.allow_reverse or True #def allow reverse always, so you can maybe remove this
-
-        
 
         # SmartDashboard
         self.sd = NetworkTables.getTable('SmartDashboard')
@@ -196,7 +191,7 @@ class SwerveModule:
                 #deg += 180
                 #deg %= 360
             
-            print("Module Flipped Test: flipped: ", self.moduleFlipped, " speed: ", speed, " positionSign: ", self.positionSign)
+            #print("Module Flipped Test: flipped: ", self.moduleFlipped, " speed: ", speed, " positionSign: ", self.positionSign)
 
         self._requested_speed = speed 
         self._set_deg(deg)
@@ -261,7 +256,13 @@ class SwerveModule:
     def idle(self):
         self.rotateMotor.set(0)
         self.driveMotor.set(0)
-        
+
+    def setRampRate(self, openLoopRampRate, closedLoopRampRate):
+        self.driveMotor.setOpenLoopRampRate(openLoopRampRate)
+        #print("Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
+        self.driveMotor.setClosedLoopRampRate(closedLoopRampRate)
+        #print("Closed Loop Ramp Rate: ", self.driveMotor.getClosedLoopRampRate())
+
     def update_smartdash(self):
         """
         Output a bunch on internal variables for debugging purposes.

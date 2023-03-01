@@ -25,7 +25,7 @@ controllerConfig = {
 
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': False, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -69,13 +69,16 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_BUMPER_DIMENSION_Y': 3.0, # Width of bumper (Y-axis)
     'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
     'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
+    'ROBOT_COM_OFFSET_X': -4.0, # X-offset of center of mass (relative to center of frame)
+    'ROBOT_COM_OFFSET_Y': 0.0, # Y-offset of center of mass (relative to center of frame)
     'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
     'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)
-    'ROBOT_CAMERA_OFFSET_X': 17.0, # X-offset of center of camera lens (relative to lower left frame)
-    'ROBOT_CAMERA_OFFSET_Y': 0.0, # Y-offset of center of camera lens (relative to lower left frame)
+    'ROBOT_CAMERA_OFFSET_X': 17.0, # X-offset of center of camera lens (relative to center of frame)
+    'ROBOT_CAMERA_OFFSET_Y': 0.0, # Y-offset of center of camera lens (relative to center of frame)
     'ROBOT_CAMERA_HEIGHT': 12.1875, # Height of camera eye relative to gyroscope: 11 3/16+ 2 -1
     'ROBOT_SWERVE_MODULE_OFFSET_X': 13.75, # X-offset of swerve module center from COF
     'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
+    'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
 }
 
 drivetrainConfig = {
@@ -105,12 +108,14 @@ drivetrainConfig = {
     'TARGET_KP': 0.005,
     'TARGET_KI': 0.005,
     'TARGET_KD': 0.0001,
-    'ROBOT_INCHES_PER_ROTATION': 1.0 #1.793, # Inches per rotation of wheels
+    'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
+    'TELEOP_OPEN_LOOP_RAMP_RATE': 0.0, # Improves maneuverability of bot.
+    'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.1
 }
 
 intakeConfig = {
     # Update IDs when known
-    'INTAKE_MOTOR_ID': -1
+    'INTAKE_MOTOR_ID': -1,
 }
 
 visionConfig = {
@@ -145,26 +150,28 @@ autonConfig = {
     'PICKUP_NEW': False,
     'SCORE_NEW': False,
     'BALANCE_BOT': True,
+    'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
+    'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TFFT': [['ELEVATE'],
-                        ['MOVE', -122.6, 27.8, 180],
-                        ['MOVE', -238.3, 27.8, 180]],
+                        ['MOVE', -122.6, 27.8, 0],
+                        ['MOVE', -238.3, 27.8, 0]],
     'TASK_BLU_B_TFFT': [['ELEVATE'],
-                        ['MOVE', -94.5, -47.4, 180],
-                        ['MOVE', -157, -47.4, 180],
+                        ['MOVE', -94.5, -47.4, 0],
+                        ['MOVE', -157, -47.4, 0],
                         ['BALANCE']],
     'TASK_BLU_C_TFFT': [['ELEVATE'],
-                        ['MOVE', -92.4, -128.5, 180],
-                        ['MOVE', -188.1, -128.5, 180]],
+                        ['MOVE', -92.4, -128.5, 0],
+                        ['MOVE', -188.1, -128.5, 0]],
     'TASK_RED_A_TFFT': [['ELEVATE'],
-                        ['MOVE', 122.6, 27.8, 0],
-                        ['MOVE', 238.3, 27.8, 0]],
+                        ['MOVE', 122.6, 27.8, 180],
+                        ['MOVE', 238.3, 27.8, 180]],
     'TASK_RED_B_TFFT': [['ELEVATE'],
-                        ['MOVE', 94.5, -47.4, 0],
-                        ['MOVE', 157, -47.4, 0],
+                        ['MOVE', 94.5, -47.4, 180],
+                        ['MOVE', 157, -47.4, 180],
                         ['BALANCE']],
     'TASK_RED_C_TFFT': [['ELEVATE'],
-                        ['MOVE', 92.4, -128.5, 0],
-                        ['MOVE', 188.1, -128.5, 0]],
+                        ['MOVE', 92.4, -128.5, 180],
+                        ['MOVE', 188.1, -128.5, 180]],
 }
 
 #######################

@@ -200,12 +200,15 @@ class MyRobot(wpilib.TimedRobot):
                                 is_red_team=self.team_is_red,
                                 team_gyro_adjustment=teamGyroAdjustment,
                                 team_move_adjustment=teamMoveAdjustment,
+                                use_com_adjustment=config['USE_COM_ADJUSTMENT'],
                                 frame_dimension_x=config['ROBOT_FRAME_DIMENSION_X'],
                                 frame_dimension_y=config['ROBOT_FRAME_DIMENSION_Y'],
                                 bumper_dimension_x=actual_bumper_dimension_x,
                                 bumper_dimension_y=actual_bumper_dimension_y,
                                 cof_offset_x=config['ROBOT_COF_OFFSET_X'],
                                 cof_offset_y=config['ROBOT_COF_OFFSET_Y'],
+                                com_offset_x=config['ROBOT_COM_OFFSET_X'],
+                                com_offset_y=config['ROBOT_COM_OFFSET_Y'],
                                 gyro_offset_x=config['ROBOT_GYRO_OFFSET_X'],
                                 gyro_offset_y=config['ROBOT_GYRO_OFFSET_Y'],
                                 camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],
@@ -218,7 +221,7 @@ class MyRobot(wpilib.TimedRobot):
         return swervometer
     
     def initVision(self, config):
-        vision = Vision(NetworkTables.getTable('limelight-nigel'), config['UPDATE_POSE'])
+        vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
 
         return vision
 
@@ -268,6 +271,10 @@ class MyRobot(wpilib.TimedRobot):
         rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_driveMotor_encoder, rlModule_rotateMotor, rlModule_rotateMotor_encoder, rlModule_cfg)
         rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_rotateMotor_encoder, rrModule_cfg)
 
+        # Set Open and Closed Loop Ramp Rate for Teleop
+        self.teleopOpenLoopRampRate = config['TELEOP_OPEN_LOOP_RAMP_RATE']
+        self.teleopClosedLoopRampRate = config['TELEOP_CLOSED_LOOP_RAMP_RATE']
+
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
@@ -280,6 +287,7 @@ class MyRobot(wpilib.TimedRobot):
         self.autonPickupNew = config['PICKUP_NEW']
         self.autonScoreNew = config['SCORE_NEW']
         self.autonBalanceRobot = config['BALANCE_BOT']
+
         self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
         self.dashboard.putNumber('Auton Pickup New Element', self.autonPickupNew)
         self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
@@ -287,6 +295,10 @@ class MyRobot(wpilib.TimedRobot):
 
         # Reset task counter.
         self.autonTaskCounter = 0
+
+        # Set Open Loop Ramp Rate for Auton
+        self.autonOpenLoopRampRate = config['AUTON_OPEN_LOOP_RAMP_RATE']
+        self.autonClosedLoopRampRate = config['AUTON_CLOSED_LOOP_RAMP_RATE']
 
         # Figure out task list
         if (self.team_is_red
@@ -354,6 +366,9 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopInit(self):
         print("teleopInit ran")
+
+        self.drivetrain.setRampRates(self.teleopOpenLoopRampRate, self.teleopClosedLoopRampRate)
+
         return True
 
     def teleopPeriodic(self):
@@ -477,6 +492,8 @@ class MyRobot(wpilib.TimedRobot):
         #self.autonTimer.start()
 
         self.drivetrain.resetGyro()
+
+        self.drivetrain.setRampRates(self.autonOpenLoopRampRate, self.autonClosedLoopRampRate)
 
         # Reset the task counter
         self.autonTaskCounter = 0
