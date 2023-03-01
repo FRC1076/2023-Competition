@@ -60,9 +60,13 @@ class Vision:
         """
         Returns the robot's calculated field position (x, y, z) in inches relative to the center of the field.
         """
-        pose = self.table.getNumberArray('botpose', None) # returns [x, y, z, roll, pitch, yaw]
         s = 39.37 # scalar to convert meters to inches
-        return (pose[0] * s, pose[1] * s, pose[2] * s)
+        pose = self.table.getNumberArray('botpose', None) # returns [x, y, z, roll, pitch, yaw]
+        print("POSE IS: ", pose)
+        if self.hasTargets() or len(pose) != 0:
+            return (pose[0] * s, pose[1] * s, pose[2] * s)
+        else:
+            return (-1, -1, -1)
 
     def getOrientation(self):
         pose = self.table.getNumberArray('botpose', None) # returns [x, y, z, roll, pitch, yaw]

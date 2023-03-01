@@ -218,7 +218,7 @@ class MyRobot(wpilib.TimedRobot):
         return swervometer
     
     def initVision(self, config):
-        vision = Vision(NetworkTables.getTable('limelight-nigel'), config['UPDATE_POSE'])
+        vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
 
         return vision
 

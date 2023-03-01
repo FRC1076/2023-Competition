@@ -24,8 +24,8 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -148,25 +148,25 @@ autonConfig = {
     'BALANCE_BOT': True,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'TASK_BLU_A_TFFT': [['ELEVATE'],
-                        ['MOVE', -122.6, 27.8, 180],
-                        ['MOVE', -238.3, 27.8, 180]],
+                        ['MOVE', -122.6, 27.8, 0],
+                        ['MOVE', -238.3, 27.8, 0]],
     'TASK_BLU_B_TFFT': [['ELEVATE'],
-                        ['MOVE', -94.5, -47.4, 180],
-                        ['MOVE', -157, -47.4, 180],
+                        ['MOVE', -94.5, -47.4, 0],
+                        ['MOVE', -157, -47.4, 0],
                         ['BALANCE']],
     'TASK_BLU_C_TFFT': [['ELEVATE'],
-                        ['MOVE', -92.4, -128.5, 180],
-                        ['MOVE', -188.1, -128.5, 180]],
+                        ['MOVE', -92.4, -128.5, 0],
+                        ['MOVE', -188.1, -128.5, 0]],
     'TASK_RED_A_TFFT': [['ELEVATE'],
-                        ['MOVE', 122.6, 27.8, 0],
-                        ['MOVE', 238.3, 27.8, 0]],
+                        ['MOVE', 122.6, 27.8, 180],
+                        ['MOVE', 238.3, 27.8, 180]],
     'TASK_RED_B_TFFT': [['ELEVATE'],
-                        ['MOVE', 94.5, -47.4, 0],
-                        ['MOVE', 157, -47.4, 0],
+                        ['MOVE', 94.5, -47.4, 180],
+                        ['MOVE', 157, -47.4, 180],
                         ['BALANCE']],
     'TASK_RED_C_TFFT': [['ELEVATE'],
-                        ['MOVE', 92.4, -128.5, 0],
-                        ['MOVE', 188.1, -128.5, 0]],
+                        ['MOVE', 92.4, -128.5, 180],
+                        ['MOVE', 188.1, -128.5, 180]],
 }
 
 #######################

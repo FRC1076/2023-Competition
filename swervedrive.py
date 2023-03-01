@@ -566,6 +566,7 @@ class SwerveDrive:
                     print("Vision updated position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
                 else:
                     print("Vision reports position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
+                print("AFTER COMMENTS")
 
         print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 
