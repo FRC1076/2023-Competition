@@ -543,7 +543,8 @@ class SwerveDrive:
 
         # Set the speed and angle for each module
         for key in self.modules:
-            self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
+            print("Execute: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
+            self.modules[key].move((self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_angles[key])
 
         # Reset the speed back to zero
         self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)

@@ -206,6 +206,8 @@ class MyRobot(wpilib.TimedRobot):
                                 bumper_dimension_y=actual_bumper_dimension_y,
                                 cof_offset_x=config['ROBOT_COF_OFFSET_X'],
                                 cof_offset_y=config['ROBOT_COF_OFFSET_Y'],
+                                com_offset_x=config['ROBOT_COM_OFFSET_X'],
+                                com_offset_y=config['ROBOT_COM_OFFSET_Y'],
                                 gyro_offset_x=config['ROBOT_GYRO_OFFSET_X'],
                                 gyro_offset_y=config['ROBOT_GYRO_OFFSET_Y'],
                                 camera_offset_x=config['ROBOT_CAMERA_OFFSET_X'],

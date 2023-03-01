@@ -23,6 +23,7 @@ RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',
                                                          'frame_dimension_x', 'frame_dimension_y',
                                                          'bumper_dimension_x', 'bumper_dimension_y',
                                                          'cof_offset_x', 'cof_offset_y',
+                                                         'com_offset_x', 'com_offset_y',
                                                          'gyro_offset_x', 'gyro_offset_y',
                                                          'camera_offset_x', 'camera_offset_y',
                                                          'swerve_module_offset_x', 'swerve_module_offset_y'])
@@ -44,8 +45,16 @@ class Swervometer:
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
         self.frame_dimension_x = self.robotProperty.frame_dimension_x
         self.frame_dimension_y = self.robotProperty.frame_dimension_y
+        self.com_offset_x = self.robotProperty.com_offset_x
+        self.com_offset_y = self.robotProperty.com_offset_y
         print("init current X: ", self.currentX, " init current y: ", self.currentY, " init current rcw: ", self.currentRCW)
     
+        self.frontLeftCOMmult = 1.0
+        self.frontRightCOMmult = 1.0
+        self.rearLeftCOMmult = 1.0
+        self.rearRightCOMmult = 1.0
+        self.calcLeverArmLengths()
+
     def getFrameDimensions(self):
         return self.frame_dimension_x, self.frame_dimension_y
 
@@ -62,6 +71,37 @@ class Swervometer:
         self.currentX = x
         self.currentY = y
         self.currentRCW = rcw
+
+    def calcLeverArmLengths(self):
+
+        # Calc X and Y distances from COM
+        frontLeverArmX = self.swerveModuleOffsetX - self.com_offset_x
+        rearLeverArmX = self.swerveModuleOffsetX + self.com_offset_x
+        leftLeverArmY = self.swerveModuleOffsetX + self.com_offset_x
+        rightLeverArmY = self.swerveModuleOffsetX - self.com_offset_x
+
+        # Calc true lever lengths
+        frontLeftLeverLength = math.hypot(frontLeverArmX, leftLeverArmY)
+        frontRightLeverLength = math.hypot(frontLeverArmX, rightLeverArmY)
+        rearLeftLeverLength = math.hypot(rearLeverArmX, leftLeverArmY)
+        rearRightLeverLength = math.hypot(rearLeverArmX, rightLeverArmY)
+        avgLeverLength = (frontLeftLeverLength + frontRightLeverLength + rearLeftLeverLength + rearRightLeverLength) / 4
+
+        # Normalize lever lengths
+        self.frontLeftCOMmult = avgLeverLength / frontLeftLeverLength
+        self.frontRightCOMmult = avgLeverLength / frontRightLeverLength
+        self.rearLeftCOMmult = avgLeverLength / rearLeftLeverLength
+        self.rearRightCOMmult = avgLeverLength / rearRightLeverLength
+
+    def getCOMmult(self, key):
+        if (key == 'front_right'):
+            return self.frontRightCOMmult
+        elif (key == 'rear_right'):
+            return self.rearRightCOMmult
+        elif (key == 'rear_left'):
+            return self.rearLeftCOMmult
+        else: # (key == 'rear_right'):
+            return self.rearRightCOMmult
 
     def calculateModuleCoordinates(self, psi, currentGyroAngle, hypotenuse, positionChange, wheelAngle):
         #print("calcModCoord: psi: ", psi, " currentGyroAngle: ", currentGyroAngle, " hypo: ", hypotenuse, " posChg: ", positionChange, " wheelAngle: ", wheelAngle)
