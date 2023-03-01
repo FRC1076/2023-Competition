@@ -542,9 +542,29 @@ class SwerveDrive:
         self._calculate_vectors()
 
         # Set the speed and angle for each module
+
+        # Calculate normalized speeds with lever arm adjustment
+        max_proposed_speed = 0
+        self.proposed_speeds = {}
         for key in self.modules:
-            print("Execute: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
-            self.modules[key].move((self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_angles[key])
+            self.proposed_speeds[key] = self._requested_speeds[key] * self.swervometer.getCOMmult(key)
+            if abs(self.proposed_speeds[key]) > max_proposed_speed:
+                max_proposed_speed = abs(self.proposed_speeds[key])
+        print("Execute: max proposed speed: ", max_proposed_speed)
+       
+        # Scale speeds down so maximum is 1.0
+        if max_proposed_speed > 1.0:
+            for key in self.modules:
+                self.modules[key].move((self.proposed_speeds[key]/ max_proposed_speed), self._requested_angles[key])
+                print("Execute Scaled Down: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
+        else:
+            for key in self.modules:
+                self.modules[key].move(self.proposed_speeds[key], self._requested_angles[key])        
+                print("Execute: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
+        
+        #for key in self.modules:
+        #    print("Execute: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
+        #    self.modules[key].move((self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_angles[key])
 
         # Reset the speed back to zero
         self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
