@@ -77,8 +77,9 @@ class Swervometer:
         # Calc X and Y distances from COM
         frontLeverArmX = self.swerveModuleOffsetX - self.com_offset_x
         rearLeverArmX = self.swerveModuleOffsetX + self.com_offset_x
-        leftLeverArmY = self.swerveModuleOffsetX + self.com_offset_x
-        rightLeverArmY = self.swerveModuleOffsetX - self.com_offset_x
+        leftLeverArmY = self.swerveModuleOffsetY + self.com_offset_y
+        rightLeverArmY = self.swerveModuleOffsetY - self.com_offset_y
+        #print("FL: ", frontLeverArmX, " RL: ", rearLeverArmX, " LL: ", leftLeverArmY, " RL: ", rightLeverArmY)
 
         # Calc true lever lengths
         frontLeftLeverLength = math.hypot(frontLeverArmX, leftLeverArmY)
@@ -93,15 +94,15 @@ class Swervometer:
         self.rearLeftCOMmult = avgLeverLength / rearLeftLeverLength
         self.rearRightCOMmult = avgLeverLength / rearRightLeverLength
 
-    def getCOMmult(self, key):
+    def getCOMmult(self, key): 
         if (key == 'front_right'):
             return self.frontRightCOMmult
         elif (key == 'rear_right'):
             return self.rearRightCOMmult
         elif (key == 'rear_left'):
             return self.rearLeftCOMmult
-        else: # (key == 'rear_right'):
-            return self.rearRightCOMmult
+        else: # (key == 'front_left'):
+            return self.frontLeftCOMmult
 
     def calculateModuleCoordinates(self, psi, currentGyroAngle, hypotenuse, positionChange, wheelAngle):
         #print("calcModCoord: psi: ", psi, " currentGyroAngle: ", currentGyroAngle, " hypo: ", hypotenuse, " posChg: ", positionChange, " wheelAngle: ", wheelAngle)
