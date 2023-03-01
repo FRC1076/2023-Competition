@@ -200,6 +200,7 @@ class MyRobot(wpilib.TimedRobot):
                                 is_red_team=self.team_is_red,
                                 team_gyro_adjustment=teamGyroAdjustment,
                                 team_move_adjustment=teamMoveAdjustment,
+                                use_com_adjustment=config['USE_COM_ADJUSTMENT'],
                                 frame_dimension_x=config['ROBOT_FRAME_DIMENSION_X'],
                                 frame_dimension_y=config['ROBOT_FRAME_DIMENSION_Y'],
                                 bumper_dimension_x=actual_bumper_dimension_x,

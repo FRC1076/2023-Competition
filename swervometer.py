@@ -20,6 +20,7 @@ RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',
                                                          'is_red_team',
                                                          'team_gyro_adjustment',
                                                          'team_move_adjustment',
+                                                         'use_com_adjustment',
                                                          'frame_dimension_x', 'frame_dimension_y',
                                                          'bumper_dimension_x', 'bumper_dimension_y',
                                                          'cof_offset_x', 'cof_offset_y',
@@ -34,6 +35,7 @@ class Swervometer:
         self.robotProperty = robot_property_cfg
         self.teamGyroAdjustment=self.robotProperty.team_gyro_adjustment
         self.teamMoveAdjustment=self.robotProperty.team_move_adjustment
+        self.useCOMadjustment = self.robotProperty.use_com_adjustment
         print("field.orgin_x", self.field.origin_x, " field.origin_y", self.field.origin_y)
         print("field.start_position_x: ", self.field.start_position_x, " field.start_position_y: ", self.field.start_position_y)
         print("bumper_dimension_x: ", self.robotProperty.bumper_dimension_x, " bumper_dimension_y: ", self.robotProperty.bumper_dimension_y)
@@ -49,10 +51,6 @@ class Swervometer:
         self.com_offset_y = self.robotProperty.com_offset_y
         print("init current X: ", self.currentX, " init current y: ", self.currentY, " init current rcw: ", self.currentRCW)
     
-        self.frontLeftCOMmult = 1.0
-        self.frontRightCOMmult = 1.0
-        self.rearLeftCOMmult = 1.0
-        self.rearRightCOMmult = 1.0
         self.calcLeverArmLengths()
 
     def getFrameDimensions(self):
@@ -74,25 +72,35 @@ class Swervometer:
 
     def calcLeverArmLengths(self):
 
-        # Calc X and Y distances from COM
-        frontLeverArmX = self.swerveModuleOffsetX - self.com_offset_x
-        rearLeverArmX = self.swerveModuleOffsetX + self.com_offset_x
-        leftLeverArmY = self.swerveModuleOffsetY + self.com_offset_y
-        rightLeverArmY = self.swerveModuleOffsetY - self.com_offset_y
-        #print("FL: ", frontLeverArmX, " RL: ", rearLeverArmX, " LL: ", leftLeverArmY, " RL: ", rightLeverArmY)
+        if self.useCOMadjustment:
+            
+            # Calc X and Y distances from COM
+            frontLeverArmX = self.swerveModuleOffsetX - self.com_offset_x
+            rearLeverArmX = self.swerveModuleOffsetX + self.com_offset_x
+            leftLeverArmY = self.swerveModuleOffsetY + self.com_offset_y
+            rightLeverArmY = self.swerveModuleOffsetY - self.com_offset_y
+            #print("FL: ", frontLeverArmX, " RL: ", rearLeverArmX, " LL: ", leftLeverArmY, " RL: ", rightLeverArmY)
 
-        # Calc true lever lengths
-        frontLeftLeverLength = math.hypot(frontLeverArmX, leftLeverArmY)
-        frontRightLeverLength = math.hypot(frontLeverArmX, rightLeverArmY)
-        rearLeftLeverLength = math.hypot(rearLeverArmX, leftLeverArmY)
-        rearRightLeverLength = math.hypot(rearLeverArmX, rightLeverArmY)
-        avgLeverLength = (frontLeftLeverLength + frontRightLeverLength + rearLeftLeverLength + rearRightLeverLength) / 4
+            # Calc true lever lengths
+            frontLeftLeverLength = math.hypot(frontLeverArmX, leftLeverArmY)
+            frontRightLeverLength = math.hypot(frontLeverArmX, rightLeverArmY)
+            rearLeftLeverLength = math.hypot(rearLeverArmX, leftLeverArmY)
+            rearRightLeverLength = math.hypot(rearLeverArmX, rightLeverArmY)
 
-        # Normalize lever lengths
-        self.frontLeftCOMmult = avgLeverLength / frontLeftLeverLength
-        self.frontRightCOMmult = avgLeverLength / frontRightLeverLength
-        self.rearLeftCOMmult = avgLeverLength / rearLeftLeverLength
-        self.rearRightCOMmult = avgLeverLength / rearRightLeverLength
+            # Calc average lever length
+            avgLeverLength = (frontLeftLeverLength + frontRightLeverLength + rearLeftLeverLength + rearRightLeverLength) / 4
+
+            # Normalize lever lengths
+            self.frontLeftCOMmult = avgLeverLength / frontLeftLeverLength
+            self.frontRightCOMmult = avgLeverLength / frontRightLeverLength
+            self.rearLeftCOMmult = avgLeverLength / rearLeftLeverLength
+            self.rearRightCOMmult = avgLeverLength / rearRightLeverLength
+
+        else:
+            self.frontLeftCOMmult = 1.0
+            self.frontRightCOMmult = 1.0
+            self.rearLeftCOMmult = 1.0
+            self.rearRightCOMmult = 1.0
 
     def getCOMmult(self, key): 
         if (key == 'front_right'):
