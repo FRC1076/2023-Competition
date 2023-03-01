@@ -191,7 +191,7 @@ class SwerveModule:
                 #deg += 180
                 #deg %= 360
             
-            print("Module Flipped Test: flipped: ", self.moduleFlipped, " speed: ", speed, " positionSign: ", self.positionSign)
+            #print("Module Flipped Test: flipped: ", self.moduleFlipped, " speed: ", speed, " positionSign: ", self.positionSign)
 
         self._requested_speed = speed 
         self._set_deg(deg)
@@ -257,9 +257,11 @@ class SwerveModule:
         self.rotateMotor.set(0)
         self.driveMotor.set(0)
 
-    def setOpenLoopRampRate(self, openLoopRampRate):
+    def setRampRate(self, openLoopRampRate, closedLoopRampRate):
         self.driveMotor.setOpenLoopRampRate(openLoopRampRate)
         #print("Open Loop Ramp Rate: ", self.driveMotor.getOpenLoopRampRate())
+        self.driveMotor.setClosedLoopRampRate(closedLoopRampRate)
+        #print("Closed Loop Ramp Rate: ", self.driveMotor.getClosedLoopRampRate())
 
     def update_smartdash(self):
         """

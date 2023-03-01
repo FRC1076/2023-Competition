@@ -268,8 +268,9 @@ class MyRobot(wpilib.TimedRobot):
         rearLeftModule = SwerveModule(rlModule_driveMotor, rlModule_driveMotor_encoder, rlModule_rotateMotor, rlModule_rotateMotor_encoder, rlModule_cfg)
         rearRightModule = SwerveModule(rrModule_driveMotor, rrModule_driveMotor_encoder, rrModule_rotateMotor, rrModule_rotateMotor_encoder, rrModule_cfg)
 
-        # Set Open Loop Ramp Rate for Teleop
+        # Set Open and Closed Loop Ramp Rate for Teleop
         self.teleopOpenLoopRampRate = config['TELEOP_OPEN_LOOP_RAMP_RATE']
+        self.teleopClosedLoopRampRate = config['TELEOP_CLOSED_LOOP_RAMP_RATE']
 
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
@@ -294,6 +295,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Set Open Loop Ramp Rate for Auton
         self.autonOpenLoopRampRate = config['AUTON_OPEN_LOOP_RAMP_RATE']
+        self.autonClosedLoopRampRate = config['AUTON_CLOSED_LOOP_RAMP_RATE']
 
         # Figure out task list
         if (self.team_is_red
@@ -362,7 +364,7 @@ class MyRobot(wpilib.TimedRobot):
     def teleopInit(self):
         print("teleopInit ran")
 
-        self.drivetrain.setOpenLoopRampRates(self.teleopOpenLoopRampRate)
+        self.drivetrain.setRampRates(self.teleopOpenLoopRampRate, self.teleopClosedLoopRampRate)
 
         return True
 
@@ -488,7 +490,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.drivetrain.resetGyro()
 
-        self.drivetrain.setOpenLoopRampRates(self.autonOpenLoopRampRate)
+        self.drivetrain.setRampRates(self.autonOpenLoopRampRate, self.autonClosedLoopRampRate)
 
         # Reset the task counter
         self.autonTaskCounter = 0

@@ -190,7 +190,7 @@ class SwerveDrive:
     #angle off of gyro zero
     def getGyroAngle(self):
         angle = (self.gyro.getAngle() - self.gyro_angle_zero + self.swervometer.getTeamGyroAdjustment()) % 360
-        print ("Gyro Adjustment", self.swervometer.getTeamGyroAdjustment())
+        #print ("Gyro Adjustment", self.swervometer.getTeamGyroAdjustment())
         return angle
         
     def getGyroBalance(self):
@@ -334,7 +334,7 @@ class SwerveDrive:
             yawSign = -1
         BALANCED_PITCH = 0.0
 
-        print("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
+        #print("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
 
         pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
         yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW) 
@@ -409,7 +409,7 @@ class SwerveDrive:
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
         rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
-        print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
+        #print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
             print("X at set point")
         if self.target_y_pid_controller.atSetpoint():
@@ -515,9 +515,9 @@ class SwerveDrive:
     def getWheelLock(self):
         return self.wheel_lock
 
-    def setOpenLoopRampRates(self, openLoopRampRate):
+    def setRampRates(self, openLoopRampRate, closedLoopRampRate):
         for key in self.modules:
-            self.modules[key].setOpenLoopRampRate(openLoopRampRate)
+            self.modules[key].setRampRate(openLoopRampRate, closedLoopRampRate)
         
     def debug(self, debug_modules=False):
         """
@@ -562,8 +562,11 @@ class SwerveDrive:
                 pose = self.vision.getPose()
                 orientation = self.vision.getOrientation()
                 if self.vision.shouldUpdatePose():
-                    self.swervometer.setCOF(pose[0], pose[1], orientation[2])
-                    print("Vision updated position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
+                    if pose[0] != -1:
+                        self.swervometer.setCOF(pose[0], pose[1], orientation[2])
+                        print("Vision updated position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
+                    else:
+                        print("Vision should have updated position, but pose was empty.")
                 else:
                     print("Vision reports position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
                 print("AFTER COMMENTS")

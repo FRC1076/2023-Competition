@@ -24,7 +24,7 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -107,6 +107,7 @@ drivetrainConfig = {
     'TARGET_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 0.0, # Improves maneuverability of bot.
+    'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.1
 }
 
 intakeConfig = {
@@ -147,6 +148,7 @@ autonConfig = {
     'SCORE_NEW': False,
     'BALANCE_BOT': True,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
+    'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TFFT': [['ELEVATE'],
                         ['MOVE', -122.6, 27.8, 0],
                         ['MOVE', -238.3, 27.8, 0]],
