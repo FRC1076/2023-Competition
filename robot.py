@@ -284,10 +284,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.hooks.update()
 
-    def teleopPiston(self):
-        driver = self.driver.xboxController
-
-        if driver.getLeftBumperReleased():
+        '''if driver.getLeftBumperReleased():
             #if vacuuming
             if self.suction_state:
                 self.piston.set(DoubleSolenoid.Value.kReverse)
@@ -302,7 +299,19 @@ class MyRobot(wpilib.TimedRobot):
                 self.motor_state = False
             else:
                 self.suction_motor.set(1)
+                self.motor_state = True'''
+
+    def teleopPiston(self):
+        driver = self.driver.xboxController
+        if driver.getRightBumperReleased():
+            if self.motor_state:
+                self.suction_motor.set(0)
+                self.motor_state = False
+                self.piston.set(DoubleSolenoid.Value.kReverse)
+            else:
+                self.suction_motor.set(1)
                 self.motor_state = True
+                self.piston.set(DoubleSolenoid.Value.kOff)
 
 
     def autonomousInit(self):
