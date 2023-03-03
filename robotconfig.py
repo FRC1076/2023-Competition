@@ -148,6 +148,10 @@ elevatorConfig = {
     'SOLENOID_REVERSE_ID': 5
 }
 
+grabberConfig = {
+    'MOTOR_ID': -666
+}
+
 cliffDetectorConfig = {
     'LEFT_CLIFF_DETECTOR_PINGID': 0,
     'LEFT_CLIFF_DETECTOR_ECHOID': 1,

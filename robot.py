@@ -26,6 +26,7 @@ from tester import Tester
 from networktables import NetworkTables
 
 from elevator import Elevator
+from grabber import Grabber
 from vision import Vision
 
 # Drive Types
@@ -49,6 +50,7 @@ class MyRobot(wpilib.TimedRobot):
         self.auton = None
         self.vision = None
         self.elevator = None
+        self.grabber = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -75,6 +77,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.swervometer = self.initSwervometer(config)
             if key == 'ELEVATOR':
                 self.elevator = self.initElevator(config)
+            if key == 'GRABBER':
+                self.grabber = self.initGrabber(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
             #if key == 'CLIFFDETECTOR':
@@ -228,6 +232,9 @@ class MyRobot(wpilib.TimedRobot):
         self.elevator_is_automatic = False
         self.elevator_destination = 0
         return elevator
+
+    def initGrabber(self, config):
+        return Grabber(config['MOTOR_ID'])
 
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
