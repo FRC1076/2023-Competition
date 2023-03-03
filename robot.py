@@ -381,6 +381,7 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.teleopDrivetrain()
         #self.teleopelevator()
+        self.teleopGrabber()
         return True
 
     def move(self, x, y, rcw):
@@ -504,6 +505,14 @@ class MyRobot(wpilib.TimedRobot):
         self.yButtonLastRead = self.operator.xboxController.getYButton()
     
         
+    def teleopGrabber(self):
+        operator = self.operator.xboxController
+        # if the operator is holding the bumper, keep the grab going. Otherwise release.
+        if (operator.getRightBumper()):
+            self.grabber.grab()
+        else:
+            self.grabber.release()
+
     def autonomousInit(self):
         if not self.auton:
             return

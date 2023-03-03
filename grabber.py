@@ -8,10 +8,10 @@ class Grabber:
         self.motor = rev.CANSparkMax(motor_id, motor_type) # elevator up-down
 
     def grab(self):
+        self.motor.set(1)
         print('Grabber is grabbing!')
-        pass
 
     def release(self):
+        self.motor.set(0)
         print('Grabber is releasing!')
-        pass
 
