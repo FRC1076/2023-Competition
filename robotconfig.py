@@ -113,7 +113,6 @@ drivetrainConfig = {
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.1
 }
 
-
 visionConfig = {
     'TARGET_HEIGHT': 8.5,
     'TARGET_RADIUS': 2,
@@ -140,7 +139,6 @@ climberConfig = {
     'RETRACT_SPEED': 0.5,
 }
 
-
 elevatorConfig = {
     'RIGHT_ID': 6,
     'LEFT_ID': 10,
@@ -149,7 +147,7 @@ elevatorConfig = {
 }
 
 grabberConfig = {
-    'MOTOR_ID': -666
+    'MOTOR_ID': 15 # from testbed
 }
 
 cliffDetectorConfig = {
