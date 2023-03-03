@@ -228,6 +228,8 @@ class MyRobot(wpilib.TimedRobot):
     def initGrabber(self, config):
         grabber = Grabber(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
         self.yButtonLastRead = False
+        self.grabber_is_automatic = False
+        self.grabber_destination = 0
         return grabber
 
     def initDrivetrain(self, config):
@@ -470,13 +472,33 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopGrabber(self):
         operator = self.operator.xboxController
-        #deadzone
-        self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone))
-        print(self.operator.xboxController.getYButton())
-        if self.operator.xboxController.getYButton() and not self.yButtonLastRead:
-            self.grabber.toggle()
+        clutch_factor = 1
+        #Check for clutch
+        if(operator.getLeftTriggerAxis() > 0.7):
+            clutch_factor = 0.4
+        #Find the value the arm will move at
+        extend_value = self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor
+        #preset destinations
+        if operator.getAButton():
+            self.grabber_destination = 1
+            self.grabber_is_automatic = True
+        if operator.getYButton():
+            self.grabber_destination = 36
+            self.grabber_is_automatic = True
+        if operator.getBButton():
+            self.grabber_destination = 18
+            self.grabber_is_automatic = True
+        #if controller is moving, disable grabber automatic move
+        if(abs(extend_value) > 0):
+            self.grabber_is_automatic = False
+        #if automatic move, move to destination position
+        if self.grabber_is_automatic:
+            self.grabber.moveToPos(self.grabber_destination)
+        else:
+            self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor)
+        #if self.operator.xboxController.getYButton() and not self.yButtonLastRead:
+            #self.grabber.toggle()
         self.yButtonLastRead = self.operator.xboxController.getYButton()
-        print(self.grabber.getEncoderPosition())
     
     
     def teleopIntake(self):
