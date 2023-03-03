@@ -27,7 +27,6 @@ from networktables import NetworkTables
 
 from grabber import Grabber
 from vision import Vision
-from intake import Intake
 
 # Drive Types
 ARCADE = 1
@@ -76,8 +75,6 @@ class MyRobot(wpilib.TimedRobot):
                 self.swervometer = self.initSwervometer(config)
             if key == 'GRABBER':
                 self.grabber = self.initGrabber(config)
-            if key == 'INTAKE':
-                self.intake = self.initIntake(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
             #if key == 'CLIFFDETECTOR':
@@ -377,7 +374,6 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.teleopDrivetrain()
         #self.teleopGrabber()
-        #self.teleopIntake()
         return True
 
     def move(self, x, y, rcw):
@@ -500,11 +496,6 @@ class MyRobot(wpilib.TimedRobot):
             #self.grabber.toggle()
         self.yButtonLastRead = self.operator.xboxController.getYButton()
     
-    
-    def teleopIntake(self):
-        operator = self.operator.xboxController
-        if operator.getXButtonReleased():
-            self.intake.toggle()
         
     def autonomousInit(self):
         if not self.auton:

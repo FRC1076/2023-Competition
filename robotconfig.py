@@ -113,10 +113,6 @@ drivetrainConfig = {
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.1
 }
 
-intakeConfig = {
-    # Update IDs when known
-    'INTAKE_MOTOR_ID': 0,
-}
 
 visionConfig = {
     'TARGET_HEIGHT': 8.5,
@@ -126,15 +122,6 @@ visionConfig = {
     'CAMERA_HEIGHT': 4,
     'CAMERA_PITCH': 0,
     'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
-}
-
-oldbad_autonConfig = {
-    'HOOK_UP_TIME': 0.5,
-    'DRIVE_FORWARD_TIME': 0.75,
-    'HOOK_DOWN_TIME': 2.0,
-    'DRIVE_BACKWARD_TIME': 2.5,
-    'AUTON_SPEED_FORWARD': 0.8,
-    'AUTON_SPEED_BACKWARD': 0.5,
 }
 
 climberConfig = {
@@ -153,27 +140,10 @@ climberConfig = {
     'RETRACT_SPEED': 0.5,
 }
 
-hooksConfig = {
-    'FRONT_HOOK_ID': 99,
-    'BACK_HOOK_ID': 98,
-    'LEFT_HOOK_ID': 97,
-    'RIGHT_HOOK_ID': 96,
-
-    'FRONT_TOP_PORT': 0,
-    'FRONT_BOTTOM_PORT': 1,
-    'BACK_TOP_PORT': 2,
-    'BACK_BOTTOM_PORT': 3,
-    'LEFT_TOP_PORT': 4,
-    'LEFT_BOTTOM_PORT': 5,
-    'RIGHT_TOP_PORT': 6,
-    'RIGHT_BOTTOM_PORT': 7
-}
 
 grabberConfig = {
     'RIGHT_ID': 6,
     'LEFT_ID': 10,
-    'INTAKE_TOP_ID': 0,
-    'INTAKE_BOTTOM_ID': 0,
     'SOLENOID_FORWARD_ID': 4,
     'SOLENOID_REVERSE_ID': 5
 }
@@ -226,7 +196,6 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
     'GRABBER': grabberConfig,
-    'INTAKE': intakeConfig,
     'AUTON': autonConfig,
 }
 

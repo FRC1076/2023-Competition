@@ -8,16 +8,19 @@ import math
 class Grabber:
     def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
-        self.right_motor = rev.CANSparkMax(right_id, motor_type)
-        self.left_motor = rev.CANSparkMax(left_id, motor_type)
-        self.right_encoder = self.right_motor.getEncoder()
-        self.left_encoder = self.left_motor.getEncoder()
-        self.solenoid = wpilib.DoubleSolenoid(1, wpilib.PneumaticsModuleType.REVPH, solenoid_forward_id, solenoid_reverse_id)
+        self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
+        self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
+        self.right_encoder = self.right_motor.getEncoder() # measure elevator height
+        self.left_encoder = self.left_motor.getEncoder() # ""
+        self.solenoid = wpilib.DoubleSolenoid(1, # controls the "lean" of the elevator
+            wpilib.PneumaticsModuleType.REVPH, 
+            solenoid_forward_id, 
+            solenoid_reverse_id)
         self.pid_controller = PIDController(0.5, 0.00001, 0.00001) #change later
-        self.pid_controller.setTolerance(0.00005)
+        self.pid_controller.setTolerance(0.1)
 
     #1.00917431193 inches per rotation
-    def extend(self, value):
+    def extend(self, value):  # controls length of the elevator 
         print(self.getEncoderPosition())
         if value > 1:
             value = 1
@@ -36,22 +39,23 @@ class Grabber:
         self.right_motor.set(-value * 0.1)
         self.left_motor.set(-value * 0.1)
 
-    #automatically move to a position using a pid controller
+    #automatically move to an elevator extension (position) using a pid controller
     def moveToPos(self, value):
         extend_value = self.pid_controller.calculate(self.getEncoderPosition(), value)
-        if(abs(extend_value * 0.3) < 0.01):
+        if(abs(extend_value * 0.3) < 0.01): # hack for finding the set point
             self.extend(0)
             return True
         else:
             print("Moving")
-            self.extend(-extend_value * 3) # TO BE RESOLVED: WHICH ONE?
-            # self.extend(math.copysign(0.5, self.right_encoder.getPosition() - value))
+            self.extend(-extend_value * 3)
 
+    # contols the "lean" of the elevator 
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
         elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             self.solenoid.set(DoubleSolenoid.Value.kForward)
     
+    # only reading the right encoder, assuming that left and right will stay about the same
     def getEncoderPosition(self):
         return self.right_encoder.getPosition()
