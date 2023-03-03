@@ -5,7 +5,7 @@ import wpimath.controller
 from wpimath.controller import PIDController
 import math
 
-class Grabber:
+class Elevator:
     def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down

@@ -141,7 +141,7 @@ climberConfig = {
 }
 
 
-grabberConfig = {
+elevatorConfig = {
     'RIGHT_ID': 6,
     'LEFT_ID': 10,
     'SOLENOID_FORWARD_ID': 4,
@@ -195,7 +195,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
-    'GRABBER': grabberConfig,
+    'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
 }
 
@@ -204,7 +204,7 @@ showbot = {
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'GRABBER': grabberConfig,
+    'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
 }
 

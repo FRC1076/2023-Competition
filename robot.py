@@ -25,7 +25,7 @@ from cliffdetector import CliffDetector
 from tester import Tester
 from networktables import NetworkTables
 
-from grabber import Grabber
+from elevator import Elevator
 from vision import Vision
 
 # Drive Types
@@ -48,7 +48,7 @@ class MyRobot(wpilib.TimedRobot):
         self.cliffDetector = None
         self.auton = None
         self.vision = None
-        self.grabber = None
+        self.elevator = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -73,8 +73,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.vision = self.initVision(config)
             if key == 'SWERVOMETER':
                 self.swervometer = self.initSwervometer(config)
-            if key == 'GRABBER':
-                self.grabber = self.initGrabber(config)
+            if key == 'ELEVATOR':
+                self.elevator = self.initElevator(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
             #if key == 'CLIFFDETECTOR':
@@ -222,12 +222,12 @@ class MyRobot(wpilib.TimedRobot):
 
         return vision
 
-    def initGrabber(self, config):
-        grabber = Grabber(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+    def initElevator(self, config):
+        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
         self.yButtonLastRead = False
-        self.grabber_is_automatic = False
-        self.grabber_destination = 0
-        return grabber
+        self.elevator_is_automatic = False
+        self.elevator_destination = 0
+        return elevator
 
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
@@ -373,7 +373,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
-        #self.teleopGrabber()
+        #self.teleopelevator()
         return True
 
     def move(self, x, y, rcw):
@@ -466,7 +466,7 @@ class MyRobot(wpilib.TimedRobot):
         #    self.drive.set_raw_strafe(-0.35)
         return
 
-    def teleopGrabber(self):
+    def teleopElevator(self):
         operator = self.operator.xboxController
         clutch_factor = 1
         #Check for clutch
@@ -476,24 +476,24 @@ class MyRobot(wpilib.TimedRobot):
         extend_value = self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor
         #preset destinations
         if operator.getAButton():
-            self.grabber_destination = 1
-            self.grabber_is_automatic = True
+            self.elevator_destination = 1
+            self.elevator_is_automatic = True
         if operator.getYButton():
-            self.grabber_destination = 36
-            self.grabber_is_automatic = True
+            self.elevator_destination = 36
+            self.elevator_is_automatic = True
         if operator.getBButton():
-            self.grabber_destination = 18
-            self.grabber_is_automatic = True
-        #if controller is moving, disable grabber automatic move
+            self.elevator_destination = 18
+            self.elevator_is_automatic = True
+        #if controller is moving, disable elevator automatic move
         if(abs(extend_value) > 0):
-            self.grabber_is_automatic = False
+            self.elevator_is_automatic = False
         #if automatic move, move to destination position
-        if self.grabber_is_automatic:
-            self.grabber.moveToPos(self.grabber_destination)
+        if self.elevator_is_automatic:
+            self.elevator.moveToPos(self.elevator_destination)
         else:
-            self.grabber.extend(self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor)
+            self.elevator.extend(self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor)
         #if self.operator.xboxController.getYButton() and not self.yButtonLastRead:
-            #self.grabber.toggle()
+            #self.elevator.toggle()
         self.yButtonLastRead = self.operator.xboxController.getYButton()
     
         
@@ -538,8 +538,8 @@ class MyRobot(wpilib.TimedRobot):
             print("Elevate: ", self.autonTaskCounter)
             self.autonTaskCounter += 1
         elif (autonTask[0] == 'GRAB'):
-            self.grabber.moveToPos(10)
-            print(self.grabber.getEncoderPosition())
+            self.elevator.moveToPos(10)
+            print(self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'MOVE'):
             x = autonTask[1]
             y = autonTask[2]
