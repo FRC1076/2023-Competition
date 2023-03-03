@@ -39,6 +39,7 @@ class Grabber:
         else:
             print("Moving")
             self.extend(math.copysign(0.5, self.right_encoder.getPosition() - value))
+            return False
 
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
