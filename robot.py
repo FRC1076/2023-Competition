@@ -228,7 +228,10 @@ class MyRobot(wpilib.TimedRobot):
 
     def initElevator(self, config):
         elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
-        self.yButtonLastRead = False
+        self.human_position = config['HUMAN_POSITION']
+        self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
+        self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
+        self.retracted_height = config['RETRACTED_HEIGHT']
         self.elevator_is_automatic = False
         self.elevator_destination = 0
         return elevator
@@ -478,13 +481,9 @@ class MyRobot(wpilib.TimedRobot):
     def teleopElevator(self):
         operator = self.operator.xboxController
 
-        ## simple operation for testing
-        extend_speed = self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone)
-        self.elevator.extend(extend_speed)
-
         if (operator.getLeftBumperPressed()):
+            print("Toggling Elevator")
             self.elevator.toggle()
-        return
 
         ## ignored for now
         clutch_factor = 1
@@ -492,17 +491,25 @@ class MyRobot(wpilib.TimedRobot):
         if(operator.getLeftTriggerAxis() > 0.7):
             clutch_factor = 0.4
         #Find the value the arm will move at
-        extend_value = self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor
+        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 2) * clutch_factor
         #preset destinations
-        if operator.getAButton():
-            self.elevator_destination = 1
+        if operator.getAButton(): #Lowest
+            self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
-        if operator.getYButton():
-            self.elevator_destination = 36
+            #print("Elevator: A Button")
+        if operator.getYButton(): #Highest
+            self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
-        if operator.getBButton():
-            self.elevator_destination = 18
+            #print("Elevator: Y Button")
+        if operator.getBButton(): #Medium Position
+            self.elevator_destination = self.lower_scoring_height
             self.elevator_is_automatic = True
+            #print("Elevator: B Button")
+        if operator.getXButton(): #Human Position
+            self.elevator_destination = self.human_position
+            self.elevator_is_automatic = True
+            #print("Elevator: X Button")
+
         #if controller is moving, disable elevator automatic move
         if(abs(extend_value) > 0):
             self.elevator_is_automatic = False
@@ -511,11 +518,7 @@ class MyRobot(wpilib.TimedRobot):
             print("Elevator move to Pos")
             self.elevator.moveToPos(self.elevator_destination)
         else:
-            self.elevator.extend(self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor)
-        #if self.operator.xboxController.getYButton() and not self.yButtonLastRead:
-            #self.elevator.toggle()
-        self.yButtonLastRead = self.operator.xboxController.getYButton()
-    
+            self.elevator.extend(extend_value)
         
     def teleopGrabber(self):
         operator = self.operator.xboxController

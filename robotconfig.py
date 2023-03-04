@@ -142,8 +142,12 @@ climberConfig = {
 elevatorConfig = {
     'RIGHT_ID': 6,
     'LEFT_ID': 10,
-    'SOLENOID_FORWARD_ID': 4,
-    'SOLENOID_REVERSE_ID': 5
+    'SOLENOID_FORWARD_ID': 15,
+    'SOLENOID_REVERSE_ID': 14,
+    'HUMAN_POSITION': 18,
+    'UPPER_SCORING_HEIGHT': 36,
+    'LOWER_SCORING_HEIGHT': 26,
+    'RETRACTED_HEIGHT': 3,
 }
 
 grabberConfig = {
