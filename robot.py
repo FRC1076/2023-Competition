@@ -569,13 +569,14 @@ class MyRobot(wpilib.TimedRobot):
         autonTask = self.autonTaskList[self.autonTaskCounter]
 
         if (autonTask[0] == 'TIMER'):
+            print("Auton: Timer: ", self.autonTimer.get())
             if self.autonTimer.get() > autonTask[1]:
                 self.autonTaskCounter += 1
         elif (autonTask[0] == 'GRAB'):
-            print("Grab: ", self.autonTaskCounter)
+            print("Auton: Grab: ", self.autonTaskCounter)
             self.autonTaskCounter += 1
         elif (autonTask[0] == 'RELASE'):
-            print("Release: ", self.autonTaskCounter)
+            print("Auton: Release: ", self.autonTaskCounter)
             self.autonTaskCounter += 1
         elif (autonTask[0] == 'ELEVATOR_TOGGLE'):
             if self.elevator.toggle():
@@ -601,23 +602,23 @@ class MyRobot(wpilib.TimedRobot):
             x = autonTask[1]
             y = autonTask[2]
             rcw = autonTask[3]
-            print("Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " rcw: ", rcw)
+            print("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " rcw: ", rcw)
             if self.drivetrain.goToPose(x, y, rcw):
                 self.autonTaskCounter += 1 # Move on to next task.
-                print("Move: Reached target: x: ", x, " y: ", y, " rcw: ", rcw)
+                print("Auton: Move: Reached target: x: ", x, " y: ", y, " rcw: ", rcw)
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
-                print("Move: Not at target: x: ", x, " y: ", y, " rcw: ", rcw)
+                print("Auton: Move: Not at target: x: ", x, " y: ", y, " rcw: ", rcw)
         elif (autonTask[0] == 'BALANCE'):
-            print("BALANCE: ", self.autonTaskCounter)
+            print("Auton: Balance: ", self.autonTaskCounter)
             if self.drivetrain.balance():
                 self.autonTaskCounter += 1 # Move on to next task.
-                print("Balance: Leveled and oriented")
+                print("Auton: Balance: Leveled and oriented")
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
-                print("Balance: Keep balancing and orienting")
+                print("Auton: Balance: Keep balancing and orienting")
         else:
-            print("UNKNOWN TASK", self.autonTaskCounter)
+            print("Auton: ERROR: Unknown Task", self.autonTaskCounter)
             self.autonTaskCounter += 1   
         
         return
