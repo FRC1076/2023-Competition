@@ -21,7 +21,7 @@ class Elevator:
 
     #1.00917431193 inches per rotation
     def extend(self, value):  # controls length of the elevator 
-        print(self.getEncoderPosition())
+        #print(self.getEncoderPosition())
         if value > 1:
             value = 1
         if value < -1:

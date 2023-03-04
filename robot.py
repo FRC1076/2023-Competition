@@ -380,7 +380,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
-        self.teleopelevator()
+        self.teleopElevator()
         #self.teleopGrabber()
         return True
 
@@ -505,6 +505,7 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator_is_automatic = False
         #if automatic move, move to destination position
         if self.elevator_is_automatic:
+            print("Elevator move to Pos")
             self.elevator.moveToPos(self.elevator_destination)
         else:
             self.elevator.extend(self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) * clutch_factor)
