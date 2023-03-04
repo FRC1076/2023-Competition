@@ -69,7 +69,7 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_BUMPER_DIMENSION_Y': 3.0, # Width of bumper (Y-axis)
     'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
     'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
-    'ROBOT_COM_OFFSET_X': -4.0, # X-offset of center of mass (relative to center of frame)
+    'ROBOT_COM_OFFSET_X': -3.5, #-4.0 X-offset of center of mass (relative to center of frame)
     'ROBOT_COM_OFFSET_Y': 0.0, # Y-offset of center of mass (relative to center of frame)
     'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
     'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)

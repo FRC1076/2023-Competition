@@ -408,8 +408,9 @@ class MyRobot(wpilib.TimedRobot):
         #    else:
         #        print("Bogus result from cliff detector. Ignore danger.")
 
-        self.drivetrain.move(-x, -y, rcw)
-        
+        self.drivetrain.move(x, y, rcw)
+        #self.drivetrain.move(0, y, 0)
+
     def teleopDrivetrain(self):
         if (not self.drivetrain):
             return
