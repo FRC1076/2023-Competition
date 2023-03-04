@@ -523,10 +523,10 @@ class MyRobot(wpilib.TimedRobot):
     def teleopGrabber(self):
         operator = self.operator.xboxController
         # if the operator is holding the bumper, keep the grab going. Otherwise release.
-        if (operator.getRightBumper()):
-            self.grabber.grab()
-        else:
-            self.grabber.release()
+        
+        if (operator.getRightBumperPressed()):
+            print("Toggling Grabber")
+            self.grabber.toggle()
 
     def autonomousInit(self):
         if not self.auton:

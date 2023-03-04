@@ -10,14 +10,17 @@ class Grabber:
 
     def engage(self):
         self.isEngaged = True
+        self.execute()
         return True # task is complete
 
     def release(self):
         self.isEngaged = False
+        self.execute()
         return True # task is complete
     
     def toggle(self):
         self.isEngaged = not self.isEngaged
+        self.execute()
         return True # probably not needed?
 
     def execute(self):
