@@ -357,7 +357,7 @@ class SwerveDrive:
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
         self.sd.putNumber('Balance yaw output', yaw_output)
-        self.move(0.0, yawSign * pitch_output, yaw_output)
+        self.move(yawSign * pitch_output, 0.0, yaw_output)
         
         self.update_smartdash()
 
@@ -389,8 +389,8 @@ class SwerveDrive:
         chassis_angle = (desired_angle - current_angle) % 360
         magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
 
-        chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
-        chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
+        chassis_strafe = magnitude * math.sin(math.radians(chassis_angle))
+        chassis_fwd = magnitude * math.cos(math.radians(chassis_angle))
 
         #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
         self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
@@ -421,7 +421,7 @@ class SwerveDrive:
             self.update_smartdash()
             return True
         else:
-            self.move(y_error, x_error, rcw_error)
+            self.move(x_error, y_error, rcw_error)
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
@@ -544,28 +544,15 @@ class SwerveDrive:
         # Set the speed and angle for each module
 
         # Calculate normalized speeds with lever arm adjustment
-        max_proposed_speed = 0
-        self.proposed_speeds = {}
         for key in self.modules:
-            self.proposed_speeds[key] = self._requested_speeds[key] * self.swervometer.getCOMmult(key)
-            if abs(self.proposed_speeds[key]) > max_proposed_speed:
-                max_proposed_speed = abs(self.proposed_speeds[key])
-        print("Execute: max proposed speed: ", max_proposed_speed)
-       
-        # Scale speeds down so maximum is 1.0
-        if max_proposed_speed > 1.0:
-            for key in self.modules:
-                self.modules[key].move((self.proposed_speeds[key]/ max_proposed_speed), self._requested_angles[key])
-                print("Execute Scaled Down: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
-        else:
-            for key in self.modules:
-                self.modules[key].move(self.proposed_speeds[key], self._requested_angles[key])        
-                print("Execute: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
+            print("Execute: key: ", key, " base speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_speeds[key] * self.swervometer.getCOMmult(key))
+            self._requested_speeds[key] = self._requested_speeds[key] * self.swervometer.getCOMmult(key)
         
-        #for key in self.modules:
-        #    print("Execute: key: ", key, " requested speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)))
-        #    self.modules[key].move((self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_angles[key])
+        self._requested_speeds = self.normalizeDictionary(self._requested_speeds)
 
+        for key in self.modules:
+            self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
+        
         # Reset the speed back to zero
         self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
 
