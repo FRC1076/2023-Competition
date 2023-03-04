@@ -557,6 +557,8 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.swervometer:
             return
+        if not self.autonTimer:
+            return
 
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
