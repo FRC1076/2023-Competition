@@ -575,7 +575,7 @@ class MyRobot(wpilib.TimedRobot):
         elif (autonTask[0] == 'GRAB'):
             print("Auton: Grab: ", self.autonTaskCounter)
             self.autonTaskCounter += 1
-        elif (autonTask[0] == 'RELASE'):
+        elif (autonTask[0] == 'RELEASE'):
             print("Auton: Release: ", self.autonTaskCounter)
             self.autonTaskCounter += 1
         elif (autonTask[0] == 'ELEVATOR_TOGGLE'):
