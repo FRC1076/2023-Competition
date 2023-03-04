@@ -12,16 +12,12 @@ from navx import AHRS
 
 from robotconfig import robotconfig
 from controller import Controller
-from swervedrive import SwerveDrive
-from swervemodule import SwerveModule
-from swervemodule import ModuleConfig
+from swervemodule import SwerveModule, ModuleConfig
 
-from swervedrive import BalanceConfig
-from swervedrive import TargetConfig
-from swervometer import FieldConfig
-from swervometer import RobotPropertyConfig
-from swervometer import Swervometer
+from swervedrive import SwerveDrive, BalanceConfig, TargetConfig
+from swervometer import Swervometer, FieldConfig, RobotPropertyConfig
 from cliffdetector import CliffDetector
+from led_sender import LEDSender
 from tester import Tester
 from networktables import NetworkTables
 
@@ -59,7 +55,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.config = robotconfig
 
-        NetworkTables.initialize(server='roborio-1076-frc.local') # Necessary for vision to
+        NetworkTables.initialize(server='roborio-1076-frc.local') # Necessary for vision
         self.dashboard = NetworkTables.getTable('SmartDashboard')
 
         print(self.config)
@@ -78,6 +74,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.grabber = self.initGrabber(config)
             if key == 'INTAKE':
                 self.intake = self.initIntake(config)
+            if key == 'SENDER':
+                self.led = self.initSender(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
             #if key == 'CLIFFDETECTOR':
@@ -224,6 +222,14 @@ class MyRobot(wpilib.TimedRobot):
         vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
 
         return vision
+
+    def initSender(self, config):
+        led = LEDSender(config['LOCALIP'],
+                        config['LOCALPORT'], 
+                        config['REMOTEPORT'], 
+                        config['REMOTEIP'])
+
+        return led
 
     def initGrabber(self, config):
         grabber = Grabber(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])

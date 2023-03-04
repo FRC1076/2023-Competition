@@ -136,6 +136,13 @@ cliffDetectorConfig = {
     'CLIFF_TOLERANCE': 2, # Centimeters?
 }
 
+udpConfig = {
+    'LOCALIP' : "localhost",
+    'LOCALPORT' : 8777,
+    'REMOTEPORT' : 8777,
+    'REMOTEIP' : "10.10.76.7",
+}
+
 grabberConfig = {
     'RIGHT_ID': -1,
     'LEFT_ID': -2,
@@ -186,6 +193,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'GRABBER': grabberConfig,
     'INTAKE': intakeConfig,
     'AUTON': autonConfig,
+    'SENDER': udpConfig, 
 }
 
 showbot = {
@@ -194,6 +202,7 @@ showbot = {
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'AUTON': autonConfig,
+    'SENDER': udpConfig, 
 }
 
 #showbot['DRIVETRAIN']['FRONTLEFT_DRIVEMOTOR'] = 1 # how to override just one thing

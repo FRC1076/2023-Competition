@@ -1,9 +1,25 @@
 import socket
-#
-#  Create the infra for two-way communication channel using UDP
-#  Set receive from timeout to .001 seconds to avoid blocking for
-#  long.
-#
+import json
+
+class LEDSender: 
+    def __init__(self, _local_ip, _local_port, _remote_port, _remote_ip):
+        self.sender = UDPChannel(
+            local_ip = _local_ip,
+            local_port = _local_port,
+            remote_port = _remote_port,
+            remote_ip = _remote_ip)
+
+    def send_logo(self, num):
+        data = {
+            'sender' : 'driver',
+            'message' : 'logo',
+            'logo' : num
+        }
+
+        message = json.dumps(data)
+        self.sender.send_to(message)
+
+
 class UDPChannel:
     """
     Create a communication channel to send and receive messages
@@ -13,23 +29,12 @@ class UDPChannel:
     There is a generic exception handled for any failure related to creating
     the sending and or receiving sockets.
     """
-    default_local_port = 5888
-    default_remote_port = 5880
-    default_local_address = '127.0.0.1'
-    default_remote_address =  '127.0.0.1'
 
-    # Useful defaults permit minimal arguments for simple test.
-    # On one end:
-    #      from lib1076.udp_channel import UDPChannel as UDPChannel
-    #      sender = UDPChannel()
-    # On the other end (in another window/program)
-    #      from lib1076.udp_channel import UDPChannel as UDPChannel
-    #      receiver = UDPChannel(local_port=UDPChannel.default_remote_port, remote_port=UDPChannel.default_local_port)
     def __init__(self,
-                 local_ip=default_local_address,
-                 local_port=default_local_port,
-                 remote_ip=default_remote_address,
-                 remote_port=default_remote_port,
+                 local_ip,
+                 local_port,
+                 remote_ip,
+                 remote_port,
                  timeout_in_seconds=.0001,
                  receive_buffer_size=8192):
         """
