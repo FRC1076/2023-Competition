@@ -357,7 +357,7 @@ class SwerveDrive:
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
         self.sd.putNumber('Balance yaw output', yaw_output)
-        self.move(0.0, yawSign * pitch_output, yaw_output)
+        self.move(yawSign * pitch_output, 0.0, yaw_output)
         
         self.update_smartdash()
 
@@ -389,8 +389,8 @@ class SwerveDrive:
         chassis_angle = (desired_angle - current_angle) % 360
         magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
 
-        chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
-        chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
+        chassis_strafe = magnitude * math.sin(math.radians(chassis_angle))
+        chassis_fwd = magnitude * math.cos(math.radians(chassis_angle))
 
         #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
         self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
@@ -421,7 +421,7 @@ class SwerveDrive:
             self.update_smartdash()
             return True
         else:
-            self.move(y_error, x_error, rcw_error)
+            self.move(x_error, y_error, rcw_error)
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
