@@ -481,6 +481,9 @@ class MyRobot(wpilib.TimedRobot):
         ## simple operation for testing
         extend_speed = self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone)
         self.elevator.extend(extend_speed)
+
+        if (operator.getLeftBumperPressed()):
+            self.elevator.toggle()
         return
 
         ## ignored for now
