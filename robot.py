@@ -99,6 +99,10 @@ class MyRobot(wpilib.TimedRobot):
         print("no longer disabled")
         self.drivetrain.reset()
 
+        # Reset task counter.
+        self.autonTaskCounter = 0
+
+
     def initControllers(self, config):
         ctrls = {}
         print(config)
@@ -536,9 +540,8 @@ class MyRobot(wpilib.TimedRobot):
         if not self.swervometer:
             return
 
-        # Nothing in auton uses a timer.
-        #self.autonTimer = wpilib.Timer()
-        #self.autonTimer.start()
+        self.autonTimer = wpilib.Timer()
+        self.autonTimer.start()
 
         self.drivetrain.resetGyro()
 
@@ -555,8 +558,6 @@ class MyRobot(wpilib.TimedRobot):
         if not self.swervometer:
             return
 
-
-
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
 
@@ -565,12 +566,35 @@ class MyRobot(wpilib.TimedRobot):
             
         autonTask = self.autonTaskList[self.autonTaskCounter]
 
-        if (autonTask[0] == 'ELEVATE'):
-            print("Elevate: ", self.autonTaskCounter)
-            self.autonTaskCounter += 1
+        if (autonTask[0] == 'TIMER'):
+            if self.autonTimer.get() > autonTask[1]:
+                self.autonTaskCounter += 1
         elif (autonTask[0] == 'GRAB'):
-            self.elevator.moveToPos(10)
-            print(self.elevator.getEncoderPosition())
+            print("Grab: ", self.autonTaskCounter)
+            self.autonTaskCounter += 1
+        elif (autonTask[0] == 'RELASE'):
+            print("Release: ", self.autonTaskCounter)
+            self.autonTaskCounter += 1
+        elif (autonTask[0] == 'ELEVATOR_TOGGLE'):
+            if self.elevator.toggle():
+                self.autonTaskCounter += 1
+            print("Auton: Elevator Toggle: ", self.elevator.getEncoderPosition())
+        elif (autonTask[0] == 'ELEVATOR_UP'):
+            if self.elevator.elevatorUp():
+                self.autonTaskCounter += 1
+            print("Auton: Elevator Up: ", self.elevator.getEncoderPosition())
+        elif (autonTask[0] == 'ELEVATOR_DOWN'):
+            if self.elevator.elevatorDown():
+                self.autonTaskCounter += 1
+            print("Auton: Elevator Down: ", self.elevator.getEncoderPosition())
+        elif (autonTask[0] == 'ELEVATOR_EXTEND'):
+            if self.elevator.moveToPos(self.upper_scoring_height):
+                self.autonTaskCounter += 1
+            print("Auton: Elevator Extend: ", self.elevator.getEncoderPosition())
+        elif (autonTask[0] == 'ELEVATOR_RETRACT'):
+            if self.elevator.moveToPos(self.retracted_height):
+                self.autonTaskCounter += 1
+            print("Auton: Elevator Retract: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'MOVE'):
             x = autonTask[1]
             y = autonTask[2]

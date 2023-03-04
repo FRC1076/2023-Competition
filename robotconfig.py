@@ -29,23 +29,23 @@ swervometerConfig = { # All positions measured in inches
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
-    'FIELD_RED_A_START_POSITION_X': 231, #159.0, # X-Coordinate of starting position A when on red team
-    'FIELD_RED_A_START_POSITION_Y': 22.4, #54.25, # Y-Coordinate of starting postion A when on red team
+    'FIELD_RED_A_START_POSITION_X': 251, #159.0, # X-Coordinate of starting position A when on red team
+    'FIELD_RED_A_START_POSITION_Y': 41, #54.25, # Y-Coordinate of starting postion A when on red team
     'FIELD_RED_A_START_ANGLE': 0.0, # Heading angle of starting position A when on red team
-    'FIELD_RED_B_START_POSITION_X': 231, # X-Coordinate of starting position B when on red team
-    'FIELD_RED_B_START_POSITION_Y': -65.7, # Y-Coordinate of starting postion B when on red team
+    'FIELD_RED_B_START_POSITION_X': 251, # X-Coordinate of starting position B when on red team
+    'FIELD_RED_B_START_POSITION_Y': -53, # Y-Coordinate of starting postion B when on red team
     'FIELD_RED_B_START_ANGLE': 0.0, # Heading angle of starting position B when on red team
-    'FIELD_RED_C_START_POSITION_X': 231, # X-Coordinate of starting position C when on red team
-    'FIELD_RED_C_START_POSITION_Y': -137.7, # Y-Coordinate of starting postion C when on red team
+    'FIELD_RED_C_START_POSITION_X': 251, # X-Coordinate of starting position C when on red team
+    'FIELD_RED_C_START_POSITION_Y': -141, # Y-Coordinate of starting postion C when on red team
     'FIELD_RED_C_START_ANGLE': 0.0, # Heading angle of starting position C when on red team
-    'FIELD_BLU_A_START_POSITION_X': -231, # X-Coordinate of starting position A when on blue team
-    'FIELD_BLU_A_START_POSITION_Y': 22.4, # Y-Coordinate of starting postion A when on blue team
+    'FIELD_BLU_A_START_POSITION_X': -251, # X-Coordinate of starting position A when on blue team
+    'FIELD_BLU_A_START_POSITION_Y': 41, # Y-Coordinate of starting postion A when on blue team
     'FIELD_BLU_A_START_ANGLE': 180.0, # Heading angle of starting position A when on blue team
-    'FIELD_BLU_B_START_POSITION_X': -231, # X-Coordinate of starting position B when on blue team
-    'FIELD_BLU_B_START_POSITION_Y': -65.7, # Y-Coordinate of starting postion B when on blue team
+    'FIELD_BLU_B_START_POSITION_X': -251, # X-Coordinate of starting position B when on blue team
+    'FIELD_BLU_B_START_POSITION_Y': -53, # Y-Coordinate of starting postion B when on blue team
     'FIELD_BLU_B_START_ANGLE': 180.0, # Heading angle of starting position B when on blue team
-    'FIELD_BLU_C_START_POSITION_X': -231, # X-Coordinate of starting position C when on blue team
-    'FIELD_BLU_C_START_POSITION_Y': -137.7, # Y-Coordinate of starting postion C when on blue team
+    'FIELD_BLU_C_START_POSITION_X': -251, # X-Coordinate of starting position C when on blue team
+    'FIELD_BLU_C_START_POSITION_Y': -141, # Y-Coordinate of starting postion C when on blue team
     'FIELD_BLU_C_START_ANGLE': 180.0, # Heading angle of starting position C when on blue team
     'FIELD_TAG1_X': 500.0, # X-Coordinate of Tag ID 1
     'FIELD_TAG1_Y': 500.0, # Y-Coordinate of Tag ID 1
@@ -169,25 +169,54 @@ autonConfig = {
     'BALANCE_BOT': True,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
-    'TASK_BLU_A_TFFT': [['ELEVATE'],
-                        ['GRAB', 10], # need to figure this out
+    'TASK_BLU_A_TFFT': [['GRAB'],
+                        ['ELEVATOR_DOWN'],
+                        ['TIMER', 5.0],
+                        ['ELEVATOR_EXTEND'],
+                        ['RELEASE'],
+                        ['ELEVATOR_RETRACT'],
                         ['MOVE', -122.6, 27.8, 0],
                         ['MOVE', -238.3, 27.8, 0]],
-    'TASK_BLU_B_TFFT': [['ELEVATE'],
+    'TASK_BLU_B_TFFT': [['GRAB'],
+                        ['ELEVATOR_DOWN'],
+                        ['TIMER', 5.0],
+                        ['ELEVATOR_EXTEND'],
+                        ['RELEASE'],
+                        ['ELEVATOR_RETRACT'],
                         ['MOVE', -94.5, -47.4, 0],
                         ['MOVE', -157, -47.4, 0],
                         ['BALANCE']],
-    'TASK_BLU_C_TFFT': [['ELEVATE'],
+    'TASK_BLU_C_TFFT': [['GRAB'],
+                        ['ELEVATOR_DOWN'],
+                        ['TIMER', 5.0],
+                        ['ELEVATOR_EXTEND'],
+                        ['RELEASE'],
+                        ['ELEVATOR_RETRACT'],
                         ['MOVE', -92.4, -128.5, 0],
                         ['MOVE', -188.1, -128.5, 0]],
-    'TASK_RED_A_TFFT': [['ELEVATE'],
+    'TASK_RED_A_TFFT': [['GRAB'],
+                        ['ELEVATOR_DOWN'],
+                        ['TIMER', 5.0],
+                        ['ELEVATOR_EXTEND'],
+                        ['RELEASE'],
+                        ['ELEVATOR_RETRACT'],
                         ['MOVE', 122.6, 27.8, 180],
                         ['MOVE', 238.3, 27.8, 180]],
-    'TASK_RED_B_TFFT': [['ELEVATE'],
+    'TASK_RED_B_TFFT': [['GRAB'],
+                        ['ELEVATOR_DOWN'],
+                        ['TIMER', 5.0],
+                        ['ELEVATOR_EXTEND'],
+                        ['RELEASE'],
+                        ['ELEVATOR_RETRACT'],
                         ['MOVE', 94.5, -47.4, 180],
                         ['MOVE', 157, -47.4, 180],
                         ['BALANCE']],
-    'TASK_RED_C_TFFT': [['ELEVATE'],
+    'TASK_RED_C_TFFT': [['GRAB'],
+                        ['ELEVATOR_DOWN'],
+                        ['TIMER', 5.0],
+                        ['ELEVATOR_EXTEND'],
+                        ['RELEASE'],
+                        ['ELEVATOR_RETRACT'],
                         ['MOVE', 92.4, -128.5, 180],
                         ['MOVE', 188.1, -128.5, 180]],
 }

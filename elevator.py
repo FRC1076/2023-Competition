@@ -16,8 +16,8 @@ class Elevator:
             wpilib.PneumaticsModuleType.REVPH, 
             solenoid_forward_id, 
             solenoid_reverse_id)
-        self.pid_controller = PIDController(0.5, 0.00001, 0.00001) #change later
-        self.pid_controller.setTolerance(0.1, 0.1)
+        self.pid_controller = PIDController(0.5, 0.00001, 0.025) #change later
+        self.pid_controller.setTolerance(0.5, 0.5)
 
     #1.00917431193 inches per rotation
     def extend(self, value):  # controls length of the elevator 
@@ -43,15 +43,25 @@ class Elevator:
     #automatically move to an elevator extension (position) using a pid controller
     def moveToPos(self, value):
         extend_value = self.pid_controller.calculate(self.getEncoderPosition(), value)
-        print("Elevator: moveToPos: ", extend_value)
+        print("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
         if(self.pid_controller.atSetpoint()):
+            print("Elevator: At set point", self.getEncoderPosition())
             self.extend(0)
             return True
         else:
             print("Moving")
             self.extend(-extend_value)
+            return False
 
-    # contols the "lean" of the elevator 
+    def elevatorUp(self):
+        self.solenoid.set(DoubleSolenoid.Value.kForward)
+        return True
+
+    def elevatorDown(self):
+        self.solenoid.set(DoubleSolenoid.Value.kReverse)
+        return True
+
+    # contols the "lean" of the elevator
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
@@ -61,6 +71,7 @@ class Elevator:
             print("Elevator: Toggle: Set forward.")
         else:
             print("Elevator: Toggle: How did we get here?")
+        return True
     
     # only reading the right encoder, assuming that left and right will stay about the same
     def getEncoderPosition(self):

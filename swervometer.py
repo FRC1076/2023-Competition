@@ -40,8 +40,8 @@ class Swervometer:
         print("field.start_position_x: ", self.field.start_position_x, " field.start_position_y: ", self.field.start_position_y)
         print("bumper_dimension_x: ", self.robotProperty.bumper_dimension_x, " bumper_dimension_y: ", self.robotProperty.bumper_dimension_y)
         print("cof_offset_x: ", self.robotProperty.cof_offset_x, " cof_offset_y: ", self.robotProperty.cof_offset_y)
-        self.currentX = self.field.origin_x + self.field.start_position_x + self.robotProperty.bumper_dimension_x + self.robotProperty.cof_offset_x
-        self.currentY = self.field.origin_y + self.field.start_position_y + self.robotProperty.bumper_dimension_y + self.robotProperty.cof_offset_y
+        self.currentX = self.field.start_position_x
+        self.currentY = self.field.start_position_y
         self.currentRCW = self.field.start_angle
         self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
