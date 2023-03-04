@@ -381,7 +381,7 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.teleopDrivetrain()
         #self.teleopelevator()
-        self.teleopGrabber()
+        #self.teleopGrabber()
         return True
 
     def move(self, x, y, rcw):
