@@ -380,7 +380,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.teleopDrivetrain()
-        #self.teleopelevator()
+        self.teleopelevator()
         #self.teleopGrabber()
         return True
 
@@ -477,6 +477,13 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopElevator(self):
         operator = self.operator.xboxController
+
+        ## simple operation for testing
+        extend_speed = self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone)
+        self.elevator.extend(extend_speed)
+        return
+
+        ## ignored for now
         clutch_factor = 1
         #Check for clutch
         if(operator.getLeftTriggerAxis() > 0.7):

@@ -26,6 +26,7 @@ class Elevator:
             value = 1
         if value < -1:
             value = -1
+            
         #make sure arm doesn't go past limit
         if self.getEncoderPosition() > 36 and value < 0:
             self.right_motor.set(0)
