@@ -1,20 +1,27 @@
+
 import rev
-import wpilib
-from wpilib import DoubleSolenoid
 
 class Grabber:
-    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id):
+
+    def __init__(self, motor_id):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
-        self.right_motor = rev.CANSparkMax(right_id, motor_type)
-        self.left_motor = rev.CANSparkMax(left_id, motor_type)
-        self.solenoid = wpilib.DoubleSolenoid(0, solenoid_forward_id, solenoid_reverse_id)
+        self.motor = rev.CANSparkMax(motor_id, motor_type) # elevator up-down
+        self.isEngaged = False
 
-    def extend(self, value):
-        self.right_motor.set(value)
-        self.left_motor.set(-value)
+    def engage(self):
+        self.isEngaged = True
+        return True # task is complete
 
+    def release(self):
+        self.isEngaged = False
+        return True # task is complete
+    
     def toggle(self):
-        if self.solenoid.get() == DoubleSolenoid.Value.kForward:
-            self.solenoid.set(DoubleSolenoid.Value.kOff)
-        if self.solenoid.get() == DoubleSolenoid.Value.kOff:
-            self.solenoid.set(DoubleSolenoid.Value.kForward)
+        self.isEngaged = not self.isEngaged
+        return True # probably not needed?
+
+    def execute(self):
+        if self.isEngaged:
+            self.motor.set(1)
+        else:
+            self.motor.set(0)

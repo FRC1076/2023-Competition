@@ -190,35 +190,35 @@ class Swervometer:
         
         return self.currentX, self.currentY, self.currentRCW
     
-    def updatePoseFromCamera(self, tagNumber, relativePositionTuple):
-        tagNum = tagNumber
-        x,y,rcw = relativePositionTuple
+    # def updatePoseFromCamera(self, tagNumber, relativePositionTuple):
+    #     tagNum = tagNumber
+    #     x,y,rcw = relativePositionTuple
 
-        tagX, tagY = self.getTagPosition(tagNum)
+    #     tagX, tagY = self.getTagPosition(tagNum)
 
-        self.currentX = tagX - x - (self.field.camera_offset_x - self.field.cof_offset_x)
-        self.currentY = tagY - y - (self.field.camera_offset_y - self.field.cof_offset_y)
-        self.currentRCW = rcw
-        return self.currentX, self.currentY, self.currentRCW
+    #     self.currentX = tagX - x - (self.field.camera_offset_x - self.field.cof_offset_x)
+    #     self.currentY = tagY - y - (self.field.camera_offset_y - self.field.cof_offset_y)
+    #     self.currentRCW = rcw
+    #     return self.currentX, self.currentY, self.currentRCW
 
-    def getTagPosition(self, tagNumber):
-        match tagNumber:
-            case 1:
-                return self.field.tag1_x, self.field.tag1_y
-            case 2:
-                return self.field.tag2_x, self.field.tag2_y
-            case 3:
-                return self.field.tag3_x, self.field.tag3_y
-            case 4:
-                return self.field.tag4_x, self.field.tag4_y
-            case 5:
-                return self.field.tag5_x, self.field.tag5_y
-            case 6:
-                return self.field.tag6_x, self.field.tag6_y
-            case 7:
-                return self.field.tag7_x, self.field.tag7_y
-            case 8:
-                return self.field.tag8_x, self.field.tag8_y
-            case _: # Should never happen
-                print("Unknown tag found.")
-                return -1, -1
+    # # def getTagPosition(self, tagNumber):
+    #     match tagNumber:
+    #         case 1:
+    #             return self.field.tag1_x, self.field.tag1_y
+    #         case 2:
+    #             return self.field.tag2_x, self.field.tag2_y
+    #         case 3:
+    #             return self.field.tag3_x, self.field.tag3_y
+    #         case 4:
+    #             return self.field.tag4_x, self.field.tag4_y
+    #         case 5:
+    #             return self.field.tag5_x, self.field.tag5_y
+    #         case 6:
+    #             return self.field.tag6_x, self.field.tag6_y
+    #         case 7:
+    #             return self.field.tag7_x, self.field.tag7_y
+    #         case 8:
+    #             return self.field.tag8_x, self.field.tag8_y
+    #         case _: # Should never happen
+    #             print("Unknown tag found.")
+    #             return -1, -1

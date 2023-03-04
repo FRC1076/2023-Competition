@@ -5,7 +5,7 @@ from util import clamp
 #from magicbot import magiccomponent
 import swervemodule
 
-import ntcore
+#import ntcore
 from networktables import NetworkTables
 from networktables.util import ntproperty
 from collections import namedtuple
@@ -425,7 +425,7 @@ class SwerveDrive:
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
-            print("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
+            # print("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
             print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentRCW: ", currentRCW, " targetRCW: ", rcw, " rcw_error: ", rcw_error)
             return False
 

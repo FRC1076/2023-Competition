@@ -113,11 +113,6 @@ drivetrainConfig = {
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.1
 }
 
-intakeConfig = {
-    # Update IDs when known
-    'INTAKE_MOTOR_ID': -1,
-}
-
 visionConfig = {
     'TARGET_HEIGHT': 8.5,
     'TARGET_RADIUS': 2,
@@ -128,21 +123,39 @@ visionConfig = {
     'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
+climberConfig = {
+    'WINCH_LEFT_ID': 6,
+    'WINCH_RIGHT_ID': 14,
+    # Pneumatic board IDs
+    'SOLENOID_FORWARD_ID': 6,
+    'SOLENOID_REVERSE_ID': 0,
+    # DIO pin numbers
+    'LEFT_LIMIT_ID': 0,
+    'RIGHT_LIMIT_ID': 1,
+    'CABLE_WRAPPED': 'UNDER',
+    # Both speeds positive.
+    # Extend speed must be lower than natural extend rate
+    'EXTEND_SPEED': 0.2,
+    'RETRACT_SPEED': 0.5,
+}
+
+elevatorConfig = {
+    'RIGHT_ID': 6,
+    'LEFT_ID': 10,
+    'SOLENOID_FORWARD_ID': 4,
+    'SOLENOID_REVERSE_ID': 5
+}
+
+grabberConfig = {
+    'MOTOR_ID': 15 # from testbed
+}
+
 cliffDetectorConfig = {
     'LEFT_CLIFF_DETECTOR_PINGID': 0,
     'LEFT_CLIFF_DETECTOR_ECHOID': 1,
     'RIGHT_CLIFF_DETECTOR_PINGID': 2,
     'RIGHT_CLIFF_DETECTOR_ECHOID': 3,
     'CLIFF_TOLERANCE': 2, # Centimeters?
-}
-
-grabberConfig = {
-    'RIGHT_ID': -1,
-    'LEFT_ID': -2,
-    'INTAKE_TOP_ID': -3,
-    'INTAKE_BOTTOM_ID': -4,
-    'SOLENOID_FORWARD_ID': -5,
-    'SOLENOID_REVERSE_ID': -6
 }
 
 autonConfig = {
@@ -153,6 +166,7 @@ autonConfig = {
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TFFT': [['ELEVATE'],
+                        ['GRAB', 10], # need to figure this out
                         ['MOVE', -122.6, 27.8, 0],
                         ['MOVE', -238.3, 27.8, 0]],
     'TASK_BLU_B_TFFT': [['ELEVATE'],
@@ -183,8 +197,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
-    'GRABBER': grabberConfig,
-    'INTAKE': intakeConfig,
+    'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
 }
 
@@ -193,6 +206,7 @@ showbot = {
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
+    'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
 }
 
