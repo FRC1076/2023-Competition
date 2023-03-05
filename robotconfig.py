@@ -154,7 +154,10 @@ elevatorConfig = {
 }
 
 grabberConfig = {
-    'MOTOR_ID': 15 # from testbed
+    'SUCTION_MOTOR_ID': 15, # from testbed
+    'ROTATE_MOTOR_ID': 0,
+    'TOP_SWITCH_ID': 0,
+    'BOTTOM_SWITCH_ID': 0
 }
 
 cliffDetectorConfig = {
@@ -233,6 +236,7 @@ testbot = { # Always used for unit tests ($ python robot.py sim)
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'CLIFFDETECTOR': cliffDetectorConfig,
+    'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
     'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
 }

@@ -231,7 +231,7 @@ class MyRobot(wpilib.TimedRobot):
         return vision
 
     def initElevator(self, config):
-        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'], config['ELEVATOR_KP'], config['ELEVATOR_KI'], config['ELEVATOR_KD'])
+        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'], config['ELEVATOR_KP'], config['ELEVATOR_KI'], config['ELEVATOR_KD'], self.grabber)
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
@@ -241,7 +241,7 @@ class MyRobot(wpilib.TimedRobot):
         return elevator
 
     def initGrabber(self, config):
-        return Grabber(config['MOTOR_ID'])
+        return Grabber(config['SUCTION_MOTOR_ID'], config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'])
 
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
@@ -376,6 +376,7 @@ class MyRobot(wpilib.TimedRobot):
     def robotPeriodic(self):
         #if self.cliffDetector:
         #    self.cliffDetector.update()
+        self.grabber.update()
         return True
 
     def teleopInit(self):
@@ -388,7 +389,7 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.teleopDrivetrain()
         self.teleopElevator()
-        #self.teleopGrabber()
+        self.teleopGrabber()
         return True
 
     def move(self, x, y, rcw):
@@ -620,7 +621,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             print("Auton: ERROR: Unknown Task", self.autonTaskCounter)
             self.autonTaskCounter += 1   
-        
+
         return
 
         # OLD STUFF BELOW

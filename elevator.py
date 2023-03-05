@@ -6,7 +6,7 @@ from wpimath.controller import PIDController
 import math
 
 class Elevator:
-    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD):
+    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, grabber):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
@@ -19,6 +19,7 @@ class Elevator:
         self.pid_controller = PIDController(kP, kI, kD)
         #self.pid_controller = PIDController(0.5, 0.00001, 0.025)
         self.pid_controller.setTolerance(0.5, 0.5)
+        self.grabber = grabber
 
     #1.00917431193 inches per rotation
     def extend(self, value):  # controls length of the elevator 
@@ -56,19 +57,23 @@ class Elevator:
 
     def elevatorUp(self):
         self.solenoid.set(DoubleSolenoid.Value.kForward)
+        if self.grabber:
+            self.grabber.raise_motor()
         return True
 
     def elevatorDown(self):
         self.solenoid.set(DoubleSolenoid.Value.kReverse)
+        if self.grabber:
+            self.grabber.lower_motor()
         return True
 
     # contols the "lean" of the elevator
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
-            self.solenoid.set(DoubleSolenoid.Value.kReverse)
+            self.elevatorDown()
             print("Elevator: Toggle: Set to reverse.")
         elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
-            self.solenoid.set(DoubleSolenoid.Value.kForward)
+            self.elevatorUp()
             print("Elevator: Toggle: Set forward.")
         else:
             print("Elevator: Toggle: How did we get here?")
