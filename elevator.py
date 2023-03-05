@@ -6,7 +6,7 @@ from wpimath.controller import PIDController
 import math
 
 class Elevator:
-    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id):
+    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
@@ -16,7 +16,8 @@ class Elevator:
             wpilib.PneumaticsModuleType.REVPH, 
             solenoid_forward_id, 
             solenoid_reverse_id)
-        self.pid_controller = PIDController(0.5, 0.00001, 0.025) #change later
+        self.pid_controller = PIDController(kP, kI, kD)
+        #self.pid_controller = PIDController(0.5, 0.00001, 0.025)
         self.pid_controller.setTolerance(0.5, 0.5)
 
     #1.00917431193 inches per rotation

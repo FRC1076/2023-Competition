@@ -231,7 +231,7 @@ class MyRobot(wpilib.TimedRobot):
         return vision
 
     def initElevator(self, config):
-        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'])
+        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'], config['ELEVATOR_KP'], config['ELEVATOR_KI'], config['ELEVATOR_KD'])
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
