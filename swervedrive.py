@@ -14,6 +14,7 @@ from swervometer import Swervometer
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
+BearingConfig = namedtuple('BearingConfig', ['sd_prefix', 'bearing_kP', 'bearing_kI', 'bearing_kD'])
 
 class SwerveDrive:
 
@@ -23,7 +24,7 @@ class SwerveDrive:
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _vision, _gyro, _balance_cfg, _target_cfg):
+    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _vision, _gyro, _balance_cfg, _target_cfg, _bearing_cfg):
         
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
@@ -115,6 +116,15 @@ class SwerveDrive:
         self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
         self.target_rcw_pid_controller.enableContinuousInput(0, 360)
+
+        self.bearing_config = _bearing_cfg
+        self.bearing_kP = self.bearing_config.bearing_kP
+        self.bearing_kI = self.bearing_config.bearing_kI
+        self.bearing_kD = self.bearing_config.bearing_kD
+        self.bearing_pid_controller = PIDController(self.bearing_kP, self.bearing_kI, self.bearing_kD)
+
+        self.bearing = self.getGyroAngle()
+        self.updateBearing = False
         
     def reset(self):
         print("In swervedrive reset")
@@ -149,7 +159,8 @@ class SwerveDrive:
             self.modules[key].reset()
 
         self.resetGyro()
-
+        self.bearing = self.getGyroAngle()
+        self.updateBearing = False
 
     @staticmethod
     def square_input(input):
@@ -222,6 +233,7 @@ class SwerveDrive:
     def resetGyro(self):
         if self.gyro:
             self.gyro.reset()
+            self.bearing = self.getGyroAngle()
 
     def flush(self):
         """
@@ -368,6 +380,23 @@ class SwerveDrive:
         else:
             return False
 
+    def steerStraight(self, rcw):
+        if rcw != 0:
+            self.updateBearing = True
+            print("rcw (!=0): ", rcw, " bearing: ", self.bearing, " currentAngle: ", self.getGyroAngle())
+            return rcw
+        else:
+            self.updateBearing = False
+            angle_diff = abs(self.getGyroAngle() - self.bearing)
+            if (angle_diff) < 180:
+                print("Angle Diff: ", angle_diff, " GyroAngle: ", self.getGyroAngle(), " bearing: ", self.bearing)
+                rcw_error = self.bearing_pid_controller.calculate(self.getGyroAngle(), self.bearing)
+            else:
+                print("Angle Diff: ", angle_diff, " 360 - GyroAngle: ", (360 - self.getGyroAngle()), " bearing: ", self.bearing)
+                rcw_error = -self.bearing_pid_controller.calculate((360 - self.getGyroAngle()), self.bearing)
+            print("rcw: ", rcw, " rcw_error: ", rcw_error, " currentAngle: ", self.getGyroAngle(), " bearing: ", self.bearing)
+            return rcw_error
+
     def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw):
         """
         Calulates the speed and angle for each wheel given the requested movement
@@ -400,7 +429,7 @@ class SwerveDrive:
 
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
-
+        rcw = self.steerStraight(rcw)
         self.set_rcw(rcw)
     
     def goToPose(self, x, y, rcw):
@@ -545,7 +574,7 @@ class SwerveDrive:
 
         # Calculate normalized speeds with lever arm adjustment
         for key in self.modules:
-            print("Execute: key: ", key, " base speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_speeds[key] * self.swervometer.getCOMmult(key))
+            #print("Execute: key: ", key, " base speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_speeds[key] * self.swervometer.getCOMmult(key))
             self._requested_speeds[key] = self._requested_speeds[key] * self.swervometer.getCOMmult(key)
         
         self._requested_speeds = self.normalizeDictionary(self._requested_speeds)
@@ -580,6 +609,12 @@ class SwerveDrive:
                 print("AFTER COMMENTS")
 
         print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
+
+        if(self.updateBearing):
+            print("Old Bearing: ", self.bearing)
+            self.bearing = self.getGyroAngle()
+            print("New Bearing: ", self.bearing)
+            self.updateBearing = False
 
     def idle(self):
         for key in self.modules:
