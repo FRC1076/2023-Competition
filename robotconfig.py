@@ -78,7 +78,7 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_CAMERA_HEIGHT': 12.1875, # Height of camera eye relative to gyroscope: 11 3/16+ 2 -1
     'ROBOT_SWERVE_MODULE_OFFSET_X': 13.75, # X-offset of swerve module center from COF
     'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
-    'USE_COM_ADJUSTMENT': False, # Should robot compensate for CoM lever arms?
+    'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
 }
 
 drivetrainConfig = {

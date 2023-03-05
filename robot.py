@@ -491,6 +491,7 @@ class MyRobot(wpilib.TimedRobot):
             print("Toggling Elevator")
             self.elevator.toggle()
 
+        print("In TeleopElevator")
         ## ignored for now
         clutch_factor = 1
         #Check for clutch
@@ -502,19 +503,19 @@ class MyRobot(wpilib.TimedRobot):
         if operator.getAButton(): #Lowest
             self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
-            #print("Elevator: A Button")
+            print("Elevator: A Button")
         if operator.getYButton(): #Highest
             self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
-            #print("Elevator: Y Button")
+            print("Elevator: Y Button")
         if operator.getBButton(): #Medium Position
             self.elevator_destination = self.lower_scoring_height
             self.elevator_is_automatic = True
-            #print("Elevator: B Button")
+            print("Elevator: B Button")
         if operator.getXButton(): #Human Position
             self.elevator_destination = self.human_position
             self.elevator_is_automatic = True
-            #print("Elevator: X Button")
+            print("Elevator: X Button")
 
         #if controller is moving, disable elevator automatic move
         if(abs(extend_value) > 0):

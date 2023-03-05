@@ -112,6 +112,7 @@ class SwerveModule:
             angle = (angle + 180) % 360
             #self.positionSign *= -1
 
+
         return angle
 
     def flush(self): # rewrite this (although it isnt used anywhere) to reset the encoder to 0 and zero out the speed, if you want.
