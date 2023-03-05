@@ -380,6 +380,41 @@ class SwerveDrive:
         else:
             return False
 
+    def steerStraight3(self, rcw):
+
+        current_angle = self.getGyroAngle()
+        if rcw != 0:
+            self.updateBearing = True
+            print("rcw (!=0): ", rcw, " bearing: ", self.bearing, " currentAngle: ", current_angle)
+            return rcw
+        else:
+            self.updateBearing = False
+            angle_diff = abs(current_angle - self.bearing)
+            if (angle_diff) > 180:
+                angle_diff = 360 - angle_diff
+                if self.bearing < current_angle:
+                    target_angle = current_angle + angle_diff
+                else:
+                    target_angle = current_angle - angle_diff
+            else:
+                if self.bearing < current_angle:
+                    target_angle = current_angle - angle_diff
+                else:
+                    target_angle = current_angle + angle_diff
+
+            rcw_error = self.bearing_pid_controller.calculate(self.getGyroAngle(), target_angle)
+            print("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
+            return rcw_error
+
+
+    def steerStraight2(self, rcw):
+        if rcw != 0:
+            self.updateBearing = True
+            return self.getGyroAngle() % 360
+        else:
+            self.updateBearing = False
+            return self.bearing
+    
     def steerStraight(self, rcw):
         if rcw != 0:
             self.updateBearing = True
@@ -413,6 +448,8 @@ class SwerveDrive:
         strafe = non_adjusted_strafe * self.swervometer.getTeamMoveAdjustment()
 
         #Convert field-oriented translate to chassis-oriented translate
+        
+        #current_angle = self.steerStraight2(rcw)
         current_angle = self.getGyroAngle() % 360
         desired_angle = ((math.atan2(fwd, strafe) / math.pi) * 180) % 360
         chassis_angle = (desired_angle - current_angle) % 360
@@ -429,7 +466,7 @@ class SwerveDrive:
 
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
-        rcw = self.steerStraight(rcw)
+        rcw = self.steerStraight3(rcw)
         self.set_rcw(rcw)
     
     def goToPose(self, x, y, rcw):
