@@ -491,7 +491,6 @@ class MyRobot(wpilib.TimedRobot):
             print("Toggling Elevator")
             self.elevator.toggle()
 
-        print("In TeleopElevator")
         ## ignored for now
         clutch_factor = 1
         #Check for clutch

@@ -625,6 +625,7 @@ class SwerveDrive:
         # Execute each module
         first_module = True
         for key in self.modules:
+            print("Module: Key: ", key)
             self.modules[key].execute()
 
         COFX, COFY, COFAngle = self.swervometer.calculateCOFPose(self.modules, self.getGyroAngle())

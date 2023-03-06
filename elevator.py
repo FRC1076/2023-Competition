@@ -12,6 +12,8 @@ class Elevator:
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
         self.right_encoder = self.right_motor.getEncoder() # measure elevator height
         self.left_encoder = self.left_motor.getEncoder() # ""
+        self.right_encoder.setPosition(0)
+        self.left_encoder.setPosition(0)
         self.solenoid = wpilib.DoubleSolenoid(1, # controls the "lean" of the elevator
             wpilib.PneumaticsModuleType.REVPH, 
             solenoid_forward_id, 

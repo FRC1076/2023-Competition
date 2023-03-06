@@ -144,12 +144,12 @@ climberConfig = {
 
 elevatorConfig = {
     'RIGHT_ID': 6,
-    'LEFT_ID': 10,
+    'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
     'ELEVATOR_KP': 0.5,
     'ELEVATOR_KI': 0.00001,
-    'ELEVATOR_KD': 0.025,
+    'ELEVATOR_KD': 0.00001, #0.25
     'HUMAN_POSITION': 18,
     'UPPER_SCORING_HEIGHT': 36,
     'LOWER_SCORING_HEIGHT': 26,
