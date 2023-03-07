@@ -6,6 +6,7 @@ class Grabber:
     def __init__(self, suction_motor_id, rotate_motor_id, bottom_switch_id, top_switch_id):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushed
         self.suction_motor = rev.CANSparkMax(suction_motor_id, motor_type) # elevator up-down
+        self.suction_motor = rev.CANSparkMax(suction_motor_id, motor_type) # elevator up-down
         self.rotate_motor = rev.CANSparkMax(rotate_motor_id, motor_type)
         self.bottom_switch = wpilib.DigitalInput(bottom_switch_id)
         self.top_switch = wpilib.DigitalInput(top_switch_id)
@@ -35,19 +36,22 @@ class Grabber:
     def raise_motor(self):
         self.state = 1
         self.rotate_motor.set(1)
-        if self.top_switch.get() == True and self.state == 1:
-            self.rotate_motor.set(0)
-            return True
+        #if self.top_switch.get() == True and self.state == 1:
+        #    self.rotate_motor.set(0)
+        #    return True
         return False
     
     #lower rotate motor
     def lower_motor(self):
         self.state = 0
         self.rotate_motor.set(-1)
-        if self.bottom_switch.get() == True and self.state == 0:
-            self.rotate_motor.set(0)
-            return True
+        #if self.bottom_switch.get() == True and self.state == 0:
+        #    self.rotate_motor.set(0)
+        #    return True
         return False
+
+    def motor_off(self):
+        self.rotate_motor.set(0)
 
     #run suction motor
     def execute(self):

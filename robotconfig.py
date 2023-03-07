@@ -156,8 +156,9 @@ elevatorConfig = {
 grabberConfig = {
     'SUCTION_MOTOR_ID': 7, # from testbed
     'ROTATE_MOTOR_ID': 8,
+
     'TOP_SWITCH_ID': 0,
-    'BOTTOM_SWITCH_ID': 0
+    'BOTTOM_SWITCH_ID': 1,
 }
 
 cliffDetectorConfig = {
@@ -246,6 +247,7 @@ showbot = {
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
+    'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
     'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
 }
