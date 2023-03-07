@@ -154,8 +154,8 @@ elevatorConfig = {
 }
 
 grabberConfig = {
-    'SUCTION_MOTOR_ID': 15, # from testbed
-    'ROTATE_MOTOR_ID': 0,
+    'SUCTION_MOTOR_ID': 7, # from testbed
+    'ROTATE_MOTOR_ID': 8,
     'TOP_SWITCH_ID': 0,
     'BOTTOM_SWITCH_ID': 0
 }
