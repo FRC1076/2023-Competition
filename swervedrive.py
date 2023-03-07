@@ -474,7 +474,12 @@ class SwerveDrive:
         currentX, currentY, currentRCW = self.swervometer.getCOF()
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
-        rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
+
+        if rcw != 0:
+            rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
+        else:
+            rcw_error = self.steerStraight3(rcw)
+        
         #print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
             print("X at set point")
