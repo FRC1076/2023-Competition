@@ -18,6 +18,7 @@ from swervemodule import ModuleConfig
 
 from swervedrive import BalanceConfig
 from swervedrive import TargetConfig
+from swervedrive import BearingConfig
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
@@ -251,6 +252,7 @@ class MyRobot(wpilib.TimedRobot):
 
         balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
         target_cfg = TargetConfig(sd_prefix='Target_Module', target_kP=config['TARGET_KP'], target_kI=config['TARGET_KI'], target_kD=config['TARGET_KD'])
+        bearing_cfg = BearingConfig(sd_prefix='Bearing_Module', bearing_kP=config['BEARING_KP'], bearing_kI=config['BEARING_KI'], bearing_kD=config['BEARING_KD'])
 
         flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.5, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
         frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=153.3, inverted=False, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
@@ -292,7 +294,7 @@ class MyRobot(wpilib.TimedRobot):
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg)
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg)
 
         return swerve
 
@@ -495,24 +497,24 @@ class MyRobot(wpilib.TimedRobot):
         if(operator.getLeftTriggerAxis() > 0.7):
             clutch_factor = 0.4
         #Find the value the arm will move at
-        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 2) * clutch_factor
+        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 10) * clutch_factor
         #preset destinations
         if operator.getAButton(): #Lowest
             self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
-            #print("Elevator: A Button")
+            print("Elevator: A Button")
         if operator.getYButton(): #Highest
             self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
-            #print("Elevator: Y Button")
+            print("Elevator: Y Button")
         if operator.getBButton(): #Medium Position
             self.elevator_destination = self.lower_scoring_height
             self.elevator_is_automatic = True
-            #print("Elevator: B Button")
+            print("Elevator: B Button")
         if operator.getXButton(): #Human Position
             self.elevator_destination = self.human_position
             self.elevator_is_automatic = True
-            #print("Elevator: X Button")
+            print("Elevator: X Button")
 
         #if controller is moving, disable elevator automatic move
         if(abs(extend_value) > 0):

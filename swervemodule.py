@@ -107,10 +107,11 @@ class SwerveModule:
         :returns: the voltage position after the zero
         """
         angle = (self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360
-
+        
         if self.moduleFlipped:
             angle = (angle + 180) % 360
             #self.positionSign *= -1
+
 
         return angle
 
