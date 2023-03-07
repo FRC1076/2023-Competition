@@ -126,22 +126,6 @@ visionConfig = {
     'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
-climberConfig = {
-    'WINCH_LEFT_ID': 6,
-    'WINCH_RIGHT_ID': 14,
-    # Pneumatic board IDs
-    'SOLENOID_FORWARD_ID': 6,
-    'SOLENOID_REVERSE_ID': 0,
-    # DIO pin numbers
-    'LEFT_LIMIT_ID': 0,
-    'RIGHT_LIMIT_ID': 1,
-    'CABLE_WRAPPED': 'UNDER',
-    # Both speeds positive.
-    # Extend speed must be lower than natural extend rate
-    'EXTEND_SPEED': 0.2,
-    'RETRACT_SPEED': 0.5,
-}
-
 elevatorConfig = {
     'RIGHT_ID': 6,
     'LEFT_ID': 5,
@@ -157,7 +141,7 @@ elevatorConfig = {
 }
 
 grabberConfig = {
-    'MOTOR_ID': 15 # from testbed
+    'MOTOR_ID': 8
 }
 
 cliffDetectorConfig = {
