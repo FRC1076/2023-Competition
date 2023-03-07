@@ -497,7 +497,7 @@ class MyRobot(wpilib.TimedRobot):
         if(operator.getLeftTriggerAxis() > 0.7):
             clutch_factor = 0.4
         #Find the value the arm will move at
-        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 2) * clutch_factor
+        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 10) * clutch_factor
         #preset destinations
         if operator.getAButton(): #Lowest
             self.elevator_destination = self.retracted_height

@@ -21,6 +21,8 @@ class Elevator:
         self.pid_controller = PIDController(kP, kI, kD)
         #self.pid_controller = PIDController(0.5, 0.00001, 0.025)
         self.pid_controller.setTolerance(0.5, 0.5)
+        self.right_motor.setOpenLoopRampRate(0.50)
+        self.left_motor.setOpenLoopRampRate(0.50)
 
     #1.00917431193 inches per rotation
     def extend(self, value):  # controls length of the elevator 
@@ -52,26 +54,26 @@ class Elevator:
             self.extend(0)
             return True
         else:
-            print("Moving")
+            print("Elevator: Moving")
             self.extend(-extend_value)
             return False
 
     def elevatorUp(self):
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
+        self.solenoid.set(DoubleSolenoid.Value.kReverse)
         return True
 
     def elevatorDown(self):
-        self.solenoid.set(DoubleSolenoid.Value.kReverse)
+        self.solenoid.set(DoubleSolenoid.Value.kForward)
         return True
 
     # contols the "lean" of the elevator
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
-            print("Elevator: Toggle: Set to reverse.")
+            print("Elevator: Toggle: Set to reverse/up.")
         elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             self.solenoid.set(DoubleSolenoid.Value.kForward)
-            print("Elevator: Toggle: Set forward.")
+            print("Elevator: Toggle: Set forward/down.")
         else:
             print("Elevator: Toggle: How did we get here?")
         return True

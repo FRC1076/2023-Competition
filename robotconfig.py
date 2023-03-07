@@ -147,11 +147,11 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.5,
-    'ELEVATOR_KI': 0.00001,
-    'ELEVATOR_KD': 0.00001, #0.25
+    'ELEVATOR_KP': 0.06, #0.048, # 0.8 * 0.6
+    'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
+    'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
     'HUMAN_POSITION': 18,
-    'UPPER_SCORING_HEIGHT': 36,
+    'UPPER_SCORING_HEIGHT': 35,
     'LOWER_SCORING_HEIGHT': 26,
     'RETRACTED_HEIGHT': 3,
 }
@@ -180,9 +180,9 @@ autonConfig = {
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
                         ['RELEASE'],
-                        ['ELEVATOR_RETRACT'],
-                        ['MOVE', -122.6, 27.8, 0],
-                        ['MOVE', -238.3, 27.8, 0]],
+                        ['ELEVATOR_RETRACT']],
+                        #['MOVE', -122.6, 27.8, 0],
+                        #['MOVE', -238.3, 27.8, 0]],
     'TASK_BLU_B_TFFT': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],
