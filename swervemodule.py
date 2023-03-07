@@ -33,7 +33,7 @@ class SwerveModule:
         self.lastPosition = self.driveEncoder.getPosition()
 
         self.encoder_zero = self.cfg.zero or 0 #idk the point of this, maybe useful for other encoder type
-        angle = ((self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360) +90
+        angle = ((self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360)
         if angle >= 90 and angle <= 270:
             self.positionSign = +1 
             self.moduleFlipped = False
@@ -46,7 +46,8 @@ class SwerveModule:
         # Config -- change this to reflect how our config is formatted. We will upon testing of the entire drivetrain figure out which need to be inverted.
         self.sd_prefix = self.cfg.sd_prefix or 'Module'
         self.inverted = self.cfg.inverted or False 
-        self.allow_reverse = self.cfg.allow_reverse or True #def allow reverse always, so you can maybe remove this
+        self.allow_reverse = False
+        #self.allow_reverse = self.cfg.allow_reverse or True #def allow reverse always, so you can maybe remove this
 
         # SmartDashboard
         self.sd = NetworkTables.getTable('SmartDashboard')

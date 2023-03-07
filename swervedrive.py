@@ -381,6 +381,7 @@ class SwerveDrive:
             return False
 
     def steerStraight3(self, rcw):
+        return rcw
 
         current_angle = self.getGyroAngle()
         if rcw != 0:
@@ -544,23 +545,23 @@ class SwerveDrive:
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
         # Velocities per quadrant
-        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
-        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        frontX = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        rearX = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        leftY = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rightY = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-        frontLeft_speed = math.hypot(frontX, rightY)
-        frontLeft_angle = math.degrees(math.atan2(frontX, rightY))
+        frontLeft_speed = math.hypot(frontX, leftY)
+        frontLeft_angle = math.degrees(math.atan2(leftY, frontX))
 
-        frontRight_speed = math.hypot(frontX, leftY)
-        frontRight_angle = math.degrees(math.atan2(frontX, leftY))
+        frontRight_speed = math.hypot(frontX, rightY)
+        frontRight_angle = math.degrees(math.atan2(rightY, frontX))
 
-        rearLeft_speed = math.hypot(rearX, rightY)
-        rearLeft_angle = math.degrees(math.atan2(rearX, rightY))
+        rearLeft_speed = math.hypot(rearX, leftY)
+        rearLeft_angle = math.degrees(math.atan2(leftY, rearX))
 
-        rearRight_speed = math.hypot(rearX, leftY)
-        rearRight_angle = math.degrees(math.atan2(rearX, leftY))
+        rearRight_speed = math.hypot(rearX, rightY)
+        rearRight_angle = math.degrees(math.atan2(rightY, rearX))
 
         self._requested_speeds['front_left'] = frontLeft_speed
         self._requested_speeds['front_right'] = frontRight_speed
