@@ -381,7 +381,7 @@ class SwerveDrive:
             return False
 
     def steerStraight3(self, rcw):
-
+        
         current_angle = self.getGyroAngle()
         if rcw != 0:
             self.updateBearing = True
@@ -455,8 +455,8 @@ class SwerveDrive:
         chassis_angle = (desired_angle - current_angle) % 360
         magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
 
-        chassis_strafe = magnitude * math.sin(math.radians(chassis_angle))
-        chassis_fwd = magnitude * math.cos(math.radians(chassis_angle))
+        chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
+        chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
 
         #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
         self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
@@ -544,10 +544,10 @@ class SwerveDrive:
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
         # Velocities per quadrant
-        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
-        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        rightY = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        leftY = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rearX = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        frontX = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
         rearLeft_speed = math.hypot(frontX, rightY)
