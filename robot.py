@@ -56,15 +56,14 @@ class MyRobot(wpilib.TimedRobot):
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
 
-        if TEST_MODE:
-            self.config = Tester.getTestConfig()
-        else:
-            self.config = robotconfig
+        self.config = robotconfig
 
-        NetworkTables.initialize(server='roborio-1076-frc.local') # Necessary for vision to
+        if TEST_MODE:
+            NetworkTables.initialize(server='localhost')
+        else:
+            NetworkTables.initialize(server='roborio-1076-frc.local')
         self.dashboard = NetworkTables.getTable('SmartDashboard')
 
-        print(self.config)
         for key, config in self.config.items():
             if key == 'CONTROLLERS':
                 controllers = self.initControllers(config)
@@ -91,10 +90,10 @@ class MyRobot(wpilib.TimedRobot):
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
 
-        if TEST_MODE:
-            self.tester = Tester(self)
-            self.tester.initTestTeleop()
-            self.tester.testCodePaths()
+        # if TEST_MODE:
+        #     self.tester = Tester(self)
+        #     self.tester.initTestTeleop()
+        #     self.tester.testCodePaths()
 
     def disabledExit(self):
         print("no longer disabled")
@@ -304,10 +303,10 @@ class MyRobot(wpilib.TimedRobot):
         self.autonScoreNew = config['SCORE_NEW']
         self.autonBalanceRobot = config['BALANCE_BOT']
 
-        self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
-        self.dashboard.putNumber('Auton Pickup New Element', self.autonPickupNew)
-        self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
-        self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
+        self.dashboard.putBoolean('Auton Score Existing Element', self.autonScoreExisting)
+        self.dashboard.putBoolean('Auton Pickup New Element', self.autonPickupNew)
+        self.dashboard.putBoolean('Auton Score New Element', self.autonScoreNew)
+        self.dashboard.putBoolean('Auton Balance Robot', self.autonBalanceRobot)
 
         # Reset task counter.
         self.autonTaskCounter = 0
@@ -535,6 +534,7 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.toggle()
 
     def autonomousInit(self):
+
         if not self.auton:
             return
         if not self.drivetrain:
@@ -662,6 +662,6 @@ class MyRobot(wpilib.TimedRobot):
 
 
 if __name__ == "__main__":
-    #if sys.argv[1] == 'sim':
-    #    TEST_MODE = True
+    if sys.argv[1] == 'sim':
+       TEST_MODE = True
     wpilib.run(MyRobot)
