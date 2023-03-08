@@ -34,7 +34,7 @@ class Grabber:
     #raise rotate motor
     def raise_motor(self):
         self.state = 1
-        self.rotate_motor.set(0.5)
+        self.rotate_motor.set(0.2)
         #if self.top_switch.get() == True and self.state == 1:
         #    self.rotate_motor.set(0)
         #    return True
@@ -43,7 +43,7 @@ class Grabber:
     #lower rotate motor
     def lower_motor(self):
         self.state = 0
-        self.rotate_motor.set(-0.5)
+        self.rotate_motor.set(-0.2)
         #if self.bottom_switch.get() == True and self.state == 0:
         #    self.rotate_motor.set(0)
         #    return True
