@@ -116,10 +116,9 @@ class MyRobot(wpilib.TimedRobot):
             ctrls[controller_id] = Controller(ctrl, dz, lta, rta)
         return ctrls
 
-    def initSwervometer(self, config):
-        print("initSwervometer ran")
-        
-        if (config['TEAM_IS_RED']):
+
+    def configSwervometer(self, team_is_red, field_start_position, config):
+        if (team_is_red):
             self.team_is_red = True
             self.team_is_blu = False
             teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
@@ -132,9 +131,9 @@ class MyRobot(wpilib.TimedRobot):
 
         self.dashboard.putBoolean('Team is Red', self.team_is_red)
 
-        print("FIELD_START_POSITION:", config['FIELD_START_POSITION'])
+        print("FIELD_START_POSITION:", field_start_position)
 
-        if (config['FIELD_START_POSITION'] == 'A'):
+        if (field_start_position == 'A'):
             self.dashboard.putString('Field Start Position', 'A')
             self.fieldStartPosition = 'A'
             if self.team_is_red:
@@ -222,9 +221,12 @@ class MyRobot(wpilib.TimedRobot):
                                 swerve_module_offset_y=config['ROBOT_SWERVE_MODULE_OFFSET_Y'])
 
         swervometer = Swervometer(field_cfg, robot_cfg)
-
         return swervometer
     
+    def initSwervometer(self, config):
+        self.swervometerConfig = config
+        return self.configSwervometer(config['TEAM_IS_RED'], config['FIELD_START_POSITION'], config)
+
     def initVision(self, config):
         vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
 
@@ -496,12 +498,16 @@ class MyRobot(wpilib.TimedRobot):
         if not self.swervometer:
             return
 
-        self.fieldStartPosition = self.dashboard.getString('Field Start Position')
+        print(wpilib.DriverStation.getAlliance())
+        self.team_is_red = self.dashboard.getBoolean('Team is Red', True)
+        # wpilib.DriverStation.getAlliance() == 'Alliance.kRed'
+        self.fieldStartPosition = self.dashboard.getString('Field Start Position', self.fieldStartPosition)
+        self.autonScoreExisting =  self.dashboard.getBoolean('Auton Score Existing Element', self.autonScoreExisting)
+        self.autonPickupNew = self.dashboard.getBoolean('Auton Pickup New Element', self.autonPickupNew)
+        self.autonScoreNew = self.dashboard.getBoolean('Auton Score New Element', self.autonScoreNew)
+        self.autonBalanceRobot = self.dashboard.getBoolean('Auton Balance Robot', self.autonBalanceRobot)
 
-        self.autonScoreExisting =  self.dashboard.getBoolean('Auton Score Existing Element')
-        self.autonPickupNew = self.dashboard.getBoolean('Auton Pickup New Element')
-        self.autonScoreNew = self.dashboard.getBoolean('Auton Score New Element')
-        self.autonBalanceRobot = self.dashboard.getBoolean('Auton Balance Robot')
+        self.swervometer = self.configSwervometer(self.team_is_red, self.fieldStartPosition, self.swervometerConfig)
 
         if (self.team_is_red
             and self.fieldStartPosition == 'A'
