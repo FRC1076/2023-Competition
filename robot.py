@@ -493,8 +493,8 @@ class MyRobot(wpilib.TimedRobot):
         ## ignored for now
         clutch_factor = 1
         #Check for clutch
-        if(operator.getLeftTriggerAxis() > 0.7):
-            clutch_factor = 0.4
+        #if(operator.getLeftTriggerAxis() > 0.7):
+            #clutch_factor = 0.4
         #Find the value the arm will move at
         extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 2) * clutch_factor
         #preset destinations
@@ -529,6 +529,7 @@ class MyRobot(wpilib.TimedRobot):
         operator = self.operator.xboxController
         # if the operator is holding the bumper, keep the grab going. Otherwise release.
         
+        #CHANGE CONTROLS LATER
         if (operator.getRightBumper()):
             print("Grabber: Raise Grabber")
             self.grabber.raise_motor()
