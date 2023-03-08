@@ -502,7 +502,7 @@ class SwerveDrive:
 
                 if self.wheel_lock:
                     # This is intended to set the wheels in such a way that it
-                    # difficult to push the robot (intended for defence)
+                    # difficult to push the robot (intended for defense)
 
                     self._requested_angles['front_left'] = 45
                     self._requested_angles['front_right'] = -45
@@ -516,11 +516,17 @@ class SwerveDrive:
         frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
+        theta = self.getGyroAngle()
+        if (theta > 45 and theta < 135) or (theta > 225 and theta < 315):
+            speedSign = -1
+        else:
+            speedSign = 1
+
         # Velocities per quadrant
-        rightY = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        leftY = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        rearX = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
-        frontX = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        rightY = (self._requested_vectors['strafe'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        leftY = (self._requested_vectors['strafe'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rearX = (self._requested_vectors['fwd'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        frontX = (self._requested_vectors['fwd'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
         rearLeft_speed = math.hypot(frontX, rightY)
