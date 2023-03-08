@@ -380,7 +380,7 @@ class SwerveDrive:
         else:
             return False
 
-    def steerStraight3(self, rcw):
+    def steerStraight(self, rcw):
         
         current_angle = self.getGyroAngle()
         if rcw != 0:
@@ -406,32 +406,6 @@ class SwerveDrive:
             print("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
-
-    def steerStraight2(self, rcw):
-        if rcw != 0:
-            self.updateBearing = True
-            return self.getGyroAngle() % 360
-        else:
-            self.updateBearing = False
-            return self.bearing
-    
-    def steerStraight(self, rcw):
-        if rcw != 0:
-            self.updateBearing = True
-            print("rcw (!=0): ", rcw, " bearing: ", self.bearing, " currentAngle: ", self.getGyroAngle())
-            return rcw
-        else:
-            self.updateBearing = False
-            angle_diff = abs(self.getGyroAngle() - self.bearing)
-            if (angle_diff) < 180:
-                print("Angle Diff: ", angle_diff, " GyroAngle: ", self.getGyroAngle(), " bearing: ", self.bearing)
-                rcw_error = self.bearing_pid_controller.calculate(self.getGyroAngle(), self.bearing)
-            else:
-                print("Angle Diff: ", angle_diff, " 360 - GyroAngle: ", (360 - self.getGyroAngle()), " bearing: ", self.bearing)
-                rcw_error = -self.bearing_pid_controller.calculate((360 - self.getGyroAngle()), self.bearing)
-            print("rcw: ", rcw, " rcw_error: ", rcw_error, " currentAngle: ", self.getGyroAngle(), " bearing: ", self.bearing)
-            return rcw_error
-
     def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw):
         """
         Calulates the speed and angle for each wheel given the requested movement
@@ -449,7 +423,6 @@ class SwerveDrive:
 
         #Convert field-oriented translate to chassis-oriented translate
         
-        #current_angle = self.steerStraight2(rcw)
         current_angle = self.getGyroAngle() % 360
         desired_angle = ((math.atan2(fwd, strafe) / math.pi) * 180) % 360
         chassis_angle = (desired_angle - current_angle) % 360
@@ -466,7 +439,7 @@ class SwerveDrive:
 
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
-        rcw = self.steerStraight3(rcw)
+        rcw = self.steerStraight(rcw)
         self.set_rcw(rcw)
     
     def goToPose(self, x, y, rcw):
@@ -478,7 +451,7 @@ class SwerveDrive:
         if rcw != 0:
             rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
         else:
-            rcw_error = self.steerStraight3(rcw)
+            rcw_error = self.steerStraight(rcw)
         
         #print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
