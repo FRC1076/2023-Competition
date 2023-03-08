@@ -35,18 +35,20 @@ class Grabber:
     def raise_motor(self):
         self.state = 1
         self.rotate_motor.set(0.5)
-        #if self.top_switch.get() == True and self.state == 1:
-        #    self.rotate_motor.set(0)
-        #    return True
+        print("RM: top: ", self.top_switch.get(), " bottom: ", self.bottom_switch.get())
+        if self.top_switch.get() == False and self.state == 1:
+            self.rotate_motor.set(0)
+            return True
         return False
     
     #lower rotate motor
     def lower_motor(self):
         self.state = 0
         self.rotate_motor.set(-0.5)
-        #if self.bottom_switch.get() == True and self.state == 0:
-        #    self.rotate_motor.set(0)
-        #    return True
+        print("LM: top: ", self.top_switch.get(), " bottom: ", self.bottom_switch.get())
+        if self.bottom_switch.get() == False and self.state == 0:
+            self.rotate_motor.set(0)
+            return True
         return False
 
     def motor_off(self):
@@ -61,14 +63,13 @@ class Grabber:
     
     #called every loop, used for check if limit switch is activated
     def update(self):
-        return True
-        print("self.rotate_moter.get()", self.rotate_motor.get())
-        #if self.top_switch.get() == True and self.state == 1:
-        if self.state == 1:
+        print("UP: top: ", self.top_switch.get(), " bottom: ", self.bottom_switch.get())
+        if self.top_switch.get() == False and self.state == 1:
+        #if self.state == 1:
             self.rotate_motor.set(0)
             return True
-        #elif self.bottom_switch.get() == True and self.state == 0:
-        elif self.state == 0:
+        elif self.bottom_switch.get() == False and self.state == 0:
+        #elif self.state == 0:
             self.rotate_motor.set(0)
             return True
         return False

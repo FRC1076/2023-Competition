@@ -156,8 +156,8 @@ elevatorConfig = {
 grabberConfig = {
     'SUCTION_MOTOR_ID': 7,
     'ROTATE_MOTOR_ID': 8,
-    'TOP_SWITCH_ID': 0,
-    'BOTTOM_SWITCH_ID': 1,
+    'TOP_SWITCH_ID': 1,
+    'BOTTOM_SWITCH_ID': 0,
 }
 
 cliffDetectorConfig = {
