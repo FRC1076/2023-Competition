@@ -380,8 +380,8 @@ class SwerveDrive:
         else:
             return False
 
-    def steerStraight3(self, rcw):
-
+    def steerStraight(self, rcw):
+        
         current_angle = self.getGyroAngle()
         if rcw != 0:
             self.updateBearing = True
@@ -406,32 +406,6 @@ class SwerveDrive:
             print("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
-
-    def steerStraight2(self, rcw):
-        if rcw != 0:
-            self.updateBearing = True
-            return self.getGyroAngle() % 360
-        else:
-            self.updateBearing = False
-            return self.bearing
-    
-    def steerStraight(self, rcw):
-        if rcw != 0:
-            self.updateBearing = True
-            print("rcw (!=0): ", rcw, " bearing: ", self.bearing, " currentAngle: ", self.getGyroAngle())
-            return rcw
-        else:
-            self.updateBearing = False
-            angle_diff = abs(self.getGyroAngle() - self.bearing)
-            if (angle_diff) < 180:
-                print("Angle Diff: ", angle_diff, " GyroAngle: ", self.getGyroAngle(), " bearing: ", self.bearing)
-                rcw_error = self.bearing_pid_controller.calculate(self.getGyroAngle(), self.bearing)
-            else:
-                print("Angle Diff: ", angle_diff, " 360 - GyroAngle: ", (360 - self.getGyroAngle()), " bearing: ", self.bearing)
-                rcw_error = -self.bearing_pid_controller.calculate((360 - self.getGyroAngle()), self.bearing)
-            print("rcw: ", rcw, " rcw_error: ", rcw_error, " currentAngle: ", self.getGyroAngle(), " bearing: ", self.bearing)
-            return rcw_error
-
     def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw):
         """
         Calulates the speed and angle for each wheel given the requested movement
@@ -449,14 +423,13 @@ class SwerveDrive:
 
         #Convert field-oriented translate to chassis-oriented translate
         
-        #current_angle = self.steerStraight2(rcw)
         current_angle = self.getGyroAngle() % 360
         desired_angle = ((math.atan2(fwd, strafe) / math.pi) * 180) % 360
         chassis_angle = (desired_angle - current_angle) % 360
         magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
 
-        chassis_strafe = magnitude * math.sin(math.radians(chassis_angle))
-        chassis_fwd = magnitude * math.cos(math.radians(chassis_angle))
+        chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
+        chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
 
         #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
         self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
@@ -466,7 +439,7 @@ class SwerveDrive:
 
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
-        rcw = self.steerStraight3(rcw)
+        rcw = self.steerStraight(rcw)
         self.set_rcw(rcw)
     
     def goToPose(self, x, y, rcw):
@@ -474,7 +447,12 @@ class SwerveDrive:
         currentX, currentY, currentRCW = self.swervometer.getCOF()
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
-        rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
+
+        if rcw != 0:
+            rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
+        else:
+            rcw_error = self.steerStraight(rcw)
+        
         #print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
             print("X at set point")
@@ -524,7 +502,7 @@ class SwerveDrive:
 
                 if self.wheel_lock:
                     # This is intended to set the wheels in such a way that it
-                    # difficult to push the robot (intended for defence)
+                    # difficult to push the robot (intended for defense)
 
                     self._requested_angles['front_left'] = 45
                     self._requested_angles['front_right'] = -45
@@ -538,24 +516,30 @@ class SwerveDrive:
         frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
+        theta = self.getGyroAngle()
+        if (theta > 45 and theta < 135) or (theta > 225 and theta < 315):
+            speedSign = -1
+        else:
+            speedSign = 1
+
         # Velocities per quadrant
-        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
-        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        rightY = (self._requested_vectors['strafe'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        leftY = (self._requested_vectors['strafe'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rearX = (self._requested_vectors['fwd'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        frontX = (self._requested_vectors['fwd'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-        frontLeft_speed = math.hypot(frontX, rightY)
-        frontLeft_angle = math.degrees(math.atan2(frontX, rightY))
+        rearLeft_speed = math.hypot(frontX, rightY)
+        rearLeft_angle = math.degrees(math.atan2(frontX, rightY))
 
-        frontRight_speed = math.hypot(frontX, leftY)
-        frontRight_angle = math.degrees(math.atan2(frontX, leftY))
+        frontLeft_speed = math.hypot(frontX, leftY)
+        frontLeft_angle = math.degrees(math.atan2(frontX, leftY))
 
-        rearLeft_speed = math.hypot(rearX, rightY)
-        rearLeft_angle = math.degrees(math.atan2(rearX, rightY))
+        rearRight_speed = math.hypot(rearX, rightY)
+        rearRight_angle = math.degrees(math.atan2(rearX, rightY))
 
-        rearRight_speed = math.hypot(rearX, leftY)
-        rearRight_angle = math.degrees(math.atan2(rearX, leftY))
+        frontRight_speed = math.hypot(rearX, leftY)
+        frontRight_angle = math.degrees(math.atan2(rearX, leftY))
 
         self._requested_speeds['front_left'] = frontLeft_speed
         self._requested_speeds['front_right'] = frontRight_speed
