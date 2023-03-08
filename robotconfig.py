@@ -108,9 +108,12 @@ drivetrainConfig = {
     'TARGET_KP': 0.005,
     'TARGET_KI': 0.005,
     'TARGET_KD': 0.0001,
+    'BEARING_KP': 0.025,
+    'BEARING_KI': 0.00001,
+    'BEARING_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 0.0, # Improves maneuverability of bot.
-    'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.1
+    'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0
 }
 
 visionConfig = {
@@ -123,30 +126,14 @@ visionConfig = {
     'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
-climberConfig = {
-    'WINCH_LEFT_ID': 6,
-    'WINCH_RIGHT_ID': 14,
-    # Pneumatic board IDs
-    'SOLENOID_FORWARD_ID': 6,
-    'SOLENOID_REVERSE_ID': 0,
-    # DIO pin numbers
-    'LEFT_LIMIT_ID': 0,
-    'RIGHT_LIMIT_ID': 1,
-    'CABLE_WRAPPED': 'UNDER',
-    # Both speeds positive.
-    # Extend speed must be lower than natural extend rate
-    'EXTEND_SPEED': 0.2,
-    'RETRACT_SPEED': 0.5,
-}
-
 elevatorConfig = {
     'RIGHT_ID': 6,
-    'LEFT_ID': 10,
+    'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.5,
-    'ELEVATOR_KI': 0.00001,
-    'ELEVATOR_KD': 0.025,
+    'ELEVATOR_KP': 0.06, #0.048, # 0.8 * 0.6
+    'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
+    'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
     'HUMAN_POSITION': 18,
     'UPPER_SCORING_HEIGHT': 35,
     'LOWER_SCORING_HEIGHT': 26,
@@ -180,9 +167,9 @@ autonConfig = {
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
                         ['RELEASE'],
-                        ['ELEVATOR_RETRACT'],
-                        ['MOVE', -122.6, 27.8, 0],
-                        ['MOVE', -238.3, 27.8, 0]],
+                        ['ELEVATOR_RETRACT']],
+                        #['MOVE', -122.6, 27.8, 0],
+                        #['MOVE', -238.3, 27.8, 0]],
     'TASK_BLU_B_TFFT': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],

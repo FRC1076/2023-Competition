@@ -12,6 +12,8 @@ class Elevator:
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
         self.right_encoder = self.right_motor.getEncoder() # measure elevator height
         self.left_encoder = self.left_motor.getEncoder() # ""
+        self.right_encoder.setPosition(0)
+        self.left_encoder.setPosition(0)
         self.solenoid = wpilib.DoubleSolenoid(1, # controls the "lean" of the elevator
             wpilib.PneumaticsModuleType.REVPH, 
             solenoid_forward_id, 
@@ -20,6 +22,8 @@ class Elevator:
         #self.pid_controller = PIDController(0.5, 0.00001, 0.025)
         self.pid_controller.setTolerance(0.5, 0.5)
         self.grabber = grabber
+        self.right_motor.setOpenLoopRampRate(0.50)
+        self.left_motor.setOpenLoopRampRate(0.50)
 
     #1.00917431193 inches per rotation
     def extend(self, value):  # controls length of the elevator 
@@ -51,7 +55,7 @@ class Elevator:
             self.extend(0)
             return True
         else:
-            print("Moving")
+            print("Elevator: Moving")
             self.extend(-extend_value)
             return False
 
@@ -66,25 +70,21 @@ class Elevator:
         return False
 
     def elevatorUp(self):
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
-        if self.grabber:
-            self.grabber.raise_motor()
+        self.solenoid.set(DoubleSolenoid.Value.kReverse)
         return True
 
     def elevatorDown(self):
-        self.solenoid.set(DoubleSolenoid.Value.kReverse)
-        if self.grabber:
-            self.grabber.lower_motor()
+        self.solenoid.set(DoubleSolenoid.Value.kForward)
         return True
 
     # contols the "lean" of the elevator
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
-            self.elevatorDown()
-            print("Elevator: Toggle: Set to reverse.")
+            self.solenoid.set(DoubleSolenoid.Value.kReverse)
+            print("Elevator: Toggle: Set to reverse/up.")
         elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
-            self.elevatorUp()
-            print("Elevator: Toggle: Set forward.")
+            self.solenoid.set(DoubleSolenoid.Value.kForward)
+            print("Elevator: Toggle: Set forward/down.")
         else:
             print("Elevator: Toggle: How did we get here?")
         return True
