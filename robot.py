@@ -315,52 +315,7 @@ class MyRobot(wpilib.TimedRobot):
         self.autonOpenLoopRampRate = config['AUTON_OPEN_LOOP_RAMP_RATE']
         self.autonClosedLoopRampRate = config['AUTON_CLOSED_LOOP_RAMP_RATE']
 
-        # Figure out task list
-        if (self.team_is_red
-            and self.fieldStartPosition == 'A'
-            and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_A_TFFT']
-        elif (self.team_is_red
-            and self.fieldStartPosition == 'B'
-            and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_B_TFFT']     
-        elif (self.team_is_red
-            and self.fieldStartPosition == 'C'
-            and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_C_TFFT']
-        elif (not self.team_is_red
-            and self.fieldStartPosition == 'A'
-            and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_A_TFFT']     
-        elif (not self.team_is_red
-            and self.fieldStartPosition == 'B'
-            and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_B_TFFT']
-        elif (not self.team_is_red
-            and self.fieldStartPosition == 'C'
-            and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_C_TFFT']
-        else: # No matching task list
-            self.autonTaskCounter = -1
-            self.autonTaskList = []
+        self.autonConfig = config
 
         return True
 
@@ -534,13 +489,65 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.toggle()
 
     def autonomousInit(self):
-
         if not self.auton:
             return
         if not self.drivetrain:
             return
         if not self.swervometer:
             return
+
+        self.fieldStartPosition = self.dashboard.getString('Field Start Position')
+
+        self.autonScoreExisting =  self.dashboard.getBoolean('Auton Score Existing Element')
+        self.autonPickupNew = self.dashboard.getBoolean('Auton Pickup New Element')
+        self.autonScoreNew = self.dashboard.getBoolean('Auton Score New Element')
+        self.autonBalanceRobot = self.dashboard.getBoolean('Auton Balance Robot')
+
+        if (self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = self.autonConfig['TASK_RED_A_TFFT']
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = self.autonConfig['TASK_RED_B_TFFT']     
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = self.autonConfig['TASK_RED_C_TFFT']
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = self.autonConfig['TASK_BLU_A_TFFT']     
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = self.autonConfig['TASK_BLU_B_TFFT']
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and self.autonScoreExisting
+            and not self.autonPickupNew
+            and not self.autonScoreNew
+            and self.autonBalanceRobot):
+                self.autonTaskList = self.autonConfig['TASK_BLU_C_TFFT']
+        else: # No matching task list
+            self.autonTaskCounter = -1
+            self.autonTaskList = []
 
         self.autonTimer = wpilib.Timer()
         self.autonTimer.start()
