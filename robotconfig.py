@@ -148,13 +148,13 @@ elevatorConfig = {
     'ELEVATOR_KI': 0.00001,
     'ELEVATOR_KD': 0.025,
     'HUMAN_POSITION': 18,
-    'UPPER_SCORING_HEIGHT': 36,
+    'UPPER_SCORING_HEIGHT': 35,
     'LOWER_SCORING_HEIGHT': 26,
     'RETRACTED_HEIGHT': 3,
 }
 
 grabberConfig = {
-    'SUCTION_MOTOR_ID': 7, # from testbed
+    'SUCTION_MOTOR_ID': 7,
     'ROTATE_MOTOR_ID': 8,
     'TOP_SWITCH_ID': 0,
     'BOTTOM_SWITCH_ID': 1,

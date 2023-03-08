@@ -502,11 +502,11 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
             #print("Elevator: A Button")
-        if operator.getYButton(): #Highest
+        if operator.getYButton() and elevator.isElevatorDown(): #Highest
             self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
             #print("Elevator: Y Button")
-        if operator.getBButton(): #Medium Position
+        if operator.getBButton() and elevator.isElevatorDown(): #Medium Position
             self.elevator_destination = self.lower_scoring_height
             self.elevator_is_automatic = True
             #print("Elevator: B Button")

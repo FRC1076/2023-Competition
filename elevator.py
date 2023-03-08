@@ -55,6 +55,16 @@ class Elevator:
             self.extend(-extend_value)
             return False
 
+    def isElevatorUp(self):
+        if self.solenoid.get() == DoubleSolenoid.Value.kForward:
+            return True
+        return False
+
+    def isElevatorDown(self):
+        if self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
+            return True
+        return False
+
     def elevatorUp(self):
         self.solenoid.set(DoubleSolenoid.Value.kForward)
         if self.grabber:

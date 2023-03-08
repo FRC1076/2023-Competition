@@ -6,7 +6,6 @@ class Grabber:
     def __init__(self, suction_motor_id, rotate_motor_id, bottom_switch_id, top_switch_id):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushed
         self.suction_motor = rev.CANSparkMax(suction_motor_id, motor_type) # elevator up-down
-        self.suction_motor = rev.CANSparkMax(suction_motor_id, motor_type) # elevator up-down
         self.rotate_motor = rev.CANSparkMax(rotate_motor_id, motor_type)
         self.bottom_switch = wpilib.DigitalInput(bottom_switch_id)
         self.top_switch = wpilib.DigitalInput(top_switch_id)
@@ -35,7 +34,7 @@ class Grabber:
     #raise rotate motor
     def raise_motor(self):
         self.state = 1
-        self.rotate_motor.set(1)
+        self.rotate_motor.set(0.5)
         #if self.top_switch.get() == True and self.state == 1:
         #    self.rotate_motor.set(0)
         #    return True
@@ -44,7 +43,7 @@ class Grabber:
     #lower rotate motor
     def lower_motor(self):
         self.state = 0
-        self.rotate_motor.set(-1)
+        self.rotate_motor.set(-0.5)
         #if self.bottom_switch.get() == True and self.state == 0:
         #    self.rotate_motor.set(0)
         #    return True
@@ -56,16 +55,20 @@ class Grabber:
     #run suction motor
     def execute(self):
         if self.isEngaged:
-            self.suction_motor.set(1)
+            self.suction_motor.set(0.2)
         else:
             self.suction_motor.set(0)
     
     #called every loop, used for check if limit switch is activated
     def update(self):
-        if self.top_switch.get() == True and self.state == 1:
+        return True
+        print("self.rotate_moter.get()", self.rotate_motor.get())
+        #if self.top_switch.get() == True and self.state == 1:
+        if self.state == 1:
             self.rotate_motor.set(0)
             return True
-        elif self.bottom_switch.get() == True and self.state == 0:
+        #elif self.bottom_switch.get() == True and self.state == 0:
+        elif self.state == 0:
             self.rotate_motor.set(0)
             return True
         return False
