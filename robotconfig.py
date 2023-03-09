@@ -131,9 +131,9 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.06, #0.048, # 0.8 * 0.6
-    'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
-    'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
+    'ELEVATOR_KP': 0.06, #0.06
+    'ELEVATOR_KI': 0.0008, #0.0008
+    'ELEVATOR_KD': 0.01, #0.02
     'HUMAN_POSITION': 17, # Assumes Elevator Up
     'UPPER_SCORING_HEIGHT': 35,
     'LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
