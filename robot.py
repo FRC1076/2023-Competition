@@ -738,8 +738,12 @@ class MyRobot(wpilib.TimedRobot):
             if self.elevator.elevatorDown():
                 self.maneuverTaskCounter += 1
             print("maneuver: Elevator Down: ", self.elevator.getEncoderPosition())
-        elif (maneuverTask[0] == 'ELEVATOR_EXTEND'):
+        elif (maneuverTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             if self.elevator.moveToPos(self.lower_scoring_height):
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_UPPER_EXTEND'):
+            if self.elevator.moveToPos(self.upper_scoring_height):
                 self.maneuverTaskCounter += 1
             print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_RETRACT'):
@@ -751,6 +755,19 @@ class MyRobot(wpilib.TimedRobot):
             y = maneuverTask[2]
             bearing = maneuverTask[3]
             print("maneuver: Move: ", self.maneuverTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            if self.drivetrain.goToPose(x, y, bearing):
+                self.maneuverTaskCounter += 1 # Move on to next task.
+                print("maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+            else:
+                # Leave self.maneuverTaskCounter unchanged. Repeat this task.
+                print("maneuver: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+        elif (maneuverTask[0] == 'MOVE_BACK'):
+            backDistance = maneuverTask[1]
+            x,y,bearing = self.swervometer.getCOF()
+            if(self.team_is_red):
+                x -= backDistance
+            else:
+                x += backDistance
             if self.drivetrain.goToPose(x, y, bearing):
                 self.maneuverTaskCounter += 1 # Move on to next task.
                 print("maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)

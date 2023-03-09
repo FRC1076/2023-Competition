@@ -116,10 +116,16 @@ drivetrainConfig = {
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0,
     'LOW_CONE_SCORE': [['GRAB'],
                         ['RAISE_GRABBER'],
-                        ['ELEVATOR_EXTEND'],
+                        ['ELEVATOR_UP'],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_DOWN'],
-                        ['TIMER', 2.0],
                         ['RELEASE']],
+    'HIGH_CONE_SCORE': [['GRAB'],
+                        ['RAISE_GRABBER'],
+                        ['MOVE_BACK', 10],
+                        ['ELEVATOR_UPPER_EXTEND'],
+                        ['RELEASE'],
+                        ['LOWER_GRABBER']],
 }
 
 visionConfig = {
