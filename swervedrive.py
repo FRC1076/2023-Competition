@@ -126,6 +126,9 @@ class SwerveDrive:
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
+    def getBearing(self):      
+        return self.bearing
+
     def setBearing(self, _bearing):      
         self.bearing = _bearing
         self.updateBearing = False
@@ -373,7 +376,7 @@ class SwerveDrive:
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
         self.sd.putNumber('Balance yaw output', yaw_output)
-        self.move(yawSign * pitch_output, 0.0, yaw_output)
+        self.move(yawSign * pitch_output, 0.0, yaw_output, self.bearing)
         
         self.update_smartdash()
 
@@ -384,8 +387,9 @@ class SwerveDrive:
         else:
             return False
 
-    def steerStraight(self, rcw):
+    def steerStraight(self, rcw, bearing):
 
+        self.bearing = bearing
         current_angle = self.getGyroAngle()
         if rcw != 0:
             self.updateBearing = True
@@ -410,7 +414,7 @@ class SwerveDrive:
             print("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
-    def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw):
+    def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw, bearing):
         """
         Calulates the speed and angle for each wheel given the requested movement
         Positive fwd value = Forward robot movement\n
@@ -427,7 +431,6 @@ class SwerveDrive:
 
         #Convert field-oriented translate to chassis-oriented translate
         
-        #current_angle = self.steerStraight2(rcw)
         current_angle = self.getGyroAngle() % 360
         desired_angle = ((math.atan2(fwd, strafe) / math.pi) * 180) % 360
         chassis_angle = (desired_angle - current_angle) % 360
@@ -444,10 +447,10 @@ class SwerveDrive:
 
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
-        rcw = self.steerStraight(rcw)
-        self.set_rcw(rcw)
+        rcw_new = self.steerStraight(rcw, bearing)
+        self.set_rcw(rcw_new)
     
-    def goToPose(self, x, y, rcw):
+    def goToPose(self, x, y, bearing):
 
         currentX, currentY, currentRCW = self.swervometer.getCOF()
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
@@ -458,20 +461,20 @@ class SwerveDrive:
             print("X at set point")
         if self.target_y_pid_controller.atSetpoint():
             print("Y at set point")
-        if self.target_rcw_pid_controller.atSetpoint():
-            print("RCW at set point")
+        #if self.target_rcw_pid_controller.atSetpoint():
+        #    print("RCW at set point")
         
         #if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetPoint(): 
         if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
         else:
-            self.move(x_error, y_error, rcw)
+            self.move(x_error, y_error, 0, bearing)
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
             # print("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
-            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentRCW: ", currentRCW, " targetRCW: ", rcw, " rcw_error: ", rcw_error)
+            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentBearing: ", currentRCW, " self.bearing: ", self.bearing, " target bearing: ", bearing)
             return False
 
     def _calculate_vectors(self):

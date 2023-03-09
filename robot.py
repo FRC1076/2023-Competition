@@ -439,7 +439,7 @@ class MyRobot(wpilib.TimedRobot):
         #    else:
         #        print("Bogus result from cliff detector. Ignore danger.")
 
-        self.drivetrain.move(y, x, rcw)
+        self.drivetrain.move(y, x, rcw, self.drivetrain.getBearing())
         #self.drivetrain.move(0, y, 0)
 
     def teleopDrivetrain(self):
@@ -648,14 +648,14 @@ class MyRobot(wpilib.TimedRobot):
         elif (autonTask[0] == 'MOVE'):
             x = autonTask[1]
             y = autonTask[2]
-            rcw = autonTask[3]
-            print("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " rcw: ", rcw)
-            if self.drivetrain.goToPose(x, y, rcw):
+            bearing = autonTask[3]
+            print("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            if self.drivetrain.goToPose(x, y, bearing):
                 self.autonTaskCounter += 1 # Move on to next task.
-                print("Auton: Move: Reached target: x: ", x, " y: ", y, " rcw: ", rcw)
+                print("Auton: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
-                print("Auton: Move: Not at target: x: ", x, " y: ", y, " rcw: ", rcw)
+                print("Auton: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
         elif (autonTask[0] == 'BALANCE'):
             print("Auton: Balance: ", self.autonTaskCounter)
             if self.drivetrain.balance():
@@ -667,29 +667,17 @@ class MyRobot(wpilib.TimedRobot):
         elif (autonTask[0] == 'WHEEL_LOCK'):
             print("Auton: Wheel Lock: ", self.autonTaskCounter)
             self.drivetrain.setWheelLock(True)
-            self.drivetrain.goToPose(0, 0, 0)
+            self.drivetrain.goToPose(0, 0, self.drivetrain.getBearing())
+            self.autonTaskCounter += 1 # Move on to next task.
+        elif (autonTask[0] == 'IDLE'):
+            print("Auton: Idle: ", self.autonTaskCounter)
+            self.drivetrain.idle()
         else:
             print("Auton: ERROR: Unknown Task", self.autonTaskCounter)
             self.autonTaskCounter += 1   
 
         return
 
-        # OLD STUFF BELOW
-
-        #print("autonomousPeriodic")
-        x, y, rcw = self.swervometer.getCOF()
-        print("auton: old position: x:", x, " y: ", y, " rcw: ", rcw)
-        
-        if (self.drivetrain.goToPose(27, 23, 0) == True):
-            print("AUTON: Completed move to target.")
-            x, y, rcw = self.swervometer.getCOF()
-            print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)
-        else:
-            print("AUTON: Not yet at target.") 
-            x, y, rcw = self.swervometer.getCOF()
-            print("auton: new position: x:", x, " y: ", y, " rcw: ", rcw)
-        print("============================================")
-        
     def deadzoneCorrection(self, val, deadzone):
         """
         Given the deadzone value x, the deadzone both eliminates all
