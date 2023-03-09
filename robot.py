@@ -319,6 +319,16 @@ class MyRobot(wpilib.TimedRobot):
             and not self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_A_TF']
         elif (self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_A_TT']
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_B_TF']     
+        elif (self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
             and self.autonBalanceRobot):
@@ -328,11 +338,26 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_C_TF']
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_C_TT']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'A'
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_BLU_A_TF']     
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_A_TT']     
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_B_TF']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
@@ -343,10 +368,14 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_BLU_C_TF']
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_C_TT']
         else: # No matching task list
             self.autonTaskCounter = -1
             self.autonTaskList = []
-
         return True
 
     def initCliffDetector(self, config):
@@ -369,6 +398,7 @@ class MyRobot(wpilib.TimedRobot):
         print("teleopInit ran")
 
         self.drivetrain.setRampRates(self.teleopOpenLoopRampRate, self.teleopClosedLoopRampRate)
+        self.grabber.engage()
 
         return True
 
@@ -547,7 +577,10 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTimer.start()
 
         self.drivetrain.resetGyro()
-
+        if self.team_is_red:
+            self.drivetrain.setBearing(180)
+        else:
+            self.drivetrain.setBearing(0)
         self.drivetrain.setRampRates(self.autonOpenLoopRampRate, self.autonClosedLoopRampRate)
 
         # Reset the task counter
@@ -577,9 +610,20 @@ class MyRobot(wpilib.TimedRobot):
                 self.autonTaskCounter += 1
         elif (autonTask[0] == 'GRAB'):
             print("Auton: Grab: ", self.autonTaskCounter)
+            self.grabber.engage()
             self.autonTaskCounter += 1
         elif (autonTask[0] == 'RELEASE'):
             print("Auton: Release: ", self.autonTaskCounter)
+            self.grabber.release()
+            self.autonTaskCounter += 1
+        elif (autonTask[0] == 'RAISE_GRABBER'):
+            if self.grabber.raise_motor(0.6):
+                self.autonTaskCounter += 1
+        elif (autonTask[0] == 'LOWER_GRABBER'):
+            if self.grabber.lower_motor(0.2):
+                self.autonTaskCounter += 1
+        elif (autonTask[0] == 'LOWER_GRABBER_UNCHECKED'):
+            self.grabber.lower_motor(0.2)
             self.autonTaskCounter += 1
         elif (autonTask[0] == 'ELEVATOR_TOGGLE'):
             if self.elevator.toggle():
@@ -594,7 +638,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.autonTaskCounter += 1
             print("Auton: Elevator Down: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_EXTEND'):
-            if self.elevator.moveToPos(self.upper_scoring_height):
+            if self.elevator.moveToPos(self.lower_scoring_height):
                 self.autonTaskCounter += 1
             print("Auton: Elevator Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
@@ -620,6 +664,10 @@ class MyRobot(wpilib.TimedRobot):
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
                 print("Auton: Balance: Keep balancing and orienting")
+        elif (autonTask[0] == 'WHEEL_LOCK'):
+            print("Auton: Wheel Lock: ", self.autonTaskCounter)
+            self.drivetrain.setWheelLock(True)
+            self.drivetrain.goToPose(0, 0, 0)
         else:
             print("Auton: ERROR: Unknown Task", self.autonTaskCounter)
             self.autonTaskCounter += 1   
