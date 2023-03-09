@@ -509,8 +509,8 @@ class MyRobot(wpilib.TimedRobot):
         ## ignored for now
         clutch_factor = 1
         #Check for clutch
-        #if(operator.getLeftTriggerAxis() > 0.7):
-            #clutch_factor = 0.4
+        if(operator.getLeftTriggerAxis() > 0.7):
+            clutch_factor = 0.4
         #Find the value the arm will move at
         extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 2) * clutch_factor
         #preset destinations
