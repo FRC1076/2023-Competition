@@ -134,10 +134,12 @@ elevatorConfig = {
     'ELEVATOR_KP': 0.06, #0.048, # 0.8 * 0.6
     'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
     'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
-    'HUMAN_POSITION': 18,
+    'HUMAN_POSITION': 17, # Assumes Elevator Up
     'UPPER_SCORING_HEIGHT': 35,
     'LOWER_SCORING_HEIGHT': 26,
-    'RETRACTED_HEIGHT': 3,
+    'RETRACTED_HEIGHT': 7,
+    'LOWER_SAFETY': 15,
+    'UPPER_SAFETY': 25,
 }
 
 grabberConfig = {
@@ -145,6 +147,8 @@ grabberConfig = {
     'ROTATE_MOTOR_ID': 8,
     'TOP_SWITCH_ID': 1,
     'BOTTOM_SWITCH_ID': 0,
+    'GRABBER_ROTATE_SPEED': 0.2,
+    'GRABBER_SUCTION_SPEED': 0.25,
 }
 
 cliffDetectorConfig = {
@@ -157,20 +161,18 @@ cliffDetectorConfig = {
 
 autonConfig = {
     'SCORE_EXISTING': True,
-    'PICKUP_NEW': False,
-    'SCORE_NEW': False,
     'BALANCE_BOT': True,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
-    'TASK_BLU_A_TFFT': [['GRAB'],
+    'TASK_BLU_A_TF': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
                         ['RELEASE'],
-                        ['ELEVATOR_RETRACT']],
-                        #['MOVE', -122.6, 27.8, 0],
-                        #['MOVE', -238.3, 27.8, 0]],
-    'TASK_BLU_B_TFFT': [['GRAB'],
+                        ['TIMER', 10.0],
+                        ['ELEVATOR_RETRACT'],
+                        ['MOVE', -238.3, 27.8, 0]],
+    'TASK_BLU_B_TT': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
@@ -179,23 +181,21 @@ autonConfig = {
                         ['MOVE', -94.5, -47.4, 0],
                         ['MOVE', -157, -47.4, 0],
                         ['BALANCE']],
-    'TASK_BLU_C_TFFT': [['GRAB'],
+    'TASK_BLU_C_TF': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
                         ['RELEASE'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', -92.4, -128.5, 0],
                         ['MOVE', -188.1, -128.5, 0]],
-    'TASK_RED_A_TFFT': [['GRAB'],
+    'TASK_RED_A_TF': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
                         ['RELEASE'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 122.6, 27.8, 180],
-                        ['MOVE', 238.3, 27.8, 180]],
-    'TASK_RED_B_TFFT': [['GRAB'],
+                        ['MOVE', 122.6, 27.8, 180]],
+    'TASK_RED_B_TT': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
@@ -204,13 +204,12 @@ autonConfig = {
                         ['MOVE', 94.5, -47.4, 180],
                         ['MOVE', 157, -47.4, 180],
                         ['BALANCE']],
-    'TASK_RED_C_TFFT': [['GRAB'],
+    'TASK_RED_C_TF': [['GRAB'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 5.0],
                         ['ELEVATOR_EXTEND'],
                         ['RELEASE'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 92.4, -128.5, 180],
                         ['MOVE', 188.1, -128.5, 180]],
 }
 

@@ -18,6 +18,7 @@ from swervemodule import ModuleConfig
 
 from swervedrive import BalanceConfig
 from swervedrive import TargetConfig
+from swervedrive import BearingConfig
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
@@ -231,7 +232,7 @@ class MyRobot(wpilib.TimedRobot):
         return vision
 
     def initElevator(self, config):
-        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'], config['ELEVATOR_KP'], config['ELEVATOR_KI'], config['ELEVATOR_KD'], self.grabber)
+        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'], config['ELEVATOR_KP'], config['ELEVATOR_KI'], config['ELEVATOR_KD'], config['LOWER_SAFETY'], config['UPPER_SAFETY'], self.grabber)
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
@@ -241,7 +242,7 @@ class MyRobot(wpilib.TimedRobot):
         return elevator
 
     def initGrabber(self, config):
-        return Grabber(config['SUCTION_MOTOR_ID'], config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'])
+        return Grabber(config['SUCTION_MOTOR_ID'], config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'], config['GRABBER_ROTATE_SPEED'], config['GRABBER_SUCTION_SPEED'])
 
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
@@ -251,6 +252,7 @@ class MyRobot(wpilib.TimedRobot):
 
         balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
         target_cfg = TargetConfig(sd_prefix='Target_Module', target_kP=config['TARGET_KP'], target_kI=config['TARGET_KI'], target_kD=config['TARGET_KD'])
+        bearing_cfg = BearingConfig(sd_prefix='Bearing_Module', bearing_kP=config['BEARING_KP'], bearing_kI=config['BEARING_KI'], bearing_kD=config['BEARING_KD'])
 
         flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.5, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
         frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=153.3, inverted=False, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
@@ -292,19 +294,15 @@ class MyRobot(wpilib.TimedRobot):
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
-        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg)
+        swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg)
 
         return swerve
 
     def initAuton(self, config):
         self.autonScoreExisting = config['SCORE_EXISTING']
-        self.autonPickupNew = config['PICKUP_NEW']
-        self.autonScoreNew = config['SCORE_NEW']
         self.autonBalanceRobot = config['BALANCE_BOT']
 
         self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
-        self.dashboard.putNumber('Auton Pickup New Element', self.autonPickupNew)
-        self.dashboard.putNumber('Auton Score New Element', self.autonScoreNew)
         self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
 
         # Reset task counter.
@@ -318,45 +316,33 @@ class MyRobot(wpilib.TimedRobot):
         if (self.team_is_red
             and self.fieldStartPosition == 'A'
             and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_A_TFFT']
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_A_TF']
         elif (self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
             and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_B_TFFT']     
+                self.autonTaskList = config['TASK_RED_B_TT']     
         elif (self.team_is_red
             and self.fieldStartPosition == 'C'
             and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_C_TFFT']
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_C_TF']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'A'
             and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_A_TFFT']     
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_A_TF']     
         elif (not self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
             and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_B_TFFT']
+                self.autonTaskList = config['TASK_BLU_B_TT']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'C'
             and self.autonScoreExisting
-            and not self.autonPickupNew
-            and not self.autonScoreNew
-            and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_C_TFFT']
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_C_TF']
         else: # No matching task list
             self.autonTaskCounter = -1
             self.autonTaskList = []
@@ -376,7 +362,7 @@ class MyRobot(wpilib.TimedRobot):
     def robotPeriodic(self):
         #if self.cliffDetector:
         #    self.cliffDetector.update()
-        self.grabber.update()
+        #self.grabber.update()
         return True
 
     def teleopInit(self):
@@ -529,20 +515,26 @@ class MyRobot(wpilib.TimedRobot):
         operator = self.operator.xboxController
         # if the operator is holding the bumper, keep the grab going. Otherwise release.
         
-        #CHANGE CONTROLS LATER
-        if (operator.getRightBumper()):
+
+        grabber_speed = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
+
+        if (grabber_speed > 0):
             print("Grabber: Raise Grabber")
-            self.grabber.raise_motor()
-        elif (operator.getRightTriggerAxis() > 0.7):
+            self.grabber.lower_motor(-grabber_speed)
+        elif (grabber_speed < 0):
             print("Grabber: Lower Grabber")
-            self.grabber.lower_motor()
-        elif (operator.getLeftTriggerAxis() > 0.7):
-            print("Grabber: Toggle Suction")
-            self.grabber.toggle()
+            self.grabber.raise_motor(-grabber_speed)
         else:
             print("Grabber: Motor Off")
             self.grabber.motor_off()
-
+        
+        if (operator.getRightTriggerAxis() > 0.7):
+            print("Grabber: Release Suction")
+            self.grabber.release()
+        else:
+            print("Grabber: Engage Suction")
+            self.grabber.engage()
+        
     def autonomousInit(self):
         if not self.auton:
             return

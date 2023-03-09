@@ -54,7 +54,8 @@ class Swervometer:
         self.calcLeverArmLengths()
 
     def getFrameDimensions(self):
-        return self.frame_dimension_x, self.frame_dimension_y
+        #return self.frame_dimension_x, self.frame_dimension_y
+        return self.swerveModuleOffsetX, self.swerveModuleOffsetY
 
     def getTeamGyroAdjustment(self):
         return self.teamGyroAdjustment
