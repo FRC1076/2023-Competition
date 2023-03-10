@@ -475,9 +475,9 @@ class MyRobot(wpilib.TimedRobot):
         if(driver.getAButton()):
             self.drivetrain.balance()
         else:
-            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX(), 0.55 * speedMulti)
-            rightYCorrected = self.deadzoneCorrection(driver.getLeftY(), 0.55 * speedMulti)
-            leftXCorrected = self.deadzoneCorrection(driver.getRightX(), 0.55 * speedMulti)
+            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX() * speedMulti, 0.55)
+            rightYCorrected = self.deadzoneCorrection(driver.getLeftY() * speedMulti, 0.55)
+            leftXCorrected = self.deadzoneCorrection(driver.getRightX() * speedMulti, 0.55)
             # check if there's any input at all
             if rightXCorrected != 0 or rightYCorrected != 0 or leftXCorrected != 0:
                 self.move(rightXCorrected, rightYCorrected, leftXCorrected)
