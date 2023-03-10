@@ -120,55 +120,21 @@ class MyRobot(wpilib.TimedRobot):
     def initSwervometer(self, config):
         print("initSwervometer ran")
         
+        self.swervometerConfig = config
+
         if (config['TEAM_IS_RED']):
             self.team_is_red = True
             self.team_is_blu = False
-            teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
-            teamMoveAdjustment = -1 # Red Team needs to flip the controls as well.
         else:
             self.team_is_red = False
             self.team_is_blu = True
-            teamGyroAdjustment = 0 # Blue Team faces 0 degrees at start.
-            teamMoveAdjustment = 1 # Blue Team does not need to flip controlls.
-
+            
         self.dashboard.putBoolean('Team is Red', self.team_is_red)
 
         print("FIELD_START_POSITION:", config['FIELD_START_POSITION'])
 
-        if (config['FIELD_START_POSITION'] == 'A'):
-            self.dashboard.putString('Field Start Position', 'A')
-            self.fieldStartPosition = 'A'
-            if self.team_is_red:
-                starting_position_x = config['FIELD_RED_A_START_POSITION_X']
-                starting_position_y = config['FIELD_RED_A_START_POSITION_Y']
-                starting_angle = config['FIELD_RED_A_START_ANGLE']
-            else: # self.team_is_blu
-                starting_position_x = config['FIELD_BLU_A_START_POSITION_X']
-                starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
-                starting_angle = config['FIELD_BLU_A_START_ANGLE']
-        elif (config['FIELD_START_POSITION'] == 'B'):
-            self.dashboard.putString('Field Start Position', 'B')
-            self.fieldStartPosition = 'B'
-            if self.team_is_red:
-                starting_position_x = config['FIELD_RED_B_START_POSITION_X']
-                starting_position_y = config['FIELD_RED_B_START_POSITION_Y']
-                starting_angle = config['FIELD_RED_B_START_ANGLE']
-            else: # self.team_is_blu
-                starting_position_x = config['FIELD_BLU_B_START_POSITION_X']
-                starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
-                starting_angle = config['FIELD_BLU_B_START_ANGLE']
-        else: # config['FIELD_START_POSITION'] == 'C'
-            self.dashboard.putString('Field Start Position', 'C')
-            self.fieldStartPosition = 'C'
-            if self.team_is_red:
-                starting_position_x = config['FIELD_RED_C_START_POSITION_X']
-                starting_position_y = config['FIELD_RED_C_START_POSITION_Y']
-                starting_angle = config['FIELD_RED_C_START_ANGLE']
-            else: # self.team_is_blu
-                starting_position_x = config['FIELD_BLU_C_START_POSITION_X']
-                starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
-                starting_angle = config['FIELD_BLU_C_START_ANGLE']
-        
+        starting_position_x, starting_position_y, starting_angle, teamGyroAdjustment, teamMoveAdjustment = self.updateSwerveometer(self.swervometerConfig)
+
         bumpers_attached = config['HAS_BUMPERS_ATTACHED']
         if bumpers_attached:
             actual_bumper_dimension_x = config['ROBOT_BUMPER_DIMENSION_X']
@@ -225,7 +191,51 @@ class MyRobot(wpilib.TimedRobot):
         swervometer = Swervometer(field_cfg, robot_cfg)
 
         return swervometer
-    
+
+    def updateSwervometer(self, config)
+        if (self.team_is_red):
+            teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
+            teamMoveAdjustment = -1 # Red Team needs to flip the controls as well.
+        else:
+            teamGyroAdjustment = 0 # Blue Team faces 0 degrees at start.
+            teamMoveAdjustment = 1 # Blue Team does not need to flip controlls.
+
+        if (config['FIELD_START_POSITION'] == 'A'):
+            self.dashboard.putString('Field Start Position', 'A')
+            self.fieldStartPosition = 'A'
+            if self.team_is_red:
+                starting_position_x = config['FIELD_RED_A_START_POSITION_X']
+                starting_position_y = config['FIELD_RED_A_START_POSITION_Y']
+                starting_angle = config['FIELD_RED_A_START_ANGLE']
+            else: # self.team_is_blu
+                starting_position_x = config['FIELD_BLU_A_START_POSITION_X']
+                starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
+                starting_angle = config['FIELD_BLU_A_START_ANGLE']
+        elif (config['FIELD_START_POSITION'] == 'B'):
+            self.dashboard.putString('Field Start Position', 'B')
+            self.fieldStartPosition = 'B'
+            if self.team_is_red:
+                starting_position_x = config['FIELD_RED_B_START_POSITION_X']
+                starting_position_y = config['FIELD_RED_B_START_POSITION_Y']
+                starting_angle = config['FIELD_RED_B_START_ANGLE']
+            else: # self.team_is_blu
+                starting_position_x = config['FIELD_BLU_B_START_POSITION_X']
+                starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
+                starting_angle = config['FIELD_BLU_B_START_ANGLE']
+        else: # config['FIELD_START_POSITION'] == 'C'
+            self.dashboard.putString('Field Start Position', 'C')
+            self.fieldStartPosition = 'C'
+            if self.team_is_red:
+                starting_position_x = config['FIELD_RED_C_START_POSITION_X']
+                starting_position_y = config['FIELD_RED_C_START_POSITION_Y']
+                starting_angle = config['FIELD_RED_C_START_ANGLE']
+            else: # self.team_is_blu
+                starting_position_x = config['FIELD_BLU_C_START_POSITION_X']
+                starting_position_y = config['FIELD_BLU_C_START_POSITION_Y']
+                starting_angle = config['FIELD_BLU_C_START_ANGLE']
+
+        return starting_position_x, starting_position_y, starting_angle, teamGyroAdjustment, teamMoveAdjustment
+
     def initVision(self, config):
         vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
 
@@ -303,6 +313,7 @@ class MyRobot(wpilib.TimedRobot):
         return swerve
 
     def initAuton(self, config):
+        self.autonConfig = config # Save this for later as some stuff has to be done after Shuffelboard launch
         self.autonScoreExisting = config['SCORE_EXISTING']
         self.autonBalanceRobot = config['BALANCE_BOT']
 
@@ -315,6 +326,10 @@ class MyRobot(wpilib.TimedRobot):
         # Set Open Loop Ramp Rate for Auton
         self.autonOpenLoopRampRate = config['AUTON_OPEN_LOOP_RAMP_RATE']
         self.autonClosedLoopRampRate = config['AUTON_CLOSED_LOOP_RAMP_RATE']
+
+        return True
+
+    def updateAuton(self, config):
 
         # Figure out task list
         if (self.team_is_red
@@ -547,8 +562,7 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
             #print("Elevator: A Button")
-        if operator.getYButton() and self.elevator.isElevatorDown
-        (): #Highest
+        if operator.getYButton() and self.elevator.isElevatorDown(): #Highest
             self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
             #print("Elevator: Y Button")
@@ -602,6 +616,8 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.swervometer:
             return
+
+        updateAuton(self.autonConfig)
 
         self.autonTimer = wpilib.Timer()
         self.autonTimer.start()
