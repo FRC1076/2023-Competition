@@ -240,6 +240,8 @@ class MyRobot(wpilib.TimedRobot):
                                 swerve_module_offset_x=config['ROBOT_SWERVE_MODULE_OFFSET_X'],
                                 swerve_module_offset_y=config['ROBOT_SWERVE_MODULE_OFFSET_Y'])
 
+        print ("Updated swervometer! Field config: ", field_cfg)
+
         return Swervometer(field_cfg, robot_cfg)
 
     def initVision(self, config):
@@ -628,7 +630,7 @@ class MyRobot(wpilib.TimedRobot):
             return
 
         ## BEFORE STARTING AUTON, READ VALUES FROM SHUFFLEBOARD
-        self.team_is_red = self.dashboard.getBoolean('Team Is Red', self.team_is_red)
+        self.team_is_red = self.dashboard.getBoolean('Team is Red', self.team_is_red)
         self.team_is_blu = not self.team_is_red
         orig_start_position = self.field_start_position
         self.field_start_position = self.dashboard.getString(
@@ -650,6 +652,9 @@ class MyRobot(wpilib.TimedRobot):
         ## UPDATE THE AUTON PARAMS AND SWERVOMETER OBJECT
         self.updateAuton(self.autonConfig)
         self.swervometer = self.updateSwervometer(self.swervometerConfig)
+
+        print("Auton config: ", self.autonConfig)
+        print("Swervometer config: ", self.swervometerConfig)
 
         self.autonTimer = wpilib.Timer()
         self.autonTimer.start()

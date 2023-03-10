@@ -29,6 +29,11 @@
         "open": true
       },
       "open": true
+    },
+    "transitory": {
+      "FMSInfo": {
+        "open": true
+      }
     }
   }
 }
