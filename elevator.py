@@ -53,7 +53,7 @@ class Elevator:
             value = -1
             
         #make sure arm doesn't go past limit
-        if self.getEncoderPosition() > 36 and value < 0:
+        if self.getEncoderPosition() > 33 and value < 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
@@ -78,12 +78,12 @@ class Elevator:
             self.extend(-extend_value)
             return False
 
-    def isElevatorUp(self):
+    def isElevatorDown(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             return True
         return False
 
-    def isElevatorDown(self):
+    def isElevatorUp(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             return True
         return False
