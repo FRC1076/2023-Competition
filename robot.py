@@ -504,9 +504,9 @@ class MyRobot(wpilib.TimedRobot):
         elif (driver.getBButton == False and driver.getYButton == False and self.maneuverComplete == True):
             self.startingManeuver = True
         else:
-            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX(), 0.55 * speedMulti)
-            rightYCorrected = self.deadzoneCorrection(driver.getLeftY(), 0.55 * speedMulti)
-            leftXCorrected = self.deadzoneCorrection(driver.getRightX(), 0.55 * speedMulti)
+            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX() * speedMulti, 0.55)
+            rightYCorrected = self.deadzoneCorrection(driver.getLeftY() * speedMulti, 0.55)
+            leftXCorrected = self.deadzoneCorrection(driver.getRightX() * speedMulti, 0.55)
             # check if there's any input at all
             if rightXCorrected != 0 or rightYCorrected != 0 or leftXCorrected != 0:
                 self.move(rightXCorrected, rightYCorrected, leftXCorrected)
@@ -541,13 +541,14 @@ class MyRobot(wpilib.TimedRobot):
         if(operator.getLeftTriggerAxis() > 0.7):
             clutch_factor = 0.4
         #Find the value the arm will move at
-        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 2) * clutch_factor
+        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
         #preset destinations
         if operator.getAButton(): #Lowest
             self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
             #print("Elevator: A Button")
-        if operator.getYButton() and self.elevator.isElevatorDown(): #Highest
+        if operator.getYButton() and self.elevator.isElevatorDown
+        (): #Highest
             self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
             #print("Elevator: Y Button")

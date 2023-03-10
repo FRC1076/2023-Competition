@@ -25,7 +25,7 @@ controllerConfig = {
 
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
+    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -112,7 +112,7 @@ drivetrainConfig = {
     'BEARING_KI': 0.00001,
     'BEARING_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
-    'TELEOP_OPEN_LOOP_RAMP_RATE': 0.0, # Improves maneuverability of bot.
+    'TELEOP_OPEN_LOOP_RAMP_RATE': 1.0, # Improves maneuverability of bot.
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0,
     'LOW_CONE_SCORE': [['GRAB'],
                         ['RAISE_GRABBER'],
@@ -150,8 +150,8 @@ elevatorConfig = {
     'SOLENOID_REVERSE_ID': 14,
     'ELEVATOR_KP': 0.06, #0.048, # 0.8 * 0.6
     'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
-    'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
-    'HUMAN_POSITION': 17, # Assumes Elevator Up
+    'ELEVATOR_KD': 0.01, # 0.00972, # 0.048 * 1.62 / 8
+    'HUMAN_POSITION': 21, # Assumes Elevator Up, up from failed 17
     'UPPER_SCORING_HEIGHT': 35,
     'LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
     'RETRACTED_HEIGHT': 7,
@@ -178,7 +178,7 @@ cliffDetectorConfig = {
 
 autonConfig = {
     'SCORE_EXISTING': True,
-    'BALANCE_BOT': False,
+    'BALANCE_BOT': True,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TF': [['GRAB'],
