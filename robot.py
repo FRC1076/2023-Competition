@@ -291,6 +291,10 @@ class MyRobot(wpilib.TimedRobot):
         self.teleopOpenLoopRampRate = config['TELEOP_OPEN_LOOP_RAMP_RATE']
         self.teleopClosedLoopRampRate = config['TELEOP_CLOSED_LOOP_RAMP_RATE']
 
+        self.lowConeScoreTaskList = config['LOW_CONE_SCORE']
+        self.highConeScoreTaskList = config['HIGH_CONE_SCORE']
+        self.humanStationTaskList = config['HUMAN_STATION_PICKUP']
+
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
@@ -399,6 +403,8 @@ class MyRobot(wpilib.TimedRobot):
 
         self.drivetrain.setRampRates(self.teleopOpenLoopRampRate, self.teleopClosedLoopRampRate)
         self.grabber.engage()
+        self.maneuverComplete = True
+        self.startingManeuver = True
 
         return True
 
@@ -474,6 +480,29 @@ class MyRobot(wpilib.TimedRobot):
         
         if(driver.getAButton()):
             self.drivetrain.balance()
+        elif (driver.getBButton()):
+            if(self.startingManeuver == True):
+                self.startingManeuver = False
+                self.maneuverComplete = False
+                self.maneuverTaskCounter = 0
+                self.maneuverTaskList = self.lowConeScoreTaskList
+            self.teleopManeuver()
+        elif (driver.getYButton()):
+            if(self.startingManeuver == True):
+                self.startingManeuver = False
+                self.maneuverComplete = False
+                self.maneuverTaskCounter = 0
+                self.maneuverTaskList = self.highConeScoreTaskList
+            self.teleopManeuver()
+        elif (driver.getXButton()):
+            if(self.startingManeuver == True):
+                self.startingManeuver = False
+                self.maneuverComplete = False
+                self.maneuverTaskCounter = 0
+                self.maneuverTaskList = self.humanStationTaskList
+            self.teleopManeuver()
+        elif (driver.getBButton == False and driver.getYButton == False and self.maneuverComplete == True):
+            self.startingManeuver = True
         else:
             rightXCorrected = self.deadzoneCorrection(-driver.getLeftX() * speedMulti, 0.55)
             rightYCorrected = self.deadzoneCorrection(driver.getLeftY() * speedMulti, 0.55)
@@ -676,6 +705,112 @@ class MyRobot(wpilib.TimedRobot):
         else:
             print("Auton: ERROR: Unknown Task", self.autonTaskCounter)
             self.autonTaskCounter += 1   
+
+        return
+
+    def teleopManeuver(self):
+        if not self.drivetrain:
+            return
+        if not self.swervometer:
+            return
+        
+        if self.maneuverTaskCounter < 0:
+            return # No tasks assigned.
+
+        if self.maneuverTaskCounter >= len(self.maneuverTaskList):
+            self.maneuverComplete = True
+            return # No tasks remaining.
+            
+        maneuverTask = self.maneuverTaskList[self.maneuverTaskCounter]
+
+        if (maneuverTask[0] == 'GRAB'):
+            print("maneuver: Grab: ", self.maneuverTaskCounter)
+            self.grabber.engage()
+            self.maneuverTaskCounter += 1
+        elif (maneuverTask[0] == 'RELEASE'):
+            print("maneuver: Release: ", self.maneuverTaskCounter)
+            self.grabber.release()
+            self.maneuverTaskCounter += 1
+        elif (maneuverTask[0] == 'RAISE_GRABBER'):
+            if self.grabber.raise_motor(0.6):
+                self.maneuverTaskCounter += 1
+        elif (maneuverTask[0] == 'LOWER_GRABBER'):
+            if self.grabber.lower_motor(0.2):
+                self.maneuverTaskCounter += 1
+        elif (maneuverTask[0] == 'LOWER_GRABBER_UNCHECKED'):
+            self.grabber.lower_motor(0.2)
+            self.maneuverTaskCounter += 1
+        elif (maneuverTask[0] == 'ELEVATOR_TOGGLE'):
+            if self.elevator.toggle():
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Toggle: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_UP'):
+            if self.elevator.elevatorUp():
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Up: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_DOWN'):
+            if self.elevator.elevatorDown():
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Down: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_LOWER_EXTEND'):
+            if self.elevator.moveToPos(self.lower_scoring_height):
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_HUMAN_EXTEND'):
+            if self.elevator.moveToPos(self.human_position):
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_UPPER_EXTEND'):
+            if self.elevator.moveToPos(self.upper_scoring_height):
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_RETRACT'):
+            if self.elevator.moveToPos(self.retracted_height):
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Retract: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'MOVE'):
+            x = maneuverTask[1]
+            y = maneuverTask[2]
+            bearing = maneuverTask[3]
+            print("maneuver: Move: ", self.maneuverTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            if self.drivetrain.goToPose(x, y, bearing):
+                self.maneuverTaskCounter += 1 # Move on to next task.
+                print("maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+            else:
+                # Leave self.maneuverTaskCounter unchanged. Repeat this task.
+                print("maneuver: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+        elif (maneuverTask[0] == 'MOVE_BACK'):
+            backDistance = maneuverTask[1]
+            x,y,bearing = self.swervometer.getCOF()
+            if(self.team_is_red):
+                x -= backDistance
+            else:
+                x += backDistance
+            if self.drivetrain.goToPose(x, y, bearing):
+                self.maneuverTaskCounter += 1 # Move on to next task.
+                print("maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+            else:
+                # Leave self.maneuverTaskCounter unchanged. Repeat this task.
+                print("maneuver: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+        elif (maneuverTask[0] == 'BALANCE'):
+            print("maneuver: Balance: ", self.maneuverTaskCounter)
+            if self.drivetrain.balance():
+                self.maneuverTaskCounter += 1 # Move on to next task.
+                print("maneuver: Balance: Leveled and oriented")
+            else:
+                # Leave self.maneuverTaskCounter unchanged. Repeat this task.
+                print("maneuver: Balance: Keep balancing and orienting")
+        elif (maneuverTask[0] == 'WHEEL_LOCK'):
+            print("maneuver: Wheel Lock: ", self.maneuverTaskCounter)
+            self.drivetrain.setWheelLock(True)
+            self.drivetrain.goToPose(0, 0, self.drivetrain.getBearing())
+            self.maneuverTaskCounter += 1 # Move on to next task.
+        elif (maneuverTask[0] == 'IDLE'):
+            print("maneuver: Idle: ", self.maneuverTaskCounter)
+            self.drivetrain.idle()
+        else:
+            print("maneuver: ERROR: Unknown Task", self.maneuverTaskCounter)
+            self.maneuverTaskCounter += 1   
 
         return
 

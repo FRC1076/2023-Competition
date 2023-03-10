@@ -113,7 +113,24 @@ drivetrainConfig = {
     'BEARING_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 1.0, # Improves maneuverability of bot.
-    'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0
+    'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0,
+    'LOW_CONE_SCORE': [['GRAB'],
+                        ['RAISE_GRABBER'],
+                        ['ELEVATOR_UP'],
+                        ['ELEVATOR_LOWER_EXTEND'],
+                        ['ELEVATOR_DOWN'],
+                        ['RELEASE']],
+    'HIGH_CONE_SCORE': [['GRAB'],
+                        ['RAISE_GRABBER'],
+                        ['MOVE_BACK', 6],
+                        ['ELEVATOR_UPPER_EXTEND'],
+                        ['ELEVATOR_DOWN'],
+                        ['RELEASE'],
+                        ['LOWER_GRABBER']],
+    'HUMAN_STATION_PICKUP': [['GRAB'],
+                        ['RAISE_GRABBER'],
+                        ['ELEVATOR_UP'],
+                        ['ELEVATOR_HUMAN_EXTEND']],
 }
 
 visionConfig = {
