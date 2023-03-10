@@ -122,10 +122,15 @@ drivetrainConfig = {
                         ['RELEASE']],
     'HIGH_CONE_SCORE': [['GRAB'],
                         ['RAISE_GRABBER'],
-                        ['MOVE_BACK', 10],
+                        ['MOVE_BACK', 6],
                         ['ELEVATOR_UPPER_EXTEND'],
+                        ['ELEVATOR_DOWN'],
                         ['RELEASE'],
                         ['LOWER_GRABBER']],
+    'HUMAN_STATION_PICKUP': [['GRAB'],
+                        ['RAISE_GRABBER'],
+                        ['ELEVATOR_UP'],
+                        ['ELEVATOR_HUMAN_EXTEND']],
 }
 
 visionConfig = {

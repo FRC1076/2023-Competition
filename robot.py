@@ -291,6 +291,10 @@ class MyRobot(wpilib.TimedRobot):
         self.teleopOpenLoopRampRate = config['TELEOP_OPEN_LOOP_RAMP_RATE']
         self.teleopClosedLoopRampRate = config['TELEOP_CLOSED_LOOP_RAMP_RATE']
 
+        self.lowConeScoreTaskList = config['LOW_CONE_SCORE']
+        self.highConeScoreTaskList = config['HIGH_CONE_SCORE']
+        self.humanStationTaskList = config['HUMAN_STATION_PICKUP']
+
         #gyro = AHRS.create_spi()
         gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
@@ -399,6 +403,8 @@ class MyRobot(wpilib.TimedRobot):
 
         self.drivetrain.setRampRates(self.teleopOpenLoopRampRate, self.teleopClosedLoopRampRate)
         self.grabber.engage()
+        self.maneuverComplete = True
+        self.startingManeuver = True
 
         return True
 
@@ -479,14 +485,21 @@ class MyRobot(wpilib.TimedRobot):
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
-                self.maneuverTaskList = config['LOW_CONE_SCORE']
+                self.maneuverTaskList = self.lowConeScoreTaskList
             self.teleopManeuver()
         elif (driver.getYButton()):
             if(self.startingManeuver == True):
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
-                self.maneuverTaskList = config['HIGH_CONE_SCORE']
+                self.maneuverTaskList = self.highConeScoreTaskList
+            self.teleopManeuver()
+        elif (driver.getXButton()):
+            if(self.startingManeuver == True):
+                self.startingManeuver = False
+                self.maneuverComplete = False
+                self.maneuverTaskCounter = 0
+                self.maneuverTaskList = self.humanStationTaskList
             self.teleopManeuver()
         elif (driver.getBButton == False and driver.getYButton == False and self.maneuverComplete == True):
             self.startingManeuver = True
@@ -740,6 +753,10 @@ class MyRobot(wpilib.TimedRobot):
             print("maneuver: Elevator Down: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             if self.elevator.moveToPos(self.lower_scoring_height):
+                self.maneuverTaskCounter += 1
+            print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+        elif (maneuverTask[0] == 'ELEVATOR_HUMAN_EXTEND'):
+            if self.elevator.moveToPos(self.human_position):
                 self.maneuverTaskCounter += 1
             print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_UPPER_EXTEND'):
