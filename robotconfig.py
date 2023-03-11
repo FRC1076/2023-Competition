@@ -168,6 +168,11 @@ grabberConfig = {
     'GRABBER_SUCTION_SPEED': 0.25,
 }
 
+clawConfig = {
+    'SOLENOID_FORWARD_ID': 10,
+    'SOLENOID_REVERSE_ID': 11,
+}
+
 cliffDetectorConfig = {
     'LEFT_CLIFF_DETECTOR_PINGID': 0,
     'LEFT_CLIFF_DETECTOR_ECHOID': 1,
@@ -333,6 +338,7 @@ showbot = {
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
     'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
+    'CLAW': clawConfig,
     'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
 }

@@ -23,6 +23,8 @@ from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
 from cliffdetector import CliffDetector
+from claw import Claw
+
 from tester import Tester
 from networktables import NetworkTables
 
@@ -52,6 +54,7 @@ class MyRobot(wpilib.TimedRobot):
         self.vision = None
         self.elevator = None
         self.grabber = None
+        self.claw = None
 
         # Even if no drivetrain, defaults to drive phase
         self.phase = "DRIVE_PHASE"
@@ -82,6 +85,9 @@ class MyRobot(wpilib.TimedRobot):
                 self.grabber = self.initGrabber(config)
             if key == 'DRIVETRAIN':
                 self.drivetrain = self.initDrivetrain(config)
+            if key == 'CLAW':
+                self.claw = self.initClaw(config)
+
             #if key == 'CLIFFDETECTOR':
             #    self.cliffDetector = self.initCliffDetector(config)
 
@@ -232,7 +238,16 @@ class MyRobot(wpilib.TimedRobot):
         return vision
 
     def initElevator(self, config):
-        elevator = Elevator(config['RIGHT_ID'], config['LEFT_ID'], config['SOLENOID_FORWARD_ID'], config['SOLENOID_REVERSE_ID'], config['ELEVATOR_KP'], config['ELEVATOR_KI'], config['ELEVATOR_KD'], config['LOWER_SAFETY'], config['UPPER_SAFETY'], self.grabber)
+        elevator = Elevator(config['RIGHT_ID'], 
+                            config['LEFT_ID'], 
+                            config['SOLENOID_FORWARD_ID'], 
+                            config['SOLENOID_REVERSE_ID'], 
+                            config['ELEVATOR_KP'], 
+                            config['ELEVATOR_KI'], 
+                            config['ELEVATOR_KD'], 
+                            config['LOWER_SAFETY'], 
+                            config['UPPER_SAFETY'], 
+                            self.grabber)
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
@@ -244,6 +259,12 @@ class MyRobot(wpilib.TimedRobot):
     def initGrabber(self, config):
         return Grabber(config['SUCTION_MOTOR_ID'], config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'], config['GRABBER_ROTATE_SPEED'], config['GRABBER_SUCTION_SPEED'])
 
+    def initClaw(self, config):
+        return Claw(
+                            config['SOLENOID_FORWARD_ID'], 
+                            config['SOLENOID_REVERSE_ID']
+        )
+    
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
         self.drive_type = config['DRIVETYPE']  # side effect!
@@ -547,8 +568,7 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
             #print("Elevator: A Button")
-        if operator.getYButton() and self.elevator.isElevatorDown
-        (): #Highest
+        if operator.getYButton() and self.elevator.isElevatorDown(): #Highest
             self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
             #print("Elevator: Y Button")
