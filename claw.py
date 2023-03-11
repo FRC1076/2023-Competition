@@ -22,14 +22,20 @@ class Claw:
     def toggle(self):
         if self.solenoid.get() == SOLENOID_CLOSED:
             self.open()
+            print("Claw: open via toggle")
         elif self.solenoid.get() == SOLENOID_OPEN or self.solenoid.get() == SOLENOID_OFF:
             self.close()
+            print("Claw: close via toggle")
         else:
-            print("Elevator: Toggle: How did we get here?")
+            print("Claw: Toggle: How did we get here?")
         return True
     
     def open(self):
         self.solenoid.set(SOLENOID_OPEN)
+        print("Claw: Open")
+        return True
 
     def close(self):
         self.solenoid.set(SOLENOID_CLOSED)
+        print("Claw: Close")
+        return True

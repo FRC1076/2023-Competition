@@ -247,7 +247,7 @@ class MyRobot(wpilib.TimedRobot):
                             config['ELEVATOR_KD'], 
                             config['LOWER_SAFETY'], 
                             config['UPPER_SAFETY'], 
-                            self.grabber)
+                            self.claw)
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
@@ -257,7 +257,7 @@ class MyRobot(wpilib.TimedRobot):
         return elevator
 
     def initGrabber(self, config):
-        return Grabber(config['SUCTION_MOTOR_ID'], config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'], config['GRABBER_ROTATE_SPEED'], config['GRABBER_SUCTION_SPEED'])
+        return Grabber(config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'], config['GRABBER_ROTATE_SPEED'])
 
     def initClaw(self, config):
         return Claw(
@@ -446,14 +446,12 @@ class MyRobot(wpilib.TimedRobot):
     def robotPeriodic(self):
         #if self.cliffDetector:
         #    self.cliffDetector.update()
-        #self.grabber.update()
         return True
 
     def teleopInit(self):
         print("teleopInit ran")
 
         self.drivetrain.setRampRates(self.teleopOpenLoopRampRate, self.teleopClosedLoopRampRate)
-        self.grabber.engage()
         self.maneuverComplete = True
         self.startingManeuver = True
         self.maneuverTaskCounter = 0
@@ -633,21 +631,18 @@ class MyRobot(wpilib.TimedRobot):
         grabber_speed = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
 
         if (grabber_speed > 0):
-            print("Grabber: Raise Grabber")
+            #print("Grabber: Raise Grabber")
             self.grabber.lower_motor(-grabber_speed)
         elif (grabber_speed < 0):
-            print("Grabber: Lower Grabber")
+            #print("Grabber: Lower Grabber")
             self.grabber.raise_motor(-grabber_speed)
         else:
-            print("Grabber: Motor Off")
+            #print("Grabber: Motor Off")
             self.grabber.motor_off()
         
         if (operator.getRightTriggerAxis() > 0.7):
-            print("Grabber: Release Suction")
-            self.grabber.release()
-        else:
-            print("Grabber: Engage Suction")
-            self.grabber.engage()
+            print("Claw: Toggle Claw")
+            self.claw.toggle()
         
     def autonomousInit(self):
         if not self.auton:
@@ -692,13 +687,13 @@ class MyRobot(wpilib.TimedRobot):
             print("Auton: Timer: ", self.autonTimer.get())
             if self.autonTimer.get() > autonTask[1]:
                 self.autonTaskCounter += 1
-        elif (autonTask[0] == 'GRAB'):
-            print("Auton: Grab: ", self.autonTaskCounter)
-            self.grabber.engage()
+        elif (autonTask[0] == 'CLAW_CLOSE'):
+            print("Auton: Claw CLose: ", self.autonTaskCounter)
+            self.claw.close()
             self.autonTaskCounter += 1
-        elif (autonTask[0] == 'RELEASE'):
-            print("Auton: Release: ", self.autonTaskCounter)
-            self.grabber.release()
+        elif (autonTask[0] == 'CLAW_OPEN'):
+            print("Auton: Claw Open: ", self.autonTaskCounter)
+            self.claw.open()
             self.autonTaskCounter += 1
         elif (autonTask[0] == 'RAISE_GRABBER'):
             if self.grabber.raise_motor(0.6):
@@ -782,16 +777,16 @@ class MyRobot(wpilib.TimedRobot):
 
         print("WHICH TASK: ", maneuverTask[0])
 
-        if (maneuverTask[0] == 'GRAB'):
-            print("maneuver: Grab: ", self.maneuverTaskCounter)
+        if (maneuverTask[0] == 'CLAW_OPEN'):
+            print("Maneuver: Claw Open: ", self.maneuverTaskCounter)
             self.grabber.engage()
             self.maneuverTaskCounter += 1
-        elif (maneuverTask[0] == 'RELEASE'):
-            print("maneuver: Release: ", self.maneuverTaskCounter)
-            self.grabber.release()
+        elif (maneuverTask[0] == 'CLAW_CLOSE'):
+            print("Maneuver: Claw Cose: ", self.maneuverTaskCounter)
+            self.claw.close()
             self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
-            print("maneuver: Rase Grabber: ", self.maneuverTaskCounter)
+            print("maneuver: Raise Grabber: ", self.maneuverTaskCounter)
             if self.grabber.raise_motor(0.6):
                 self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
