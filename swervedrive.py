@@ -11,6 +11,7 @@ from networktables.util import ntproperty
 from collections import namedtuple
 from wpimath.controller import PIDController
 from swervometer import Swervometer
+from logger import Logger
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
@@ -24,8 +25,20 @@ class SwerveDrive:
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
-    def __init__(self, _frontLeftModule, _frontRightModule, _rearLeftModule, _rearRightModule, _swervometer, _vision, _gyro, _balance_cfg, _target_cfg, _bearing_cfg):
+    def __init__(
+            self, 
+            _frontLeftModule, 
+            _frontRightModule, 
+            _rearLeftModule, 
+            _rearRightModule, 
+            _swervometer, 
+            _vision, 
+            _gyro, 
+            _balance_cfg, 
+            _target_cfg, 
+            _bearing_cfg):
         
+        self.logger = Logger.getLogger()
         self.frontLeftModule = _frontLeftModule
         self.frontRightModule = _frontRightModule
         self.rearLeftModule = _rearLeftModule
@@ -134,7 +147,7 @@ class SwerveDrive:
         self.updateBearing = False
 
     def reset(self):
-        print("In swervedrive reset")
+        self.logger.log("In swervedrive reset")
 
         # Set all inputs to zero
         self._requested_vectors = {
@@ -235,7 +248,7 @@ class SwerveDrive:
         return roll
 
     def printGyro(self):
-        print("Angle: ", self.getGyroAngle(), ", Pitch: ", self.getGyroPitch(), ", Yaw: ", self.getGyroYaw(), ", Roll: ", self.getGyroRoll())
+        self.logger.log("Angle: ", self.getGyroAngle(), ", Pitch: ", self.getGyroPitch(), ", Yaw: ", self.getGyroYaw(), ", Roll: ", self.getGyroRoll())
 
     def resetGyro(self):
         if self.gyro:
@@ -333,13 +346,13 @@ class SwerveDrive:
         self.balance_pitch_pid_controller.setI(self.sd.getNumber('Balance Pitch kI', 0))
         self.balance_pitch_pid_controller.setD(self.sd.getNumber('Balance Pitch kD', 0))
 
-        #print("Pitch: kP = ", self.sd.getNumber('Balance Pitch kP', 0), ", kI = ", self.sd.getNumber('Balance Pitch kI', 0), ", kD =", self.sd.getNumber('Balance Pitch kD', 0))
+        #self.logger.log("Pitch: kP = ", self.sd.getNumber('Balance Pitch kP', 0), ", kI = ", self.sd.getNumber('Balance Pitch kI', 0), ", kD =", self.sd.getNumber('Balance Pitch kD', 0))
         
         self.balance_yaw_pid_controller.setP(self.sd.getNumber('Balance Yaw kP', 0))
         self.balance_yaw_pid_controller.setI(self.sd.getNumber('Balance Yaw kI', 0))
         self.balance_yaw_pid_controller.setD(self.sd.getNumber('Balance Yaw kD', 0))
 
-        #print("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
+        #self.logger.log("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
         
         #self.printGyro()
 
@@ -353,7 +366,7 @@ class SwerveDrive:
             yawSign = -1
         BALANCED_PITCH = 0.0
 
-        #print("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
+        #self.logger.log("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
 
         pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
         yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW) 
@@ -370,8 +383,8 @@ class SwerveDrive:
         else:
             yaw_output = clamp(yaw_error)
         
-        print("Pitch setpoint: ", self.balance_pitch_pid_controller.getSetpoint(), "pitch output: ", pitch_output, " pitch error: ", pitch_error)
-        print("Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
+        self.logger.log("Pitch setpoint: ", self.balance_pitch_pid_controller.getSetpoint(), "pitch output: ", pitch_output, " pitch error: ", pitch_error)
+        self.logger.log("Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
 
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
@@ -393,7 +406,7 @@ class SwerveDrive:
         current_angle = self.getGyroAngle()
         if rcw != 0:
             self.updateBearing = True
-            print("rcw (!=0): ", rcw, " bearing: ", self.bearing, " currentAngle: ", current_angle)
+            self.logger.log("rcw (!=0): ", rcw, " bearing: ", self.bearing, " currentAngle: ", current_angle)
             return rcw
         else:
             self.updateBearing = False
@@ -411,7 +424,7 @@ class SwerveDrive:
                     target_angle = current_angle + angle_diff
 
             rcw_error = self.bearing_pid_controller.calculate(self.getGyroAngle(), target_angle)
-            print("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
+            self.logger.log("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
     def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw, bearing):
@@ -439,7 +452,7 @@ class SwerveDrive:
         chassis_strafe = magnitude * math.sin(math.radians(chassis_angle))
         chassis_fwd = magnitude * math.cos(math.radians(chassis_angle))
 
-        #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
+        #self.logger.log("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
         self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
 
         self.set_fwd(chassis_fwd)
@@ -462,13 +475,13 @@ class SwerveDrive:
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
         #rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
-        #print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
+        #self.logger.log("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
-            print("X at set point")
+            self.logger.log("X at set point")
         if self.target_y_pid_controller.atSetpoint():
-            print("Y at set point")
+            self.logger.log("Y at set point")
         #if self.target_rcw_pid_controller.atSetpoint():
-        #    print("RCW at set point")
+        #    self.logger.log("RCW at set point")
         
         #if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetPoint(): 
         if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
@@ -484,9 +497,9 @@ class SwerveDrive:
             
             self.update_smartdash()
             self.execute()
-            print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
-            # print("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
-            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentBearing: ", currentRCW, " self.bearing: ", self.bearing, " target bearing: ", bearing)
+            self.logger.log("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
+            # self.logger.log("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
+            self.logger.log("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentBearing: ", currentRCW, " self.bearing: ", self.bearing, " target bearing: ", bearing)
             return False
 
     def _calculate_vectors(self):
@@ -494,26 +507,26 @@ class SwerveDrive:
         Calculate the requested speed and angle of each modules from self._requested_vectors and store them in
         self._requested_speeds and self._requested_angles dictionaries.
         """
-        print("in _calculate_vectors")
+        self.logger.log("in _calculate_vectors")
         self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw'] = self.normalize([self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw']])
 
         # Does nothing if the values are lower than the input thresh
         if self.threshold_input_vectors:
-            #print("checking thresholds: fwd: ", self._requested_vectors['fwd'], "strafe: ", self._requested_vectors['strafe'], "rcw: ", self._requested_vectors['rcw'])
+            #self.logger.log("checking thresholds: fwd: ", self._requested_vectors['fwd'], "strafe: ", self._requested_vectors['strafe'], "rcw: ", self._requested_vectors['rcw'])
             if abs(self._requested_vectors['fwd']) < self.lower_input_thresh:
-                #print("forward = 0")
+                #self.logger.log("forward = 0")
                 self._requested_vectors['fwd'] = 0
 
             if abs(self._requested_vectors['strafe']) < self.lower_input_thresh:
-                #print("strafe = 0")
+                #self.logger.log("strafe = 0")
                 self._requested_vectors['strafe'] = 0
 
             if abs(self._requested_vectors['rcw']) < self.lower_input_thresh:
-                #print("rcw = 0")
+                #self.logger.log("rcw = 0")
                 self._requested_vectors['rcw'] = 0
 
             if self._requested_vectors['rcw'] == 0 and self._requested_vectors['strafe'] == 0 and self._requested_vectors['fwd'] == 0:  # Prevents a useless loop.
-                #print("all three zero")
+                #self.logger.log("all three zero")
                 self._requested_speeds = dict.fromkeys(self._requested_speeds, 0) # Do NOT reset the wheel angles.
 
                 if self.wheel_lock:
@@ -526,7 +539,7 @@ class SwerveDrive:
                     self._requested_angles['rear_right'] = 45
 
                     #self.wheel_lock = False
-                    #print("testing wheel lock")
+                    #self.logger.log("testing wheel lock")
                 return
         
         frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
@@ -569,7 +582,7 @@ class SwerveDrive:
         self._requested_vectors['rcw'] = 0.0
 
     def setWheelLock(self, isLocked):
-        #print("is locked", isLocked)
+        #self.logger.log("is locked", isLocked)
         self.wheel_lock = isLocked
     
     def getWheelLock(self):
@@ -587,9 +600,9 @@ class SwerveDrive:
             for key in self.modules:
                 self.modules[key].debug()
         
-        print('Requested values: ', self._requested_vectors, '\n')
-        print('Requested angles: ', self._requested_angles, '\n')
-        print('Requested speeds: ', self._requested_speeds, '\n')
+        self.logger.log('Requested values: ', self._requested_vectors, '\n')
+        self.logger.log('Requested angles: ', self._requested_angles, '\n')
+        self.logger.log('Requested speeds: ', self._requested_speeds, '\n')
 
     def execute(self):
         """
@@ -605,7 +618,7 @@ class SwerveDrive:
 
         # Calculate normalized speeds with lever arm adjustment
         for key in self.modules:
-            #print("Execute: key: ", key, " base speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_speeds[key] * self.swervometer.getCOMmult(key))
+            #self.logger.log("Execute: key: ", key, " base speed: ", self._requested_speeds[key], " COMmult: ", self.swervometer.getCOMmult(key), " adjusted speed: ", (self._requested_speeds[key] * self.swervometer.getCOMmult(key)), self._requested_speeds[key] * self.swervometer.getCOMmult(key))
             self._requested_speeds[key] = self._requested_speeds[key] * self.swervometer.getCOMmult(key)
         
         self._requested_speeds = self.normalizeDictionary(self._requested_speeds)
@@ -619,33 +632,33 @@ class SwerveDrive:
         # Execute each module
         first_module = True
         for key in self.modules:
-            print("Module: Key: ", key)
+            self.logger.log("Module: Key: ", key)
             self.modules[key].execute()
 
         COFX, COFY, COFAngle = self.swervometer.calculateCOFPose(self.modules, self.getGyroAngle())
 
         if self.vision:
-            print("Vision started")
+            self.logger.log("Vision started")
             if self.vision.canUpdatePose():
-                print("Vision: canupdatepose")
+                self.logger.log("Vision: canupdatepose")
                 pose = self.vision.getPose()
                 orientation = self.vision.getOrientation()
                 if self.vision.shouldUpdatePose():
                     if pose[0] != -1:
                         self.swervometer.setCOF(pose[0], pose[1], orientation[2])
-                        print("Vision updated position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
+                        self.logger.log("Vision updated position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
                     else:
-                        print("Vision should have updated position, but pose was empty.")
+                        self.logger.log("Vision should have updated position, but pose was empty.")
                 else:
-                    print("Vision reports position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
-                print("AFTER COMMENTS")
+                    self.logger.log("Vision reports position: (" + str(pose[0]) + ", " + str(pose[1]) + ") with rotation of " + str(orientation[2]) + " degrees.")
+                self.logger.log("AFTER COMMENTS")
 
-        print("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
+        self.logger.log("COFX: ", COFX, ", COFY: ", COFY, ", COF Angle: ", COFAngle)
 
         if(self.updateBearing):
-            print("Old Bearing: ", self.bearing)
+            self.logger.log("Old Bearing: ", self.bearing)
             self.bearing = self.getGyroAngle()
-            print("New Bearing: ", self.bearing)
+            self.logger.log("New Bearing: ", self.bearing)
             self.updateBearing = False
 
     def idle(self):
