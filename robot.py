@@ -455,6 +455,7 @@ class MyRobot(wpilib.TimedRobot):
         self.maneuverComplete = True
         self.startingManeuver = True
         self.maneuverTaskCounter = 0
+        self.allow_claw_toggle = True
 
         return True
 
@@ -640,9 +641,13 @@ class MyRobot(wpilib.TimedRobot):
             #print("Grabber: Motor Off")
             self.grabber.motor_off()
         
-        if (operator.getRightTriggerAxis() > 0.7):
+        if (operator.getRightTriggerAxis() > 0.7 and self.allow_claw_toggle == True):
             print("Claw: Toggle Claw")
             self.claw.toggle()
+            self.allow_claw_toggle = False
+        elif(operator.getRightTriggerAxis() <= 0.7):
+            self.allow_claw_toggle = True
+        
         
     def autonomousInit(self):
         if not self.auton:
