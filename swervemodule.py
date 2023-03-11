@@ -11,6 +11,8 @@ from networktables import NetworkTables
 from wpimath.controller import PIDController
 from collections import namedtuple
 
+from dashboard import Dashboard
+
 # Create the structure of the config: SmartDashboard prefix, Encoder's zero point, Drive motor inverted, Allow reverse
 ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse', 'position_conversion', 'heading_kP', 'heading_kI', 'heading_kD'])
 
@@ -56,6 +58,7 @@ class SwerveModule:
         self.allow_reverse = self.cfg.allow_reverse or True #def allow reverse always, so you can maybe remove this
 
         # SmartDashboard
+        self.sd = Dashboard.getDashboard()
         self.sd = NetworkTables.getTable('SmartDashboard')
         self.debugging = self.sd.getEntry('drive/drive/debugging')
 
@@ -238,7 +241,7 @@ class SwerveModule:
         #print('ERROR = ' + str(error) + ', OUTPUT = ' + str(output))
 
         # Put the output to the dashboard
-        self.sd.putNumber('drive/%s/output' % self.sd_prefix, output)
+        self.sd.putNumber('drive/%s/rotation_output' % self.sd_prefix, output)
         # Set the output as the rotateMotor's voltage
         self.rotateMotor.set(output) # will replace this with a set SETPOINT rather than actually setting the speed
         #SparkMax PID controller will take care of actually running the motors with PID values you instantiate it with
@@ -275,16 +278,20 @@ class SwerveModule:
         """
         Output a bunch on internal variables for debugging purposes.
         """
-        self.sd.putNumber('drive/%s/degrees' % self.sd_prefix, self.get_current_angle())
+        self.sd.putNumber('drive/%s/current_angle' % self.sd_prefix, self.get_current_angle())
 
-        if self.debugging.getBoolean(False):
+        # if self.debugging.getBoolean(False):
+        # not sure why we need this or how it gets set in the first place
 
-            self.sd.putNumber('drive/%s/requested_speed' % self.sd_prefix, self._requested_speed)
-            self.sd.putNumber('drive/%s/encoder position' % self.sd_prefix, self.rotateEncoder.getAbsolutePosition())
-            self.sd.putNumber('drive/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
+        self.sd.putNumber('drive/%s/requested_speed' % self.sd_prefix, self._requested_speed)
+        self.sd.putNumber('drive/%s/requested_angle' % self.sd_prefix, self._requested_angle)
+        self.sd.putNumber('drive/%s/rotate encoder absolute position' % self.sd_prefix, self.rotateEncoder.getAbsolutePosition())
+        self.sd.putNumber('drive/%s/drive encoder absolute position' % self.sd_prefix, self.driveEncoder.getAbsolutePosition())
 
-            self.sd.putNumber('drive/%s/Heading PID Setpoint' % self.sd_prefix, self.heading_pid_controller.getSetpoint())
-            self.sd.putNumber('drive/%s/Heading PID Error' % self.sd_prefix, self.heading_pid_controller.getPositionError())
-            self.sd.putBoolean('drive/%s/Heading PID isAligned' % self.sd_prefix, self.heading_pid_controller.atSetpoint())
+        self.sd.putNumber('drive/%s/Heading PID Setpoint' % self.sd_prefix, self.heading_pid_controller.getSetpoint())
+        self.sd.putNumber('drive/%s/Heading PID Error' % self.sd_prefix, self.heading_pid_controller.getPositionError())
+        self.sd.putBoolean('drive/%s/Heading PID isAligned' % self.sd_prefix, self.heading_pid_controller.atSetpoint())
 
-            self.sd.putBoolean('drive/%s/allow_reverse' % self.sd_prefix, self.allow_reverse)
+        self.sd.putBoolean('drive/%s/allow_reverse' % self.sd_prefix, self.allow_reverse)
+        self.sd.putBoolean('drive/%s/is_flipped' % self.sd_prefix, self.moduleFlipped)
+        self.sd.putNumber('drive/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
