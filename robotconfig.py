@@ -24,7 +24,7 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -148,7 +148,7 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.06, #0.048, # 0.8 * 0.6
+    'ELEVATOR_KP': 0.12, #0.048, # 0.8 * 0.6
     'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
     'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
     'HUMAN_POSITION': 20, # Assumes Elevator Up, up from failed 17
@@ -169,8 +169,8 @@ grabberConfig = {
 }
 
 clawConfig = {
-    'SOLENOID_FORWARD_ID': 12,
-    'SOLENOID_REVERSE_ID': 13,
+    'SOLENOID_FORWARD_ID': 13,
+    'SOLENOID_REVERSE_ID': 12,
 }
 
 cliffDetectorConfig = {
@@ -182,7 +182,7 @@ cliffDetectorConfig = {
 }
 
 autonConfig = {
-    'SCORE_EXISTING': True,
+    'SCORE_EXISTING': False,
     'BALANCE_BOT': True,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,

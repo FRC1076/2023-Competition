@@ -495,7 +495,16 @@ class MyRobot(wpilib.TimedRobot):
         #        print("Coast is clear. Not near a cliff.")
         #    else:
         #        print("Bogus result from cliff detector. Ignore danger.")
-
+        
+        #angle = self.drivetrain.getGyroAngle()
+        #if angle < 90 or angle > 270:
+        #    xsign = 1
+        #else:
+        #    xsign = -1
+        #if (angle > 0 and angle < 180):
+        #    ysign = -1
+        #else:
+        #    ysign = 1
         self.drivetrain.move(y, x, rcw, self.drivetrain.getBearing())
         #self.drivetrain.move(0, y, 0)
 

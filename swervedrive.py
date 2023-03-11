@@ -388,7 +388,7 @@ class SwerveDrive:
             return False
 
     def steerStraight(self, rcw, bearing):
-
+        return rcw
         self.bearing = bearing
         current_angle = self.getGyroAngle()
         if rcw != 0:
