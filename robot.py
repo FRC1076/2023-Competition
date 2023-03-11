@@ -754,6 +754,7 @@ class MyRobot(wpilib.TimedRobot):
 
         if self.maneuverTaskCounter >= len(self.maneuverTaskList):
             self.maneuverComplete = True
+            self.startingManeuver = True
             return # No tasks remaining.
             
         maneuverTask = self.maneuverTaskList[self.maneuverTaskCounter]
