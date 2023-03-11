@@ -102,7 +102,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Reset task counter.
         self.autonTaskCounter = 0
-
+        self.maneuverTaskCounter = 0
 
     def initControllers(self, config):
         ctrls = {}
@@ -328,6 +328,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_A_TT']
         elif (self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and not self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_A_FT']
+        elif (self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
@@ -338,6 +343,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_B_TT']     
         elif (self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and not self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_B_FT']     
+        elif (self.team_is_red
             and self.fieldStartPosition == 'C'
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
@@ -347,6 +357,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonScoreExisting
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_C_TT']
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and not self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_C_FT']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'A'
             and self.autonScoreExisting
@@ -358,6 +373,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_BLU_A_TT']     
         elif (not self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and not self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_A_FT']     
+        elif (not self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
@@ -368,6 +388,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_BLU_B_TT']
         elif (not self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and not self.autonScoreExisting
+            and self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_B_FT']
+        elif (not self.team_is_red
             and self.fieldStartPosition == 'C'
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
@@ -377,6 +402,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonScoreExisting
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_BLU_C_TT']
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_C_TF']
         else: # No matching task list
             self.autonTaskCounter = -1
             self.autonTaskList = []
@@ -405,6 +435,7 @@ class MyRobot(wpilib.TimedRobot):
         self.grabber.engage()
         self.maneuverComplete = True
         self.startingManeuver = True
+        self.maneuverTaskCounter = 0
 
         return True
 
@@ -469,7 +500,7 @@ class MyRobot(wpilib.TimedRobot):
             self.drivetrain.printGyro()
 
         if (driver.getRightBumper()):
-            speedMulti = 0.125
+            speedMulti = 0.4
 
         #print("gyro yaw: " + str(self.drivetrain.getGyroAngle()))
 
@@ -482,6 +513,7 @@ class MyRobot(wpilib.TimedRobot):
             self.drivetrain.balance()
         elif (driver.getBButton()):
             if(self.startingManeuver == True):
+                print("B Button - Starting Maneuver")
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
@@ -489,6 +521,7 @@ class MyRobot(wpilib.TimedRobot):
             self.teleopManeuver()
         elif (driver.getYButton()):
             if(self.startingManeuver == True):
+                print("Y Button - Starting Maneuver")
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
@@ -496,6 +529,7 @@ class MyRobot(wpilib.TimedRobot):
             self.teleopManeuver()
         elif (driver.getXButton()):
             if(self.startingManeuver == True):
+                print("X Button - Starting Maneuver")
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
@@ -504,9 +538,9 @@ class MyRobot(wpilib.TimedRobot):
         elif (driver.getBButton == False and driver.getYButton == False and self.maneuverComplete == True):
             self.startingManeuver = True
         else:
-            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX() * speedMulti, 0.55)
-            rightYCorrected = self.deadzoneCorrection(driver.getLeftY() * speedMulti, 0.55)
-            leftXCorrected = self.deadzoneCorrection(driver.getRightX() * speedMulti, 0.55)
+            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX() * speedMulti, 0.30)
+            rightYCorrected = self.deadzoneCorrection(driver.getLeftY() * speedMulti, 0.30)
+            leftXCorrected = self.deadzoneCorrection(driver.getRightX() * speedMulti, 0.30)
             # check if there's any input at all
             if rightXCorrected != 0 or rightYCorrected != 0 or leftXCorrected != 0:
                 self.move(rightXCorrected, rightYCorrected, leftXCorrected)
@@ -547,8 +581,7 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator_destination = self.retracted_height
             self.elevator_is_automatic = True
             #print("Elevator: A Button")
-        if operator.getYButton() and self.elevator.isElevatorDown
-        (): #Highest
+        if operator.getYButton() and self.elevator.isElevatorDown(): #Highest
             self.elevator_destination = self.upper_scoring_height
             self.elevator_is_automatic = True
             #print("Elevator: Y Button")
@@ -714,6 +747,8 @@ class MyRobot(wpilib.TimedRobot):
         if not self.swervometer:
             return
         
+        print("teleopManeuver")
+
         if self.maneuverTaskCounter < 0:
             return # No tasks assigned.
 
@@ -722,6 +757,8 @@ class MyRobot(wpilib.TimedRobot):
             return # No tasks remaining.
             
         maneuverTask = self.maneuverTaskList[self.maneuverTaskCounter]
+
+        print("WHICH TASK: ", maneuverTask[0])
 
         if (maneuverTask[0] == 'GRAB'):
             print("maneuver: Grab: ", self.maneuverTaskCounter)
@@ -732,6 +769,7 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.release()
             self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
+            print("maneuver: Rase Grabber: ", self.maneuverTaskCounter)
             if self.grabber.raise_motor(0.6):
                 self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
@@ -755,7 +793,7 @@ class MyRobot(wpilib.TimedRobot):
         elif (maneuverTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             if self.elevator.moveToPos(self.lower_scoring_height):
                 self.maneuverTaskCounter += 1
-            print("maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+            print("maneuver: Elevator Extend: ", self.lower_scoring_height, " current position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_HUMAN_EXTEND'):
             if self.elevator.moveToPos(self.human_position):
                 self.maneuverTaskCounter += 1

@@ -469,7 +469,13 @@ class SwerveDrive:
             self.update_smartdash()
             return True
         else:
-            self.move(x_error, y_error, 0, bearing)
+            sign = math.cos(math.radians(bearing)) # HACK HACK HACK
+            if sign <= 0:
+                sign = 1
+            else:
+                sign = -1
+            self.move(x_error * sign, y_error, 0, bearing)
+            
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
