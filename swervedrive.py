@@ -451,10 +451,10 @@ class SwerveDrive:
         self.set_rcw(rcw_new)
     
     def goToBalance(self, x, y, bearing, tolerance):
-        if self.getGyroBalance() < -tolerance or self.getGyroBalance() > self.getGyroBalance():
+        if abs(self.getGyroBalance()) > tolerance:
             return True
         else:
-            return goToPose(x, y, bearing)
+            return self.goToPose(x, y, bearing)
 
     def goToPose(self, x, y, bearing):
 

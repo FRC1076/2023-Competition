@@ -169,8 +169,8 @@ grabberConfig = {
 }
 
 clawConfig = {
-    'SOLENOID_FORWARD_ID': 10,
-    'SOLENOID_REVERSE_ID': 11,
+    'SOLENOID_FORWARD_ID': 12,
+    'SOLENOID_REVERSE_ID': 13,
 }
 
 cliffDetectorConfig = {

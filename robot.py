@@ -745,13 +745,13 @@ class MyRobot(wpilib.TimedRobot):
             y = autonTask[2]
             bearing = autonTask[3]
             tolerance = autonTask[4]
-            print("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            print("Auton: Move to Balance: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing, " tolerance: ", tolerance)
             if self.drivetrain.goToBalance(x, y, bearing, tolerance):
                 self.autonTaskCounter += 1 # Move on to next task.
-                print("Auton: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                print("Auton: Move to Balance: Reached target: x: ", x, " y: ", y, " bearing: ", bearing, " tolerance: ", tolerance)
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
-                print("Auton: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                print("Auton: Move to Balance: Not at target: x: ", x, " y: ", y, " bearing: ", bearing, " tolerance: ", tolerance)
         elif (autonTask[0] == 'BALANCE'):
             print("Auton: Balance: ", self.autonTaskCounter)
             if self.drivetrain.balance():
