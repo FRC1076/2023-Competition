@@ -180,8 +180,8 @@ class MyRobot(wpilib.TimedRobot):
             actual_bumper_dimension_x = config['ROBOT_BUMPER_DIMENSION_X']
             actual_bumper_dimension_y = config['ROBOT_BUMPER_DIMENSION_Y']
         else:
-             actual_bumper_dimension_x = 0.0
-             actual_bumper_dimension_y = 0.0
+            actual_bumper_dimension_x = 0.0
+            actual_bumper_dimension_y = 0.0
 
         self.dashboard.putBoolean('Has Bumpers Attached', bumpers_attached)
 
