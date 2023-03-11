@@ -18,7 +18,14 @@ MAX_VOLTAGE = 5 # Absolute encoder measures from 0V to 5V
 
 class SwerveModule:
 
-    def __init__(self, _driveMotor, _driveEncoder, _rotateMotor, _rotateEncoder, _config):
+    def __init__(
+            self, 
+            _driveMotor, 
+            _driveEncoder, 
+            _rotateMotor, 
+            _rotateEncoder, 
+            _config, 
+            _name):
         
         self.cfg = _config
 

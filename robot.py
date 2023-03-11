@@ -31,6 +31,7 @@ from grabber import Grabber
 from vision import Vision
 from claw import Claw
 from logger import Logger
+from dashboard import Dashboard
 
 from tester import Tester
 
@@ -63,8 +64,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.config = robotconfig
 
-        NetworkTables.initialize(server='roborio-1076-frc.local') # Necessary for vision to
-        self.dashboard = NetworkTables.getTable('SmartDashboard')
+        self.dashboard = Dashboard.getDashboard(testMode=TEST_MODE)
 
         dir = ''
         if TEST_MODE:

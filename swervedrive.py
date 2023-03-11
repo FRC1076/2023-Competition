@@ -467,7 +467,7 @@ class SwerveDrive:
         if self.getGyroBalance() < -tolerance or self.getGyroBalance() > self.getGyroBalance():
             return True
         else:
-            return goToPose(x, y, bearing)
+            return self.goToPose(x, y, bearing)
 
     def goToPose(self, x, y, bearing):
 
