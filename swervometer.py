@@ -5,7 +5,7 @@ from collections import namedtuple
 # Create the structure of the field config:
 FieldConfig = namedtuple('FieldConfig', ['sd_prefix',
                                          'origin_x', 'origin_y',
-                                         'start_position_x', 'start_position_y', 'start_angle')
+                                         'start_position_x', 'start_position_y', 'start_angle'])
 
 # Create the structure of the robot property config: 
 RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',

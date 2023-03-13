@@ -426,7 +426,7 @@ class SwerveDrive:
         #Convert field-oriented translate to chassis-oriented translate
         
         current_angle = self.getGyroAngle() % 360
-        desired_angle = (math.degrees(math.atan2(fwd, strafe)) % 360
+        desired_angle = (math.degrees(math.atan2(fwd, strafe))) % 360
         chassis_angle = (desired_angle - current_angle) % 360
         magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
                          
