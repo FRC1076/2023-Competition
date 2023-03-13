@@ -130,12 +130,12 @@ class MyRobot(wpilib.TimedRobot):
             self.team_is_red = True
             self.team_is_blu = False
             teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
-            teamMoveAdjustment = -1 # Red Team needs to flip the controls as well.
+            teamMoveAdjustment = 1 # Red Team start is oriented in the same direction as field.
         else:
             self.team_is_red = False
             self.team_is_blu = True
             teamGyroAdjustment = 0 # Blue Team faces 0 degrees at start.
-            teamMoveAdjustment = 1 # Blue Team does not need to flip controlls.
+            teamMoveAdjustment = -1 # Blue Team start is oriented 180 degrees from field.
 
         self.dashboard.putBoolean('Team is Red', self.team_is_red)
 
