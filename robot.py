@@ -464,28 +464,6 @@ class MyRobot(wpilib.TimedRobot):
         self.teleopGrabber()
         return True
 
-    def move(self, x, y, rcw):
-        """
-        This function is meant to be used by the teleOp.
-        :param x: Velocity in x axis [-1, 1]
-        :param y: Velocity in y axis [-1, 1]
-        :param rcw: Velocity in z axis [-1, 1]
-        """
-        
-        #if self.cliffdetector:
-        #    if self.cliffdetector.atCliff() == -1:
-        #        print("Warning: At Left Cliff!!!")
-        #    elif self.cliffdetector.atCliff() == 1:
-        #        print("Warning: At Right Cliff!!!")
-        #    elif self.cliffdetector.atCliff() == 0:
-        #        print("Coast is clear. Not near a cliff.")
-        #    else:
-        #        print("Bogus result from cliff detector. Ignore danger.")
-        
-        # Bot starts facing controller
-        controller_at_180 = -1
-        self.drivetrain.move(controller_at_180 * y, controller_at_180 * x, rcw, self.drivetrain.getBearing())
-
     def teleopDrivetrain(self):
         if (not self.drivetrain):
             return
@@ -495,27 +473,24 @@ class MyRobot(wpilib.TimedRobot):
         driver = self.driver.xboxController
         deadzone = self.driver.deadzone
 
-        speedMulti = 1.0
+        # Implement clutch on driving and rotating.
+        clutch = 1.0
+        if (driver.getRightBumper()):
+            clutch = 0.4
 
-        self.dashboard.putNumber('ctrl right x', driver.getLeftX())
-        self.dashboard.putNumber('ctrl right y', driver.getLeftY())
-        #print("dashboard: ", self.dashboard.getNumber('ctrl right y', -1))
-        
+        # Reset the gyro in the direction bot is facing.
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
         if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
 
-        if (driver.getRightBumper()):
-            speedMulti = 0.4
-
-        #print("gyro yaw: " + str(self.drivetrain.getGyroAngle()))
-
+        # Determine if Wheel Lock is needed.
         if (driver.getLeftBumper()):
             self.drivetrain.setWheelLock(True)
         else:
             self.drivetrain.setWheelLock(False)
         
+        #Manuevers
         if(driver.getAButton()):
             self.drivetrain.balance()
         elif (driver.getBButton()):
@@ -544,17 +519,28 @@ class MyRobot(wpilib.TimedRobot):
             self.teleopManeuver()
         elif (driver.getBButton == False and driver.getYButton == False and self.maneuverComplete == True):
             self.startingManeuver = True
+        
+        # Regular driving, not a maneuver
         else:
-            rightXCorrected = self.deadzoneCorrection(-driver.getLeftX() * speedMulti, 0.30)
-            rightYCorrected = self.deadzoneCorrection(driver.getLeftY() * speedMulti, 0.30)
-            leftXCorrected = self.deadzoneCorrection(driver.getRightX() * speedMulti, 0.30)
-            # check if there's any input at all
-            if rightXCorrected != 0 or rightYCorrected != 0 or leftXCorrected != 0:
-                self.move(rightXCorrected, rightYCorrected, leftXCorrected)
+            strafe = self.deadzoneCorrection(driver.getLeftX() * clutch, self.driver.deadzone)
+            fwd = self.deadzoneCorrection(driver.getLeftY() * clutch, self.driver.deadzone)
+            rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
+            
+            # Bot starts facing controller
+            controller_at_180_to_bot = -1
+            fwdCorrected *= controller_at_180_to_bot
+            strafeCorrected *= controller_at_180_to_bot
+            # No need to correct RCW, as clockwise is clockwise whether you are facing with or against bot.
+            
+            # If any joysticks are dictating movement.
+            if fwdCorrected != 0 or strafeCorrected != 0 or rcwCorrected != 0:
+                self.drivetrain.move(fwdCorrected, strafeCorrected, rcwCorrected, self.drivetrain.getBearing())
                 self.drivetrain.execute()
+            # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
-                self.move(rightXCorrected, rightYCorrected, leftXCorrected)
+                self.move(0, 0, 0, self.drivetrain.getBearing())
                 self.drivetrain.execute()
+            # Otherwise, make sure we are explicitly doing nothing, so bot does not drift.
             else:
                 self.drivetrain.idle()
 
