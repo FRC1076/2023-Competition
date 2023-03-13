@@ -261,8 +261,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def initClaw(self, config):
         return Claw(
-                            config['SOLENOID_FORWARD_ID'], 
-                            config['SOLENOID_REVERSE_ID']
+                            config['MOTOR_ID']
         )
     
     def initDrivetrain(self, config):
