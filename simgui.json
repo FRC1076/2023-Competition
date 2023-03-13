@@ -29,6 +29,9 @@
         "open": true
       },
       "open": true
+    },
+    "Transitory Values": {
+      "open": false
     }
   }
 }

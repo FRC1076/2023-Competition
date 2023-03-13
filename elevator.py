@@ -6,7 +6,7 @@ from wpimath.controller import PIDController
 import math
 
 class Elevator:
-    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD):
+    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
@@ -19,21 +19,40 @@ class Elevator:
             solenoid_forward_id, 
             solenoid_reverse_id)
         self.pid_controller = PIDController(kP, kI, kD)
-        #self.pid_controller = PIDController(0.5, 0.00001, 0.025)
-        self.pid_controller.setTolerance(0.5, 0.5)
+        self.pid_controller.setTolerance(0.6, 0.6)
+        self.grabber = grabber
         self.right_motor.setOpenLoopRampRate(0.50)
         self.left_motor.setOpenLoopRampRate(0.50)
+        self.upperSafety = upper_safety
+        self.lowerSafety = lower_safety
 
     #1.00917431193 inches per rotation
     def extend(self, value):  # controls length of the elevator 
         #print(self.getEncoderPosition())
+
+        currentPosition = self.getEncoderPosition()
+        #if currentPosition >= self.upperSafety:
+        #    self.grabber.lower_motor()
+        #if currentPosition <= self.lowerSafety:
+        #    self.grabber.raise_motor()
+        
+        #if currentPosition >= self.upperSafety and not self.grabber.atLowerLimit():
+        #    self.right_motor.set(0)
+        #    self.left_motor.set(0)
+        #    return
+        
+        #if currentPosition <= self.lowerSafety and not self.grabber.atUpperLimit():
+        #    self.right_motor.set(0)
+        #    self.left_motor.set(0)
+        #    return
+            
         if value > 1:
             value = 1
         if value < -1:
             value = -1
             
         #make sure arm doesn't go past limit
-        if self.getEncoderPosition() > 36 and value < 0:
+        if self.getEncoderPosition() > 33 and value < 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
@@ -57,6 +76,16 @@ class Elevator:
             print("Elevator: Moving")
             self.extend(-extend_value)
             return False
+
+    def isElevatorDown(self):
+        if self.solenoid.get() == DoubleSolenoid.Value.kForward:
+            return True
+        return False
+
+    def isElevatorUp(self):
+        if self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
+            return True
+        return False
 
     def elevatorUp(self):
         self.solenoid.set(DoubleSolenoid.Value.kReverse)

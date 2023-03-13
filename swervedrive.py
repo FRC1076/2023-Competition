@@ -125,7 +125,14 @@ class SwerveDrive:
 
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
-        
+
+    def getBearing(self):      
+        return self.bearing
+
+    def setBearing(self, _bearing):      
+        self.bearing = _bearing
+        self.updateBearing = False
+
     def reset(self):
         print("In swervedrive reset")
 
@@ -369,7 +376,7 @@ class SwerveDrive:
         # Put the output to the dashboard
         self.sd.putNumber('Balance pitch output', pitch_output)
         self.sd.putNumber('Balance yaw output', yaw_output)
-        self.move(yawSign * pitch_output, 0.0, yaw_output)
+        self.move(yawSign * pitch_output, 0.0, yaw_output, self.bearing)
         
         self.update_smartdash()
 
@@ -380,8 +387,9 @@ class SwerveDrive:
         else:
             return False
 
-    def steerStraight(self, rcw):
-        
+    def steerStraight(self, rcw, bearing):
+        return rcw
+        self.bearing = bearing
         current_angle = self.getGyroAngle()
         if rcw != 0:
             self.updateBearing = True
@@ -406,7 +414,7 @@ class SwerveDrive:
             print("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
-    def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw):
+    def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw, bearing):
         """
         Calulates the speed and angle for each wheel given the requested movement
         Positive fwd value = Forward robot movement\n
@@ -439,38 +447,48 @@ class SwerveDrive:
 
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
-        rcw = self.steerStraight(rcw)
-        self.set_rcw(rcw)
+        
+        rcw_new = self.steerStraight(rcw, bearing)
+        self.set_rcw(rcw_new)
     
-    def goToPose(self, x, y, rcw):
+    def goToBalance(self, x, y, bearing, tolerance):
+        if abs(self.getGyroBalance()) > tolerance:
+            return True
+        else:
+            return self.goToPose(x, y, bearing)
+
+    def goToPose(self, x, y, bearing):
 
         currentX, currentY, currentRCW = self.swervometer.getCOF()
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
         y_error = self.target_y_pid_controller.calculate(currentY, y)
+        #rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
 
-        if rcw != 0:
-            rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
-        else:
-            rcw_error = self.steerStraight(rcw)
-        
         #print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
             print("X at set point")
         if self.target_y_pid_controller.atSetpoint():
             print("Y at set point")
-        if self.target_rcw_pid_controller.atSetpoint():
-            print("RCW at set point")
-            
-        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetpoint(): 
+        #if self.target_rcw_pid_controller.atSetpoint():
+        #    print("RCW at set point")
+        
+        #if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetPoint(): 
+        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
         else:
-            self.move(x_error, y_error, rcw_error)
+            sign = math.cos(math.radians(bearing)) # HACK HACK HACK
+            if sign <= 0:
+                sign = 1
+            else:
+                sign = -1
+            self.move(x_error * sign, y_error, 0, bearing)
+            
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
             # print("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
-            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentRCW: ", currentRCW, " targetRCW: ", rcw, " rcw_error: ", rcw_error)
+            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentBearing: ", currentRCW, " self.bearing: ", self.bearing, " target bearing: ", bearing)
             return False
 
     def _calculate_vectors(self):
