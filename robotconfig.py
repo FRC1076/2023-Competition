@@ -95,7 +95,6 @@ drivetrainConfig = {
     'REARRIGHT_ENCODER': 23,
     'REARLEFT_ENCODER': 24,
     'DRIVETYPE': SWERVE,
-    'ROTATION_CORRECTION': 0.0,
     'HEADING_KP': 0.005, #0.005 - reverted to this
     'HEADING_KI': 0.00001, #0.00001 - reverted to this
     'HEADING_KD':  0.00001, #0.00001 - reverted to this
