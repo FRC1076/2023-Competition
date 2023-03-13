@@ -518,7 +518,7 @@ class MyRobot(wpilib.TimedRobot):
             
             # If any joysticks are dictating movement.
             if fwdCorrected != 0 or strafeCorrected != 0 or rcwCorrected != 0:
-                self.drivetrain.move(fwdCorrected, strafeCorrected, rcwCorrected, self.drivetrain.getBearing())
+                self.drivetrain.move(fwdCorrected, strafeCorrected, rcw, self.drivetrain.getBearing())
                 self.drivetrain.execute()
             # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
