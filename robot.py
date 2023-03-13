@@ -269,8 +269,6 @@ class MyRobot(wpilib.TimedRobot):
         print("initDrivetrain ran")
         self.drive_type = config['DRIVETYPE']  # side effect!
 
-        self.rotationCorrection = config['ROTATION_CORRECTION']
-
         balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
         target_cfg = TargetConfig(sd_prefix='Target_Module', target_kP=config['TARGET_KP'], target_kI=config['TARGET_KI'], target_kD=config['TARGET_KD'])
         bearing_cfg = BearingConfig(sd_prefix='Bearing_Module', bearing_kP=config['BEARING_KP'], bearing_kI=config['BEARING_KI'], bearing_kD=config['BEARING_KD'])
@@ -474,19 +472,6 @@ class MyRobot(wpilib.TimedRobot):
         :param rcw: Velocity in z axis [-1, 1]
         """
         
-        #print("move: x: ", x, "y: ", y, "rcw: ", rcw)
-        # if self.driver.getLeftBumper():
-        #     # If the button is pressed, lower the rotate speed.
-        #     rcw *= 0.7
-
-        # degrees = (math.atan2(y, x) * 180 / math.pi) + 180
-
-        # self.testingModule.move(rcw, degrees)
-        # self.testingModule.execute()
-
-        # print('DRIVE_TARGET = ' + str(rcw) + ', PIVOT_TARGET = ' + str(degrees) + ", ENCODER_TICK = " + str(self.testingModule.get_current_angle()))
-        # print('DRIVE_POWER = ' + str(self.testingModule.driveMotor.get()) + ', PIVOT_POWER = ' + str(self.testingModule.rotateMotor.get()))
-
         #if self.cliffdetector:
         #    if self.cliffdetector.atCliff() == -1:
         #        print("Warning: At Left Cliff!!!")
@@ -497,17 +482,9 @@ class MyRobot(wpilib.TimedRobot):
         #    else:
         #        print("Bogus result from cliff detector. Ignore danger.")
         
-        #angle = self.drivetrain.getGyroAngle()
-        #if angle < 90 or angle > 270:
-        #    xsign = 1
-        #else:
-        #    xsign = -1
-        #if (angle > 0 and angle < 180):
-        #    ysign = -1
-        #else:
-        #    ysign = 1
-        self.drivetrain.move(y, x, rcw, self.drivetrain.getBearing())
-        #self.drivetrain.move(0, y, 0)
+        # Bot starts facing controller
+        controller_at_180 = -1
+        self.drivetrain.move(controller_at_180 * y, controller_at_180 * x, rcw, self.drivetrain.getBearing())
 
     def teleopDrivetrain(self):
         if (not self.drivetrain):
