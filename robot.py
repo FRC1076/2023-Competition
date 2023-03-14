@@ -114,6 +114,10 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTaskCounter = 0
         self.maneuverTaskCounter = 0
 
+        self.toy1_counter = 0
+        self.toy2_counter = 0
+        self.toy3_counter = 0
+
     def initControllers(self, config):
         ctrls = {}
         print(config)
@@ -482,13 +486,16 @@ class MyRobot(wpilib.TimedRobot):
         #Manuevers
         if(driver.getAButton()):
             self.drivetrain.balance()
-        elif (TRUE):
+        elif (True):
             if(self.startingManeuver == True):
                 print("TOY - Starting Maneuver")
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
                 self.maneuverTaskList = self.toy_toy
+                self.toy1_counter = 0
+                self.toy2_counter = 0
+                self.toy3_counter = 0
             self.teleopManeuver()
         elif (driver.getBButton()):
             if(self.startingManeuver == True):
@@ -757,6 +764,7 @@ class MyRobot(wpilib.TimedRobot):
         if self.maneuverTaskCounter < 0:
             return # No tasks assigned.
 
+        print("maneuverTaskCounter: ", self.maneuverTaskCounter, "len(self.maneuverTaskList): ", len(self.maneuverTaskList), " Task List: ", self.maneuverTaskList)
         if self.maneuverTaskCounter >= len(self.maneuverTaskList):
             self.maneuverComplete = True
             self.startingManeuver = True
@@ -857,15 +865,14 @@ class MyRobot(wpilib.TimedRobot):
             self.maneuverTaskCounter += 1 # Move on to next task.
         elif (maneuverTask[0] == 'TOY2'):
             print("maneuver: TOY2: ", self.maneuverTaskCounter)
-            self.maneuverTaskCounter += 1 # Move on to next task.
             self.toy2_counter +=1
-            if (self.toy2_counter % 100) == 75:
+            if (self.toy2_counter % 100) == 3:
                 self.toy2_counter = 0
                 self.maneuverTaskCounter += 1 # Move on to next task.
         elif (maneuverTask[0] == 'TOY3'):
             print("maneuver: TOY3: ", self.maneuverTaskCounter)
             self.toy3_counter +=1
-            if (self.toy3_counter % 100) == 75:
+            if (self.toy3_counter % 100) == 5:
                 self.toy3_counter = 0
                 self.maneuverTaskCounter += 1 # Move on to next task.
         else:
