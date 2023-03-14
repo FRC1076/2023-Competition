@@ -27,7 +27,7 @@ class SwerveModule:
             _rotateMotor, 
             _rotateEncoder, 
             _config, 
-            _name):
+        ):
         
         self.cfg = _config
 
