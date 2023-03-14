@@ -113,9 +113,6 @@ class SwerveDrive:
         self.target_x_pid_controller.setTolerance(5, 5)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         self.target_y_pid_controller.setTolerance(5, 5)
-        self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
-        self.target_rcw_pid_controller.enableContinuousInput(0, 360)
 
         self.bearing_config = _bearing_cfg
         self.bearing_kP = self.bearing_config.bearing_kP
@@ -414,7 +411,7 @@ class SwerveDrive:
             print("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
-    def move(self, non_adjusted_fwd, non_adjusted_strafe, rcw, bearing):
+    def move(self, fwd, strafe, rcw, bearing):
         """
         Calulates the speed and angle for each wheel given the requested movement
         Positive fwd value = Forward robot movement\n
@@ -425,19 +422,16 @@ class SwerveDrive:
         :param strafe: the requested movement in the X direction of the 2D plane
         :param rcw: the requestest magnatude of the rotational vector of a 2D plane
         """
-
-        fwd = non_adjusted_fwd * self.swervometer.getTeamMoveAdjustment()
-        strafe = non_adjusted_strafe * self.swervometer.getTeamMoveAdjustment()
-
+        
         #Convert field-oriented translate to chassis-oriented translate
         
         current_angle = self.getGyroAngle() % 360
-        desired_angle = ((math.atan2(fwd, strafe) / math.pi) * 180) % 360
+        desired_angle = (math.degrees(math.atan2(fwd, strafe))) % 360
         chassis_angle = (desired_angle - current_angle) % 360
         magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
-
-        chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
+                         
         chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
+        chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
 
         #print("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
         self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
@@ -459,35 +453,29 @@ class SwerveDrive:
 
     def goToPose(self, x, y, bearing):
 
-        currentX, currentY, currentRCW = self.swervometer.getCOF()
-        x_error = -self.target_x_pid_controller.calculate(currentX, x)
-        y_error = self.target_y_pid_controller.calculate(currentY, y)
-        #rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
+        # Get current pose                    
+        currentX, currentY, currentBearing = self.swervometer.getCOF()
+                         
+        # Get x and y error corrections to go to new pose
+        # Multiplying by TeamMoveAdjustment fixes the direction from the field perspective, not the controller perspective.
+        x_error = self.target_x_pid_controller.calculate(currentX, x) * self.swervometer.getTeamMoveAdjustment()
+        y_error = self.target_y_pid_controller.calculate(currentY, y) * self.swervometer.getTeamMoveAdjustment()
 
-        #print("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
-        if self.target_x_pid_controller.atSetpoint():
-            print("X at set point")
-        if self.target_y_pid_controller.atSetpoint():
-            print("Y at set point")
-        #if self.target_rcw_pid_controller.atSetpoint():
-        #    print("RCW at set point")
-        
-        #if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetPoint(): 
+        # Debugging               
+        #if self.target_x_pid_controller.atSetpoint():
+        #    print("X at set point")
+        #if self.target_y_pid_controller.atSetpoint():
+        #    print("Y at set point")
+       
         if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
         else:
-            sign = math.cos(math.radians(bearing)) # HACK HACK HACK
-            if sign <= 0:
-                sign = 1
-            else:
-                sign = -1
-            self.move(x_error * sign, y_error, 0, bearing)
+            self.move(x_error, y_error, 0, bearing)
             
             self.update_smartdash()
             self.execute()
             print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
-            # print("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
             print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentBearing: ", currentRCW, " self.bearing: ", self.bearing, " target bearing: ", bearing)
             return False
 
