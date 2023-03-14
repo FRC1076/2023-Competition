@@ -4,6 +4,7 @@ from util import clamp
 
 #from magicbot import magiccomponent
 import swervemodule
+from dashboard import Dashboard
 
 #import ntcore
 from networktables import NetworkTables
@@ -138,6 +139,8 @@ class SwerveDrive:
 
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
+
+        self.dashboard = Dashboard.getDashboard()
 
     def getBearing(self):      
         return self.bearing
@@ -669,6 +672,8 @@ class SwerveDrive:
         """
         Pushes some internal variables for debugging.
         """
+
+
         if self.debugging:
             for key in self._requested_angles:
                 self.sd.putNumber('drive/drive/%s_angle' % key, self._requested_angles[key])
