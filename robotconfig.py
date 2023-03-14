@@ -97,6 +97,9 @@ drivetrainConfig = {
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 1.0, # Improves maneuverability of bot.
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0,
+    'TOY_TOY': [['TOY1'],
+                        ['TOY2'],
+                        ['TOY3'],],
     'LOW_CONE_SCORE': [['CLAW_CLOSE'],
                         ['RAISE_GRABBER'],
                         ['ELEVATOR_UP'],

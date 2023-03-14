@@ -102,6 +102,10 @@ class MyRobot(wpilib.TimedRobot):
             self.tester.initTestTeleop()
             self.tester.testCodePaths()
 
+        self.toy1_counter = 0
+        self.toy2_counter = 0
+        self.toy3_counter = 0
+
     def disabledExit(self):
         print("no longer disabled")
         self.drivetrain.reset()
@@ -294,6 +298,7 @@ class MyRobot(wpilib.TimedRobot):
         self.teleopOpenLoopRampRate = config['TELEOP_OPEN_LOOP_RAMP_RATE']
         self.teleopClosedLoopRampRate = config['TELEOP_CLOSED_LOOP_RAMP_RATE']
 
+        self.toy_toy = config['TOY_TOY']
         self.lowConeScoreTaskList = config['LOW_CONE_SCORE']
         self.highConeScoreTaskList = config['HIGH_CONE_SCORE']
         self.humanStationTaskList = config['HUMAN_STATION_PICKUP']
@@ -477,6 +482,14 @@ class MyRobot(wpilib.TimedRobot):
         #Manuevers
         if(driver.getAButton()):
             self.drivetrain.balance()
+        elif (TRUE):
+            if(self.startingManeuver == True):
+                print("TOY - Starting Maneuver")
+                self.startingManeuver = False
+                self.maneuverComplete = False
+                self.maneuverTaskCounter = 0
+                self.maneuverTaskList = self.toy_toy
+            self.teleopManeuver()
         elif (driver.getBButton()):
             if(self.startingManeuver == True):
                 print("B Button - Starting Maneuver")
@@ -839,6 +852,22 @@ class MyRobot(wpilib.TimedRobot):
         elif (maneuverTask[0] == 'IDLE'):
             print("maneuver: Idle: ", self.maneuverTaskCounter)
             self.drivetrain.idle()
+        elif (maneuverTask[0] == 'TOY1'):
+            print("maneuver: TOY1: ", self.maneuverTaskCounter)
+            self.maneuverTaskCounter += 1 # Move on to next task.
+        elif (maneuverTask[0] == 'TOY2'):
+            print("maneuver: TOY2: ", self.maneuverTaskCounter)
+            self.maneuverTaskCounter += 1 # Move on to next task.
+            self.toy2_counter +=1
+            if (self.toy2_counter % 100) == 75:
+                self.toy2_counter = 0
+                self.maneuverTaskCounter += 1 # Move on to next task.
+        elif (maneuverTask[0] == 'TOY3'):
+            print("maneuver: TOY3: ", self.maneuverTaskCounter)
+            self.toy3_counter +=1
+            if (self.toy3_counter % 100) == 75:
+                self.toy3_counter = 0
+                self.maneuverTaskCounter += 1 # Move on to next task.
         else:
             print("maneuver: ERROR: Unknown Task", self.maneuverTaskCounter)
             self.maneuverTaskCounter += 1   
