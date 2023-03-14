@@ -42,7 +42,7 @@ class SwerveModule:
         self.lastPosition = self.driveEncoder.getPosition()
 
         self.encoder_zero = self.cfg.zero or 0 #idk the point of this, maybe useful for other encoder type
-        angle = ((self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360) +90
+        angle = ((self.rotateEncoder.getAbsolutePosition() - self.encoder_zero) % 360)
         if angle >= 90 and angle <= 270:
             self.positionSign = +1 
             self.moduleFlipped = False

@@ -24,9 +24,10 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
+    'USE_COM_ADJUSTMENT': False, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_RED_A_START_POSITION_X': 248.625, #159.0, # X-Coordinate of starting position A when on red team
@@ -47,22 +48,6 @@ swervometerConfig = { # All positions measured in inches
     'FIELD_BLU_C_START_POSITION_X': -248.625, # X-Coordinate of starting position C when on blue team
     'FIELD_BLU_C_START_POSITION_Y': -137.90, # Y-Coordinate of starting postion C when on blue team
     'FIELD_BLU_C_START_ANGLE': 180.0, # Heading angle of starting position C when on blue team
-    'FIELD_TAG1_X': 500.0, # X-Coordinate of Tag ID 1
-    'FIELD_TAG1_Y': 500.0, # Y-Coordinate of Tag ID 1
-    'FIELD_TAG2_X': 500.0, # X-Coordinate of Tag ID 2
-    'FIELD_TAG2_Y': 500.0, # Y-Coordinate of Tag ID 2
-    'FIELD_TAG3_X': 500.0, # X-Coordinate of Tag ID 3
-    'FIELD_TAG3_Y': 500.0, # Y-Coordinate of Tag ID 3
-    'FIELD_TAG4_X': 500.0, # X-Coordinate of Tag ID 4
-    'FIELD_TAG4_Y': 500.0, # Y-Coordinate of Tag ID 4
-    'FIELD_TAG5_X': 500.0, # X-Coordinate of Tag ID 5
-    'FIELD_TAG5_Y': 500.0, # Y-Coordinate of Tag ID 5
-    'FIELD_TAG6_X': 500.0, # X-Coordinate of Tag ID 6
-    'FIELD_TAG6_Y': 500.0, # Y-Coordinate of Tag ID 6
-    'FIELD_TAG7_X': 500.0, # X-Coordinate of Tag ID 7
-    'FIELD_TAG7_Y': 500.0, # Y-Coordinate of Tag ID 7
-    'FIELD_TAG8_X': 500.0, # X-Coordinate of Tag ID 8
-    'FIELD_TAG8_Y': 500.0, # Y-Coordinate of Tag ID 8
     'ROBOT_FRAME_DIMENSION_X': 34.0, # X-coordinate length of robot frame
     'ROBOT_FRAME_DIMENSION_Y': 26.0, # Y-coordinate length of robot frame
     'ROBOT_BUMPER_DIMENSION_X': 3.0, # Width of bumper (X-axis)
@@ -78,7 +63,6 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_CAMERA_HEIGHT': 12.1875, # Height of camera eye relative to gyroscope: 11 3/16+ 2 -1
     'ROBOT_SWERVE_MODULE_OFFSET_X': 13.75, # X-offset of swerve module center from COF
     'ROBOT_SWERVE_MODULE_OFFSET_Y': 9.75, # Y-offset of swerve module center from COF
-    'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
 }
 
 drivetrainConfig = {
@@ -95,7 +79,6 @@ drivetrainConfig = {
     'REARRIGHT_ENCODER': 23,
     'REARLEFT_ENCODER': 24,
     'DRIVETYPE': SWERVE,
-    'ROTATION_CORRECTION': 0.0,
     'HEADING_KP': 0.005, #0.005 - reverted to this
     'HEADING_KI': 0.00001, #0.00001 - reverted to this
     'HEADING_KD':  0.00001, #0.00001 - reverted to this
@@ -148,7 +131,7 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.06, #0.048, # 0.8 * 0.6
+    'ELEVATOR_KP': 0.12, #0.048, # 0.8 * 0.6
     'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
     'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
     'HUMAN_POSITION': 20, # Assumes Elevator Up, up from failed 17
@@ -169,8 +152,8 @@ grabberConfig = {
 }
 
 clawConfig = {
-    'SOLENOID_FORWARD_ID': 10,
-    'SOLENOID_REVERSE_ID': 11,
+    'SOLENOID_FORWARD_ID': 13,
+    'SOLENOID_REVERSE_ID': 12,
 }
 
 cliffDetectorConfig = {
@@ -182,7 +165,7 @@ cliffDetectorConfig = {
 }
 
 autonConfig = {
-    'SCORE_EXISTING': True,
+    'SCORE_EXISTING': False,
     'BALANCE_BOT': True,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
