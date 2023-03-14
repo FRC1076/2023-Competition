@@ -475,8 +475,8 @@ class SwerveDrive:
             
             self.update_smartdash()
             self.execute()
-            print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
-            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentBearing: ", currentRCW, " self.bearing: ", self.bearing, " target bearing: ", bearing)
+            print("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError())
+            print("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " self.bearing: ", self.bearing, " target bearing: ", bearing)
             return False
 
     def _calculate_vectors(self):
