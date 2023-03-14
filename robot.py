@@ -755,7 +755,7 @@ class MyRobot(wpilib.TimedRobot):
 
         if (maneuverTask[0] == 'CLAW_OPEN'):
             print("Maneuver: Claw Open: ", self.maneuverTaskCounter)
-            self.grabber.engage()
+            self.claw.open()
             self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'CLAW_CLOSE'):
             print("Maneuver: Claw Cose: ", self.maneuverTaskCounter)
@@ -763,7 +763,7 @@ class MyRobot(wpilib.TimedRobot):
             self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
             print("maneuver: Raise Grabber: ", self.maneuverTaskCounter)
-            if self.grabber.raise_motor(0.6):
+            if self.grabber.raise_motor(0.7):
                 self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
             if self.grabber.lower_motor(0.2):
