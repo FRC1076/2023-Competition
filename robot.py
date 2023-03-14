@@ -101,6 +101,8 @@ class MyRobot(wpilib.TimedRobot):
             self.tester = Tester(self)
             self.tester.initTestTeleop()
             self.tester.testCodePaths()
+        
+        self.elevator_has_reset = False
 
     def disabledExit(self):
         print("no longer disabled")
@@ -247,7 +249,8 @@ class MyRobot(wpilib.TimedRobot):
                             config['ELEVATOR_KD'], 
                             config['LOWER_SAFETY'], 
                             config['UPPER_SAFETY'], 
-                            self.claw)
+                            self.claw,
+                            config['LIMIT_SWITCH'])
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
@@ -461,6 +464,9 @@ class MyRobot(wpilib.TimedRobot):
         return True
 
     def teleopPeriodic(self):
+        if self.elevator_has_reset == False:
+            self.elevator_has_reset = self.elevator.elevatorReset()
+            return
         self.teleopDrivetrain()
         self.teleopElevator()
         self.teleopGrabber()
@@ -689,7 +695,9 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.autonTimer:
             return
-
+        if self.elevator_has_reset == False:
+            self.elevator_has_reset = self.elevator.elevatorReset()
+            return
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
 
