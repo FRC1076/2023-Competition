@@ -140,6 +140,7 @@ elevatorConfig = {
     'RETRACTED_HEIGHT': 7,
     'LOWER_SAFETY': 15,
     'UPPER_SAFETY': 25,
+    'LIMIT_SWITCH': 2,
 }
 
 grabberConfig = {
