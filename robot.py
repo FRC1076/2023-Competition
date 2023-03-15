@@ -574,7 +574,8 @@ class MyRobot(wpilib.TimedRobot):
 
         #Find the value the arm will move at
         controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
-        if controller_value != 0:
+        
+        if controller_value != 0: # Drive in direction of controller
             self.elevator.extend(controller_value)
         else: # Go to preset destinations
             if operator.getAButton(): #Lowest Position
@@ -586,7 +587,7 @@ class MyRobot(wpilib.TimedRobot):
             elif operator.getBButton() and self.elevator.isElevatorDown(): #Medium Position
                 self.elevator_destination = self.lower_scoring_height
                 #print("Elevator: B Button")
-            elif operator.getXButton()and self.elevator.isElevatorDown(): #Human Position
+            elif operator.getXButton() and self.elevator.isElevatorDown(): #Human Position
                 self.elevator_destination = self.human_position
                 #print("Elevator: X Button")
             else:
