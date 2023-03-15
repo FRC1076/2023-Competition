@@ -241,7 +241,6 @@ class MyRobot(wpilib.TimedRobot):
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
         self.retracted_height = config['RETRACTED_HEIGHT']
-        self.elevator_is_automatic = False
         self.elevator_destination = 0
         return elevator
 
@@ -570,35 +569,31 @@ class MyRobot(wpilib.TimedRobot):
         #Check for clutch
         if(operator.getLeftTriggerAxis() > 0.7):
             clutch_factor = 0.4
-        #Find the value the arm will move at
-        extend_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
-        #preset destinations
-        if operator.getAButton(): #Lowest
-            self.elevator_destination = self.retracted_height
-            self.elevator_is_automatic = True
-            #print("Elevator: A Button")
-        if operator.getYButton() and self.elevator.isElevatorDown(): #Highest
-            self.elevator_destination = self.upper_scoring_height
-            self.elevator_is_automatic = True
-            #print("Elevator: Y Button")
-        if operator.getBButton() and self.elevator.isElevatorDown(): #Medium Position
-            self.elevator_destination = self.lower_scoring_height
-            self.elevator_is_automatic = True
-            #print("Elevator: B Button")
-        if operator.getXButton(): #Human Position
-            self.elevator_destination = self.human_position
-            self.elevator_is_automatic = True
-            #print("Elevator: X Button")
+        
+        self.elevator_destination = -1
 
-        #if controller is moving, disable elevator automatic move
-        if(abs(extend_value) > 0):
-            self.elevator_is_automatic = False
-        #if automatic move, move to destination position
-        if self.elevator_is_automatic:
-            print("Elevator move to Pos")
+        #Find the value the arm will move at
+        controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
+        if controller_value != 0:
+            self.elevator.extend(controller_value)
+        else: # Go to preset destinations
+            if operator.getAButton(): #Lowest Position
+                self.elevator_destination = self.retracted_height
+                #print("Elevator: A Button")
+            elif operator.getYButton() and self.elevator.isElevatorDown(): #Highest Position
+                self.elevator_destination = self.upper_scoring_height
+                #print("Elevator: Y Button")
+            elif operator.getBButton() and self.elevator.isElevatorDown(): #Medium Position
+                self.elevator_destination = self.lower_scoring_height
+                #print("Elevator: B Button")
+            elif operator.getXButton()and self.elevator.isElevatorDown(): #Human Position
+                self.elevator_destination = self.human_position
+                #print("Elevator: X Button")
+            else:
+                # Set the destination as the current position.
+                self.elevator_destination = self.elevator.getEncoderPosition()
+
             self.elevator.moveToPos(self.elevator_destination)
-        else:
-            self.elevator.extend(extend_value)
         
     def teleopGrabber(self):
         operator = self.operator.xboxController
