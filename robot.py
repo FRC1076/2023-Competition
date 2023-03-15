@@ -235,7 +235,8 @@ class MyRobot(wpilib.TimedRobot):
                             config['ELEVATOR_KD'], 
                             config['LOWER_SAFETY'], 
                             config['UPPER_SAFETY'], 
-                            self.claw)
+                            self.claw,
+                            config['LIMIT_SWITCH'])
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
@@ -447,16 +448,23 @@ class MyRobot(wpilib.TimedRobot):
         return True
 
     def teleopPeriodic(self):
-        self.teleopDrivetrain()
-        self.teleopElevator()
-        self.teleopGrabber()
-        return True
+        if self.elevator_has_reset == False:
+            self.elevator_has_reset = self.elevator.elevatorReset()
+            return
+        if self.teleopDrivetrain():
+            print("TeleoDrivetrain returned true.")
+            return True
+        else:
+            print("TeleoDrivetrain returned False.")
+            self.teleopElevator()
+            self.teleopGrabber()
+            return True
 
     def teleopDrivetrain(self):
         if (not self.drivetrain):
-            return
+            return False
         if (not self.driver):
-            return
+            return False
 
         driver = self.driver.xboxController
         deadzone = self.driver.deadzone
@@ -481,6 +489,7 @@ class MyRobot(wpilib.TimedRobot):
         #Manuevers
         if(driver.getAButton()):
             self.drivetrain.balance()
+            return False
         elif (driver.getBButton()):
             if(self.startingManeuver == True):
                 self.logger.log("B Button - Starting Maneuver")
@@ -489,6 +498,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.maneuverTaskCounter = 0
                 self.maneuverTaskList = self.lowConeScoreTaskList
             self.teleopManeuver()
+            return True
         elif (driver.getYButton()):
             if(self.startingManeuver == True):
                 self.logger.log("Y Button - Starting Maneuver")
@@ -497,6 +507,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.maneuverTaskCounter = 0
                 self.maneuverTaskList = self.highConeScoreTaskList
             self.teleopManeuver()
+            return True
         elif (driver.getXButton()):
             if(self.startingManeuver == True):
                 self.logger.log("X Button - Starting Maneuver")
@@ -505,8 +516,10 @@ class MyRobot(wpilib.TimedRobot):
                 self.maneuverTaskCounter = 0
                 self.maneuverTaskList = self.humanStationTaskList
             self.teleopManeuver()
+            return True
         elif (driver.getBButton == False and driver.getYButton == False and self.maneuverComplete == True):
             self.startingManeuver = True
+            return True
         
         # Regular driving, not a maneuver
         else:
@@ -543,7 +556,7 @@ class MyRobot(wpilib.TimedRobot):
         #    self.drive.set_raw_strafe(0.35)
         #elif self.gamempad.getPOV() == 270:
         #    self.drive.set_raw_strafe(-0.35)
-        return
+        return False
 
     def teleopElevator(self):
         operator = self.operator.xboxController
@@ -591,8 +604,9 @@ class MyRobot(wpilib.TimedRobot):
         operator = self.operator.xboxController
         # if the operator is holding the bumper, keep the grab going. Otherwise release.
         
-
         grabber_speed = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
+
+        print("TeleopGrabber: In teleopGrabber", grabber_speed)
 
         if (grabber_speed > 0):
             #self.logger.log("Grabber: Raise Grabber")
@@ -642,7 +656,9 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.autonTimer:
             return
-
+        if self.elevator_has_reset == False:
+            self.elevator_has_reset = self.elevator.elevatorReset()
+            return
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
 
@@ -759,7 +775,7 @@ class MyRobot(wpilib.TimedRobot):
 
         if (maneuverTask[0] == 'CLAW_OPEN'):
             self.logger.log("Maneuver: Claw Open: ", self.maneuverTaskCounter)
-            self.grabber.engage()
+            self.claw.open()
             self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'CLAW_CLOSE'):
             self.logger.log("Maneuver: Claw Cose: ", self.maneuverTaskCounter)
@@ -767,10 +783,10 @@ class MyRobot(wpilib.TimedRobot):
             self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
             self.logger.log("maneuver: Raise Grabber: ", self.maneuverTaskCounter)
-            if self.grabber.raise_motor(0.6):
+            if self.grabber.raise_motor(1.0):
                 self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
-            if self.grabber.lower_motor(0.2):
+            if self.grabber.lower_motor(1.0):
                 self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'LOWER_GRABBER_UNCHECKED'):
             self.grabber.lower_motor(0.2)

@@ -112,7 +112,7 @@ drivetrainConfig = {
                         ['LOWER_GRABBER']],
     'HUMAN_STATION_PICKUP': [['CLAW_OPEN'],
                         ['RAISE_GRABBER'],
-                        ['ELEVATOR_UP'],
+                        ['ELEVATOR_DOWN'],
                         ['ELEVATOR_HUMAN_EXTEND']],
 }
 
@@ -134,12 +134,13 @@ elevatorConfig = {
     'ELEVATOR_KP': 0.12, #0.048, # 0.8 * 0.6
     'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
     'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
-    'HUMAN_POSITION': 20, # Assumes Elevator Up, up from failed 17
+    'HUMAN_POSITION': 28, # Assumes Elevator Down
     'UPPER_SCORING_HEIGHT': 33,
     'LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
     'RETRACTED_HEIGHT': 7,
     'LOWER_SAFETY': 15,
     'UPPER_SAFETY': 25,
+    'LIMIT_SWITCH': 2,
 }
 
 grabberConfig = {

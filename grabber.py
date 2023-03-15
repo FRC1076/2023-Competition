@@ -15,10 +15,12 @@ class Grabber:
 
         #raise rotate motor
     def raise_motor(self, grabber_speed):
+        print("Grabber: grabber_speed: ", grabber_speed)
         self.state = 1
         self.rotate_motor.set(grabber_speed * 0.7)
-        print("RM: top: ", not self.top_switch.get(), " bottom: ", not self.bottom_switch.get())
+        print("RM: top: ", self.top_switch.get(), " bottom: ", self.bottom_switch.get())
         if self.top_switch.get() == False:
+            print("Grabber: Turning grabber off.")
             self.rotate_motor.set(0)
             return True
         return False
@@ -27,7 +29,7 @@ class Grabber:
     def lower_motor(self, grabber_speed):
         self.state = 0
         self.rotate_motor.set(grabber_speed * 0.2)
-        print("LM: top: ", not self.top_switch.get(), " bottom: ", not self.bottom_switch.get())
+        print("LM: top: ", self.top_switch.get(), " bottom: ", self.bottom_switch.get())
         if self.bottom_switch.get() == False:
             self.rotate_motor.set(0)
             return True
