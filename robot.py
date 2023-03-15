@@ -112,6 +112,8 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTaskCounter = 0
         self.maneuverTaskCounter = 0
 
+        self.elevator_has_reset = False
+
     def initControllers(self, config):
         ctrls = {}
         print(config)
@@ -449,16 +451,20 @@ class MyRobot(wpilib.TimedRobot):
         if self.elevator_has_reset == False:
             self.elevator_has_reset = self.elevator.elevatorReset()
             return
-        self.teleopDrivetrain()
-        self.teleopElevator()
-        self.teleopGrabber()
-        return True
+        if self.teleopDrivetrain():
+            print("TeleoDrivetrain returned true.")
+            return True
+        else:
+            print("TeleoDrivetrain returned False.")
+            self.teleopElevator()
+            self.teleopGrabber()
+            return True
 
     def teleopDrivetrain(self):
         if (not self.drivetrain):
-            return
+            return False
         if (not self.driver):
-            return
+            return False
 
         driver = self.driver.xboxController
         deadzone = self.driver.deadzone
@@ -483,6 +489,7 @@ class MyRobot(wpilib.TimedRobot):
         #Manuevers
         if(driver.getAButton()):
             self.drivetrain.balance()
+            return False
         elif (driver.getBButton()):
             if(self.startingManeuver == True):
                 print("B Button - Starting Maneuver")
@@ -491,6 +498,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.maneuverTaskCounter = 0
                 self.maneuverTaskList = self.lowConeScoreTaskList
             self.teleopManeuver()
+            return True
         elif (driver.getYButton()):
             if(self.startingManeuver == True):
                 print("Y Button - Starting Maneuver")
@@ -499,6 +507,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.maneuverTaskCounter = 0
                 self.maneuverTaskList = self.highConeScoreTaskList
             self.teleopManeuver()
+            return True
         elif (driver.getXButton()):
             if(self.startingManeuver == True):
                 print("X Button - Starting Maneuver")
@@ -507,8 +516,10 @@ class MyRobot(wpilib.TimedRobot):
                 self.maneuverTaskCounter = 0
                 self.maneuverTaskList = self.humanStationTaskList
             self.teleopManeuver()
+            return True
         elif (driver.getBButton == False and driver.getYButton == False and self.maneuverComplete == True):
             self.startingManeuver = True
+            return True
         
         # Regular driving, not a maneuver
         else:
@@ -545,7 +556,7 @@ class MyRobot(wpilib.TimedRobot):
         #    self.drive.set_raw_strafe(0.35)
         #elif self.gamempad.getPOV() == 270:
         #    self.drive.set_raw_strafe(-0.35)
-        return
+        return False
 
     def teleopElevator(self):
         operator = self.operator.xboxController
@@ -593,8 +604,9 @@ class MyRobot(wpilib.TimedRobot):
         operator = self.operator.xboxController
         # if the operator is holding the bumper, keep the grab going. Otherwise release.
         
-
         grabber_speed = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
+
+        print("TeleopGrabber: In teleopGrabber", grabber_speed)
 
         if (grabber_speed > 0):
             #print("Grabber: Raise Grabber")
@@ -771,10 +783,10 @@ class MyRobot(wpilib.TimedRobot):
             self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
             print("maneuver: Raise Grabber: ", self.maneuverTaskCounter)
-            if self.grabber.raise_motor(0.7):
+            if self.grabber.raise_motor(1.0):
                 self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
-            if self.grabber.lower_motor(0.2):
+            if self.grabber.lower_motor(1.0):
                 self.maneuverTaskCounter += 1
         elif (maneuverTask[0] == 'LOWER_GRABBER_UNCHECKED'):
             self.grabber.lower_motor(0.2)

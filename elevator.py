@@ -79,12 +79,12 @@ class Elevator:
             return False
 
     def isElevatorDown(self):
-        if self.solenoid.get() == DoubleSolenoid.Value.kForward:
+        if self.solenoid.get() == DoubleSolenoid.Value.kForward or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             return True
         return False
 
     def isElevatorUp(self):
-        if self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
+        if self.solenoid.get() == DoubleSolenoid.Value.kReverse:
             return True
         return False
 
@@ -113,7 +113,10 @@ class Elevator:
         self.right_encoder.setPosition(0)
     
     def elevatorReset(self):
+        print("Elevator: Reseting elevator")
+        return True
         if self.limit_switch.get() == True:
+            print("Elevator: Found the limit switch")
             self.resetEncoders()
             return True
         else:
