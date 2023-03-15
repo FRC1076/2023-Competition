@@ -558,10 +558,15 @@ class MyRobot(wpilib.TimedRobot):
         return False
 
     def teleopElevator(self):
+        if (not self.elevator):
+            return
+        if (not self.operator):
+            return False
+
         operator = self.operator.xboxController
 
         if (operator.getLeftBumperPressed()):
-            print("Toggling Elevator")
+            print("Toggling Elevator Up/Down")
             self.elevator.toggle()
 
         ## ignored for now
