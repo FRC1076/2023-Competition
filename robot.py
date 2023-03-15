@@ -575,14 +575,14 @@ class MyRobot(wpilib.TimedRobot):
         if(operator.getLeftTriggerAxis() > 0.7):
             clutch_factor = 0.4
         
-        self.elevator_destination = -1
-
+        
         #Find the value the arm will move at
         controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
         
         if controller_value != 0: # Drive in direction of controller
             self.elevator.extend(controller_value)
         else: # Go to preset destinations
+            self.elevator_destination = -1
             if operator.getAButton(): #Lowest Position
                 self.elevator_destination = self.retracted_height
                 #print("Elevator: A Button")
