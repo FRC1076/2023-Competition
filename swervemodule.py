@@ -285,8 +285,8 @@ class SwerveModule:
 
         self.sd.putNumber('drive/%s/requested_speed' % self.sd_prefix, self._requested_speed)
         self.sd.putNumber('drive/%s/requested_angle' % self.sd_prefix, self._requested_angle)
-        self.sd.putNumber('drive/%s/rotate encoder absolute position' % self.sd_prefix, self.rotateEncoder.getAbsolutePosition())
-        self.sd.putNumber('drive/%s/drive encoder absolute position' % self.sd_prefix, self.driveEncoder.getAbsolutePosition())
+        self.sd.putNumber('drive/%s/rotate encoder absolute position' % self.sd_prefix, self.rotateEncoder.getPosition())
+        self.sd.putNumber('drive/%s/drive encoder absolute position' % self.sd_prefix, self.driveEncoder.getPosition())
 
         self.sd.putNumber('drive/%s/Heading PID Setpoint' % self.sd_prefix, self.heading_pid_controller.getSetpoint())
         self.sd.putNumber('drive/%s/Heading PID Error' % self.sd_prefix, self.heading_pid_controller.getPositionError())

@@ -62,7 +62,8 @@ class SwerveDrive:
         self.gyro_balance_zero = 0.0
 
         # Get Smart Dashboard
-        self.sd = NetworkTables.getTable('SmartDashboard')
+        #self.sd = NetworkTables.getTable('SmartDashboard')
+        self.dashboard = Dashboard.getDashboard()
 
         # Set all inputs to zero
         self._requested_vectors = {
@@ -85,6 +86,10 @@ class SwerveDrive:
             'rear_right': 0
         }
 
+        self.pose_target_x = 666 # impossible values, default for logging
+        self.pose_target_y = 666 
+        self.pose_target_bearing = 666 
+        
         # Variables that allow enabling and disabling of features in code
         self.squared_inputs = False
         self.threshold_input_vectors = True
@@ -107,17 +112,10 @@ class SwerveDrive:
         self.balance_pitch_pid_controller.enableContinuousInput(-180, 180)
         self.balance_pitch_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
 
-        self.sd.putNumber('Balance Pitch kP', self.balance_pitch_pid_controller.getP())
-        self.sd.putNumber('Balance Pitch kI', self.balance_pitch_pid_controller.getI())
-        self.sd.putNumber('Balance Pitch kD', self.balance_pitch_pid_controller.getD())
-
         self.balance_yaw_pid_controller = PIDController(self.balance_config.balance_yaw_kP, self.balance_config.balance_yaw_kI, self.balance_config.balance_yaw_kD)
         self.balance_yaw_pid_controller.enableContinuousInput(0, 360)
         self.balance_yaw_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
 
-        self.sd.putNumber('Balance Yaw kP', self.balance_yaw_pid_controller.getP())
-        self.sd.putNumber('Balance Yaw kI', self.balance_yaw_pid_controller.getI())
-        self.sd.putNumber('Balance Yaw kD', self.balance_yaw_pid_controller.getD())
 
         self.target_config = _target_cfg
         self.target_kP = self.target_config.target_kP
@@ -140,7 +138,6 @@ class SwerveDrive:
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
-        self.dashboard = Dashboard.getDashboard()
 
     def getBearing(self):      
         return self.bearing
@@ -345,17 +342,17 @@ class SwerveDrive:
 
     def balance(self):
         
-        self.balance_pitch_pid_controller.setP(self.sd.getNumber('Balance Pitch kP', 0))
-        self.balance_pitch_pid_controller.setI(self.sd.getNumber('Balance Pitch kI', 0))
-        self.balance_pitch_pid_controller.setD(self.sd.getNumber('Balance Pitch kD', 0))
+        self.balance_pitch_pid_controller.setP(self.dashboard.getNumber('Balance Pitch kP', 0))
+        self.balance_pitch_pid_controller.setI(self.dashboard.getNumber('Balance Pitch kI', 0))
+        self.balance_pitch_pid_controller.setD(self.dashboard.getNumber('Balance Pitch kD', 0))
 
-        #self.logger.log("Pitch: kP = ", self.sd.getNumber('Balance Pitch kP', 0), ", kI = ", self.sd.getNumber('Balance Pitch kI', 0), ", kD =", self.sd.getNumber('Balance Pitch kD', 0))
+        #self.logger.log("Pitch: kP = ", self.dashboard.getNumber('Balance Pitch kP', 0), ", kI = ", self.dashboard.getNumber('Balance Pitch kI', 0), ", kD =", self.dashboard.getNumber('Balance Pitch kD', 0))
         
-        self.balance_yaw_pid_controller.setP(self.sd.getNumber('Balance Yaw kP', 0))
-        self.balance_yaw_pid_controller.setI(self.sd.getNumber('Balance Yaw kI', 0))
-        self.balance_yaw_pid_controller.setD(self.sd.getNumber('Balance Yaw kD', 0))
+        self.balance_yaw_pid_controller.setP(self.dashboard.getNumber('Balance Yaw kP', 0))
+        self.balance_yaw_pid_controller.setI(self.dashboard.getNumber('Balance Yaw kI', 0))
+        self.balance_yaw_pid_controller.setD(self.dashboard.getNumber('Balance Yaw kD', 0))
 
-        #self.logger.log("Yaw: kP = ", self.sd.getNumber('Balance Yaw kP', 0), ", kI = ", self.sd.getNumber('Balance Yaw kI', 0), ", kD =", self.sd.getNumber('Balance Yaw kD', 0))
+        #self.logger.log("Yaw: kP = ", self.dashboard.getNumber('Balance Yaw kP', 0), ", kI = ", self.dashboard.getNumber('Balance Yaw kI', 0), ", kD =", self.dashboard.getNumber('Balance Yaw kD', 0))
         
         #self.printGyro()
 
@@ -390,8 +387,8 @@ class SwerveDrive:
         self.logger.log("Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
 
         # Put the output to the dashboard
-        self.sd.putNumber('Balance pitch output', pitch_output)
-        self.sd.putNumber('Balance yaw output', yaw_output)
+        self.dashboard.putNumber('Balance pitch output', pitch_output)
+        self.dashboard.putNumber('Balance yaw output', yaw_output)
         self.move(yawSign * pitch_output, 0.0, yaw_output, self.bearing)
         
         self.update_smartdash()
@@ -453,7 +450,7 @@ class SwerveDrive:
         chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
 
         #self.logger.log("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
-        self.sd.putNumber("Current Gyro Angle", self.getGyroAngle())
+        self.dashboard.putNumber("Current Gyro Angle", self.getGyroAngle())
 
         self.set_fwd(chassis_fwd)
         self.set_strafe(chassis_strafe)
@@ -472,6 +469,11 @@ class SwerveDrive:
             return self.goToPose(x, y, bearing)
 
     def goToPose(self, x, y, bearing):
+
+        # for telemetry
+        self.pose_target_x = x
+        self.pose_target_y = y
+        self.pose_target_bearing = bearing
 
         currentX, currentY, currentRCW = self.swervometer.getCOF()
         x_error = -self.target_x_pid_controller.calculate(currentX, x)
@@ -684,12 +686,45 @@ class SwerveDrive:
             
     def update_smartdash(self):
         """
-        Pushes some internal variables for debugging.
+        Log current state for telemetry
         """
+        self.dashboard.putNumber('/drive/front_left_req_ang', self._requested_angles['front_left'])
+        self.dashboard.putNumber('/drive/front_right_req_ang', self._requested_angles['front_right'])
+        self.dashboard.putNumber('/drive/rear_left_req_ang', self._requested_angles['rear_left'])
+        self.dashboard.putNumber('/drive/rear_right_req_ang', self._requested_angles['rear_right'])
+        
+        self.dashboard.putNumber('/drive/front_left_req_spd', self._requested_speeds['front_left'])
+        self.dashboard.putNumber('/drive/front_right_req_ang', self._requested_speeds['front_right'])
+        self.dashboard.putNumber('/drive/rear_left_req_ang', self._requested_speeds['rear_left'])
+        self.dashboard.putNumber('/drive/rear_right_req_ang', self._requested_speeds['rear_right'])
+        
+        # Zero request vectors for saftey reasons
+        self.dashboard.putNumber('/drive/req_vector_fwd', self._requested_vectors['fwd'])
+        self.dashboard.putNumber('/drive/req_vector_strafe', self._requested_vectors['strafe'])
+        self.dashboard.putNumber('/drive/req_vector_rcw', self._requested_vectors['rcw'])
+        self.dashboard.putBoolean('/drive/wheel_lock', self.wheel_lock)
+        
+        self.dashboard.putNumber('/drive/pose_target_x', self.pose_target_x)
+        self.dashboard.putNumber('/drive/pose_target_y', self.pose_target_y)
+        self.dashboard.putNumber('/drive/pose_target_bearing', self.pose_target_bearing)
+        
+        self.dashboard.putNumber('/drive/Bearing', self.getBearing())
+        self.dashboard.putNumber('/drive/Gyro Angle', self.getGyroAngle())
+        self.dashboard.putNumber('/drive/Gyro Balance', self.getGyroBalance())
+        self.dashboard.putNumber('/drive/Gyro Pitch', self.getGyroPitch())
+        self.dashboard.putNumber('/drive/Bearing', self.getGyroRoll())
+        self.dashboard.putNumber('/drive/Bearing', self.getGyroYaw())
+        
+        self.dashboard.putNumber('/drive/Balance Pitch kP', self.balance_pitch_pid_controller.getP())
+        self.dashboard.putNumber('/drive/Balance Pitch kI', self.balance_pitch_pid_controller.getI())
+        self.dashboard.putNumber('/drive/Balance Pitch kD', self.balance_pitch_pid_controller.getD())
+
+        self.dashboard.putNumber('/drive/Balance Yaw kP', self.balance_yaw_pid_controller.getP())
+        self.dashboard.putNumber('/drive/Balance Yaw kI', self.balance_yaw_pid_controller.getI())
+        self.dashboard.putNumber('/drive/Balance Yaw kD', self.balance_yaw_pid_controller.getD())
 
 
-        if self.debugging:
-            for key in self._requested_angles:
-                self.sd.putNumber('drive/drive/%s_angle' % key, self._requested_angles[key])
-                self.sd.putNumber('drive/drive/%s_speed' % key, self._requested_speeds[key])
+        for key in self._requested_angles:
+            self.dashboard.putNumber('drive/%s_angle' % key, self._requested_angles[key])
+            self.dashboard.putNumber('drive/%s_speed' % key, self._requested_speeds[key])
                 
