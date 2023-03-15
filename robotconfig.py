@@ -114,6 +114,8 @@ drivetrainConfig = {
                         ['RAISE_GRABBER'],
                         ['ELEVATOR_DOWN'],
                         ['ELEVATOR_HUMAN_EXTEND']],
+    'ROTATE_CLOCKWISE': [['ROTATE', 179]], # 179, not -180 to ensure direction
+    'ROTATE_COUNTERCLOCKWISE': [['ROTATE', -179]], # -179, not -180, to ensure direction
 }
 
 visionConfig = {
