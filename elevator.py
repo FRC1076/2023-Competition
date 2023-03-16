@@ -115,10 +115,11 @@ class Elevator:
     def elevatorReset(self):
         print("Elevator: Reseting elevator")
         return True
+        #reset grabber (lift it up) after elevator is all the way down
         if self.limit_switch.get() == True:
             print("Elevator: Found the limit switch")
             self.resetEncoders()
-            return True
+            return self.grabber.grabberReset()
         else:
             self.right_motor.set(-0.1)
             self.left_motor.set(-0.1)
