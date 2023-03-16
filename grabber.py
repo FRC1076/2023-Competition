@@ -6,6 +6,7 @@ class Grabber:
     def __init__(self, rotate_motor_id, bottom_switch_id, top_switch_id, _rotate_speed):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.rotate_motor = rev.CANSparkMax(rotate_motor_id, motor_type)
+        self.rotate_motor_encoder = self.rotate_motor.getEncoder()
         self.bottom_switch = wpilib.DigitalInput(bottom_switch_id)
         self.top_switch = wpilib.DigitalInput(top_switch_id)
         self.isEngaged = False
@@ -56,3 +57,15 @@ class Grabber:
 
     def atUpperLimit(self):
         return not self.top_switch.get()
+    
+    def resetEncoder(self):
+        self.rotate_motor_encoder.setPosition(0)
+    
+    #move grabber to the up position and reset encoders for the grabber (top position is encoder position 0)
+    def grabberReset(self):
+        if self.atUpperLimit():
+            self.resetEncoder()
+            return True
+        else:
+            self.raise_motor(0.15) #goes at speed of 0.15 * 0.7 = 0.105
+            return False
