@@ -8,9 +8,12 @@ RETROREFLECTIVE = 1
 class Vision:
     def __init__(self, _table, _shouldUpdatePose):
         self.table = _table
-        self.pipeline = APRILTAGS
-        self.table.putNumber('pipeline', APRILTAGS) # default to AprilTags pipeline
+        self.pipeline = RETROREFLECTIVE
+        self.table.putNumber('pipeline', RETROREFLECTIVE) # default to retro pipeline
         self.updatePose = _shouldUpdatePose
+        # desired aspect ratio should be something like 1/2
+        self.MIN_ASPECT_RATIO = 0.2
+        self.MAX_ASPECT_RATIO = 1.0
 
     def shouldUpdatePose(self):
         return self.updatePose
@@ -76,3 +79,29 @@ class Vision:
         else:
             return (-1, -1, -1)
         
+    # get the target size within the frame in pixels
+    # can mulitply this by something to get the distance to the target
+    # can be compared with the desired distance to drive a PID
+    def getTargetSizeReflective(self):
+        if not self.hasValidTargetReflective():
+            return -1
+        return self.table.getNumber('ta')
+    
+    # get the horizontal offset of the target from the 'crosshair'
+    # can be compared with the desired offset to drive PID
+    def getTargetOffsetHorizontalReflective(self):
+        if not self.hasValidTargetReflective():
+            return 1000 # more pixels than there are, indicates no valid offset
+        return self.table.getNumber('tx')
+
+    # determine whether we have one and only target
+    # if we don't, we shouldn't use vision 
+    def hasValidTargetReflective(self):
+        hasTargets = self.table.getBoolean('tv', False)
+        if not hasTargets:
+            return False
+        targetHeight = self.table.getNumber('tvert', 100.0)
+        targetWidth = self.table.getNumber('thor', 1.0)
+        aspectRatio = targetWidth / targetHeight
+        return aspectRatio > self.MIN_ASPECT_RATIO and aspectRatio < self.MAX_ASPECT_RATIO
+    

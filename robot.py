@@ -98,6 +98,8 @@ class MyRobot(wpilib.TimedRobot):
 
         self.periods = 0
 
+        self.elevator_has_reset = True
+
         if self.drivetrain:
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
