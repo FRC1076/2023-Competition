@@ -75,8 +75,8 @@ class Elevator:
             return True
         else:
             print("Elevator: Moving")
-            extend_speed *= -1 # Elevator motor moves reverse direction.
-            self.extend(extend_speed)
+            extendSpeed *= -1 # Elevator motor moves reverse direction.
+            self.extend(extendSpeed * 0.1)
             return False
 
     def isElevatorDown(self):
