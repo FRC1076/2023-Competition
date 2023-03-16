@@ -5,15 +5,7 @@ from collections import namedtuple
 # Create the structure of the field config:
 FieldConfig = namedtuple('FieldConfig', ['sd_prefix',
                                          'origin_x', 'origin_y',
-                                         'start_position_x', 'start_position_y', 'start_angle',
-                                         'tag1_x', 'tag1_y',
-                                         'tag2_x', 'tag2_y',
-                                         'tag3_x', 'tag3_y',
-                                         'tag4_x', 'tag4_y',
-                                         'tag5_x', 'tag5_y',
-                                         'tag6_x', 'tag6_y',
-                                         'tag7_x', 'tag7_y',
-                                         'tag8_x', 'tag8_y'])
+                                         'start_position_x', 'start_position_y', 'start_angle'])
 
 # Create the structure of the robot property config: 
 RobotPropertyConfig = namedtuple('RobotPropertyConfig', ['sd_prefix',
@@ -42,14 +34,14 @@ class Swervometer:
         print("cof_offset_x: ", self.robotProperty.cof_offset_x, " cof_offset_y: ", self.robotProperty.cof_offset_y)
         self.currentX = self.field.start_position_x
         self.currentY = self.field.start_position_y
-        self.currentRCW = self.field.start_angle
+        self.currentBearing = self.field.start_angle
         self.swerveModuleOffsetX = self.robotProperty.swerve_module_offset_x
         self.swerveModuleOffsetY = self.robotProperty.swerve_module_offset_y
         self.frame_dimension_x = self.robotProperty.frame_dimension_x
         self.frame_dimension_y = self.robotProperty.frame_dimension_y
         self.com_offset_x = self.robotProperty.com_offset_x
         self.com_offset_y = self.robotProperty.com_offset_y
-        print("init current X: ", self.currentX, " init current y: ", self.currentY, " init current rcw: ", self.currentRCW)
+        print("init current X: ", self.currentX, " init current y: ", self.currentY, " init current bearing: ", self.currentBearing)
     
         self.calcLeverArmLengths()
 
@@ -64,12 +56,12 @@ class Swervometer:
         return self.teamMoveAdjustment
 
     def getCOF(self):
-        return self.currentX, self.currentY, self.currentRCW
+        return self.currentX, self.currentY, self.currentBearing
 
-    def setCOF(self, x, y, rcw):
+    def setCOF(self, x, y, bearing):
         self.currentX = x
         self.currentY = y
-        self.currentRCW = rcw
+        self.currentBearing = bearing
 
     def calcLeverArmLengths(self):
 
@@ -187,39 +179,7 @@ class Swervometer:
         # Reset pose of bot.
         self.currentX = midpointX
         self.currentY = midpointY
-        self.currentRCW = currentGyroAngle
+        self.currentBearing = currentGyroAngle
         
-        return self.currentX, self.currentY, self.currentRCW
-    
-    # def updatePoseFromCamera(self, tagNumber, relativePositionTuple):
-    #     tagNum = tagNumber
-    #     x,y,rcw = relativePositionTuple
-
-    #     tagX, tagY = self.getTagPosition(tagNum)
-
-    #     self.currentX = tagX - x - (self.field.camera_offset_x - self.field.cof_offset_x)
-    #     self.currentY = tagY - y - (self.field.camera_offset_y - self.field.cof_offset_y)
-    #     self.currentRCW = rcw
-    #     return self.currentX, self.currentY, self.currentRCW
-
-    # # def getTagPosition(self, tagNumber):
-    #     match tagNumber:
-    #         case 1:
-    #             return self.field.tag1_x, self.field.tag1_y
-    #         case 2:
-    #             return self.field.tag2_x, self.field.tag2_y
-    #         case 3:
-    #             return self.field.tag3_x, self.field.tag3_y
-    #         case 4:
-    #             return self.field.tag4_x, self.field.tag4_y
-    #         case 5:
-    #             return self.field.tag5_x, self.field.tag5_y
-    #         case 6:
-    #             return self.field.tag6_x, self.field.tag6_y
-    #         case 7:
-    #             return self.field.tag7_x, self.field.tag7_y
-    #         case 8:
-    #             return self.field.tag8_x, self.field.tag8_y
-    #         case _: # Should never happen
-    #             print("Unknown tag found.")
-    #             return -1, -1
+        return self.currentX, self.currentY, self.currentBearing
+   

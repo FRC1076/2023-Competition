@@ -6,7 +6,7 @@ from wpimath.controller import PIDController
 import math
 
 class Elevator:
-    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber):
+    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber, limit_switch_id):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
@@ -25,6 +25,7 @@ class Elevator:
         self.left_motor.setOpenLoopRampRate(0.50)
         self.upperSafety = upper_safety
         self.lowerSafety = lower_safety
+        self.limit_switch = wpilib.DigitalInput(limit_switch_id)
 
     #1.00917431193 inches per rotation
     def extend(self, value):  # controls length of the elevator 
@@ -78,12 +79,12 @@ class Elevator:
             return False
 
     def isElevatorDown(self):
-        if self.solenoid.get() == DoubleSolenoid.Value.kForward:
+        if self.solenoid.get() == DoubleSolenoid.Value.kForward or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             return True
         return False
 
     def isElevatorUp(self):
-        if self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
+        if self.solenoid.get() == DoubleSolenoid.Value.kReverse:
             return True
         return False
 
@@ -106,6 +107,22 @@ class Elevator:
         else:
             print("Elevator: Toggle: How did we get here?")
         return True
+    
+    def resetEncoders(self):
+        self.left_encoder.setPosition(0)
+        self.right_encoder.setPosition(0)
+    
+    def elevatorReset(self):
+        print("Elevator: Reseting elevator")
+        return True
+        if self.limit_switch.get() == True:
+            print("Elevator: Found the limit switch")
+            self.resetEncoders()
+            return True
+        else:
+            self.right_motor.set(-0.1)
+            self.left_motor.set(-0.1)
+            return False
     
     # only reading the right encoder, assuming that left and right will stay about the same
     def getEncoderPosition(self):
