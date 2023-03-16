@@ -14,6 +14,8 @@ from wpimath.controller import PIDController
 from swervometer import Swervometer
 from logger import Logger
 
+DASH_PREFIX = 'SWERVEDRIVE'
+
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
 BearingConfig = namedtuple('BearingConfig', ['sd_prefix', 'bearing_kP', 'bearing_kI', 'bearing_kD'])
@@ -21,6 +23,9 @@ BearingConfig = namedtuple('BearingConfig', ['sd_prefix', 'bearing_kP', 'bearing
 class SwerveDrive:
 
     # Get some config options from the dashboard.
+    # I'm pretty sure these don't get written anywhere else, unless via Shuffleboard
+    # These are static class variables but they're accessed using self. later -- should be fixed
+    # Also, it's weird to use ntproperty here when we do otherwise elsewhere
     lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.001)
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
@@ -64,6 +69,12 @@ class SwerveDrive:
         # Get Smart Dashboard
         #self.sd = NetworkTables.getTable('SmartDashboard')
         self.dashboard = Dashboard.getDashboard()
+
+        # should do this here rather than above
+        # self.lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.001)
+        # self.rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
+        # self.xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
+        # self.debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True) # Turn to true to run it in verbose mode.
 
         # Set all inputs to zero
         self._requested_vectors = {
@@ -116,7 +127,6 @@ class SwerveDrive:
         self.balance_yaw_pid_controller.enableContinuousInput(0, 360)
         self.balance_yaw_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
 
-
         self.target_config = _target_cfg
         self.target_kP = self.target_config.target_kP
         self.target_kI = self.target_config.target_kI
@@ -147,7 +157,7 @@ class SwerveDrive:
         self.updateBearing = False
 
     def reset(self):
-        self.logger.log("In swervedrive reset")
+        self.logger.log("SWERVETRIVE reset")
 
         # Set all inputs to zero
         self._requested_vectors = {
@@ -251,6 +261,7 @@ class SwerveDrive:
         self.logger.log("Angle: ", self.getGyroAngle(), ", Pitch: ", self.getGyroPitch(), ", Yaw: ", self.getGyroYaw(), ", Roll: ", self.getGyroRoll())
 
     def resetGyro(self):
+        self.logger.log("SWERVEDRIVE resetGyro Angle: ", self.getGyroAngle(), ", Pitch: ", self.getGyroPitch(), ", Yaw: ", self.getGyroYaw(), ", Roll: ", self.getGyroRoll())
         if self.gyro:
             self.gyro.reset()
             self.bearing = self.getGyroAngle()
@@ -424,10 +435,12 @@ class SwerveDrive:
                     target_angle = current_angle + angle_diff
 
             rcw_error = self.bearing_pid_controller.calculate(self.getGyroAngle(), target_angle)
-            self.logger.log("rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
+            self.logger.log("SWERVEDRIVE steerStraight rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
     def move(self, fwd, strafe, rcw, bearing):
+        self.logger.log("SWERVEDRIVE Moving:", fwd, strafe, rcw, bearing)
+
         """
         Calulates the speed and angle for each wheel given the requested movement
         Positive fwd value = Forward robot movement\n
@@ -450,7 +463,7 @@ class SwerveDrive:
         chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
 
         #self.logger.log("modified strafe: " + str(chassis_strafe) + ", modified fwd: " + str(chassis_fwd))
-        self.dashboard.putNumber("Current Gyro Angle", self.getGyroAngle())
+        # self.dashboard.putNumber("Current Gyro Angle", self.getGyroAngle())
 
         self.set_fwd(chassis_fwd)
         self.set_strafe(chassis_strafe)
@@ -462,6 +475,8 @@ class SwerveDrive:
         self.set_rcw(rcw_new)
     
     def goToBalance(self, x, y, bearing, tolerance):
+        self.logger.log("SWERVEDRIVE Going to balance:", x, y, bearing, tolerance)
+
         if abs(self.getGyroBalance()) > tolerance:
             return True
         else:
@@ -469,6 +484,8 @@ class SwerveDrive:
             return self.goToPose(x, y, bearing)
 
     def goToPose(self, x, y, bearing):
+
+        self.logger.log("SWERVEDRIVE Going to pose:", x, y, bearing)
 
         # for telemetry
         self.pose_target_x = x
@@ -520,7 +537,6 @@ class SwerveDrive:
         Calculate the requested speed and angle of each modules from self._requested_vectors and store them in
         self._requested_speeds and self._requested_angles dictionaries.
         """
-        self.logger.log("in _calculate_vectors")
         self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw'] = self.normalize([self._requested_vectors['fwd'], self._requested_vectors['strafe'], self._requested_vectors['rcw']])
 
         # Does nothing if the values are lower than the input thresh
@@ -722,7 +738,6 @@ class SwerveDrive:
         self.dashboard.putNumber('/drive/Balance Yaw kP', self.balance_yaw_pid_controller.getP())
         self.dashboard.putNumber('/drive/Balance Yaw kI', self.balance_yaw_pid_controller.getI())
         self.dashboard.putNumber('/drive/Balance Yaw kD', self.balance_yaw_pid_controller.getD())
-
 
         for key in self._requested_angles:
             self.dashboard.putNumber('drive/%s_angle' % key, self._requested_angles[key])
