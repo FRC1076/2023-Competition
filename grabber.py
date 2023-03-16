@@ -4,7 +4,7 @@ import rev
 class Grabber:
 
     def __init__(self, rotate_motor_id, bottom_switch_id, top_switch_id, _rotate_speed):
-        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushed
+        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.rotate_motor = rev.CANSparkMax(rotate_motor_id, motor_type)
         self.bottom_switch = wpilib.DigitalInput(bottom_switch_id)
         self.top_switch = wpilib.DigitalInput(top_switch_id)
