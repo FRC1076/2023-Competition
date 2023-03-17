@@ -239,8 +239,9 @@ class MyRobot(wpilib.TimedRobot):
                             config['ELEVATOR_KD'], 
                             config['LOWER_SAFETY'], 
                             config['UPPER_SAFETY'], 
-                            self.claw,
-                            config['LIMIT_SWITCH'])
+                            self.grabber,
+                            config['LEFT_LIMIT_SWITCH'],
+                            config['RIGHT_LIMIT_SWITCH'])
         self.human_position = config['HUMAN_POSITION']
         self.upper_scoring_height = config['UPPER_SCORING_HEIGHT']
         self.lower_scoring_height = config['LOWER_SCORING_HEIGHT']
@@ -454,12 +455,13 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator_has_reset = self.elevator.elevatorReset()
             return
         if self.teleopDrivetrain():
-            print("TeleoDrivetrain returned true.")
+            print("TeleoDrivetrain returned true. In a maneuver.")
             return True
         else:
-            print("TeleoDrivetrain returned False.")
+            print("TeleoDrivetrain returned False. Not in a maneuver.")
             self.teleopElevator()
             self.teleopGrabber()
+            self.teleopClaw()
             return True
 
     def teleopDrivetrain(self):
@@ -587,6 +589,12 @@ class MyRobot(wpilib.TimedRobot):
 
         operator = self.operator.xboxController
 
+        # Use only if limit switches BOTH break.
+        if (operator.getLeftBumperPressed() and operator.getRightBumperPressed()):
+            print("Elevator: Bypassing Elevator Lower Limit Switches")
+            self.elevator.bypassLimitSwitch()
+            return
+
         if (operator.getLeftBumperPressed()):
             print("Toggling Elevator Up/Down")
             self.elevator.toggle()
@@ -640,7 +648,8 @@ class MyRobot(wpilib.TimedRobot):
         else:
             #print("Grabber: Motor Off")
             self.grabber.motor_off()
-        
+    
+    def teleopClaw(self):
         if (operator.getRightBumper()):
             print("Claw: Intake")
             self.claw.intake()
@@ -649,7 +658,6 @@ class MyRobot(wpilib.TimedRobot):
             self.claw.release()
         else:
             self.claw.off()
-        
         
     def autonomousInit(self):
         if not self.auton:
