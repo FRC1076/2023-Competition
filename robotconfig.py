@@ -153,7 +153,11 @@ grabberConfig = {
 }
 
 clawConfig = {
-    'MOTOR_ID': 0
+    'MOTOR_ID': 0,
+    'RELEASE_SPEED': 0.3, # Go slow on release, so piece drops straight down
+    'RELEASE_CHANGE': 100, # Encoder change before we assume element is grabbed
+    'INTAKE_SPEED': 1.0, # Go fast on intake
+    'INTAKE_CHANGE': 100 # Encoder change before we assume element is expelled
 }
 
 cliffDetectorConfig = {
