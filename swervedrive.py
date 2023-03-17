@@ -704,42 +704,42 @@ class SwerveDrive:
         """
         Log current state for telemetry
         """
-        self.dashboard.putNumber('/drive/front_left_req_ang', self._requested_angles['front_left'])
-        self.dashboard.putNumber('/drive/front_right_req_ang', self._requested_angles['front_right'])
-        self.dashboard.putNumber('/drive/rear_left_req_ang', self._requested_angles['rear_left'])
-        self.dashboard.putNumber('/drive/rear_right_req_ang', self._requested_angles['rear_right'])
+        self.dashboard.putNumber(DASH_PREFIX + '/front_left_req_ang', self._requested_angles['front_left'])
+        self.dashboard.putNumber(DASH_PREFIX + '/front_right_req_ang', self._requested_angles['front_right'])
+        self.dashboard.putNumber(DASH_PREFIX + '/rear_left_req_ang', self._requested_angles['rear_left'])
+        self.dashboard.putNumber(DASH_PREFIX + '/rear_right_req_ang', self._requested_angles['rear_right'])
         
-        self.dashboard.putNumber('/drive/front_left_req_spd', self._requested_speeds['front_left'])
-        self.dashboard.putNumber('/drive/front_right_req_ang', self._requested_speeds['front_right'])
-        self.dashboard.putNumber('/drive/rear_left_req_ang', self._requested_speeds['rear_left'])
-        self.dashboard.putNumber('/drive/rear_right_req_ang', self._requested_speeds['rear_right'])
+        self.dashboard.putNumber(DASH_PREFIX + '/front_left_req_spd', self._requested_speeds['front_left'])
+        self.dashboard.putNumber(DASH_PREFIX + '/front_right_req_ang', self._requested_speeds['front_right'])
+        self.dashboard.putNumber(DASH_PREFIX + '/rear_left_req_ang', self._requested_speeds['rear_left'])
+        self.dashboard.putNumber(DASH_PREFIX + '/rear_right_req_ang', self._requested_speeds['rear_right'])
         
         # Zero request vectors for saftey reasons
-        self.dashboard.putNumber('/drive/req_vector_fwd', self._requested_vectors['fwd'])
-        self.dashboard.putNumber('/drive/req_vector_strafe', self._requested_vectors['strafe'])
-        self.dashboard.putNumber('/drive/req_vector_rcw', self._requested_vectors['rcw'])
-        self.dashboard.putBoolean('/drive/wheel_lock', self.wheel_lock)
+        self.dashboard.putNumber(DASH_PREFIX + '/req_vector_fwd', self._requested_vectors['fwd'])
+        self.dashboard.putNumber(DASH_PREFIX + '/req_vector_strafe', self._requested_vectors['strafe'])
+        self.dashboard.putNumber(DASH_PREFIX + '/req_vector_rcw', self._requested_vectors['rcw'])
+        self.dashboard.putBoolean(DASH_PREFIX + '/wheel_lock', self.wheel_lock)
         
-        self.dashboard.putNumber('/drive/pose_target_x', self.pose_target_x)
-        self.dashboard.putNumber('/drive/pose_target_y', self.pose_target_y)
-        self.dashboard.putNumber('/drive/pose_target_bearing', self.pose_target_bearing)
+        self.dashboard.putNumber(DASH_PREFIX + '/pose_target_x', self.pose_target_x)
+        self.dashboard.putNumber(DASH_PREFIX + '/pose_target_y', self.pose_target_y)
+        self.dashboard.putNumber(DASH_PREFIX + '/pose_target_bearing', self.pose_target_bearing)
         
-        self.dashboard.putNumber('/drive/Bearing', self.getBearing())
-        self.dashboard.putNumber('/drive/Gyro Angle', self.getGyroAngle())
-        self.dashboard.putNumber('/drive/Gyro Balance', self.getGyroBalance())
-        self.dashboard.putNumber('/drive/Gyro Pitch', self.getGyroPitch())
-        self.dashboard.putNumber('/drive/Bearing', self.getGyroRoll())
-        self.dashboard.putNumber('/drive/Bearing', self.getGyroYaw())
+        self.dashboard.putNumber(DASH_PREFIX + '/Bearing', self.getBearing())
+        self.dashboard.putNumber(DASH_PREFIX + '/Gyro Angle', self.getGyroAngle())
+        self.dashboard.putNumber(DASH_PREFIX + '/Gyro Balance', self.getGyroBalance())
+        self.dashboard.putNumber(DASH_PREFIX + '/Gyro Pitch', self.getGyroPitch())
+        self.dashboard.putNumber(DASH_PREFIX + '/Bearing', self.getGyroRoll())
+        self.dashboard.putNumber(DASH_PREFIX + '/Bearing', self.getGyroYaw())
         
-        self.dashboard.putNumber('/drive/Balance Pitch kP', self.balance_pitch_pid_controller.getP())
-        self.dashboard.putNumber('/drive/Balance Pitch kI', self.balance_pitch_pid_controller.getI())
-        self.dashboard.putNumber('/drive/Balance Pitch kD', self.balance_pitch_pid_controller.getD())
+        self.dashboard.putNumber(DASH_PREFIX + '/Balance Pitch kP', self.balance_pitch_pid_controller.getP())
+        self.dashboard.putNumber(DASH_PREFIX + '/Balance Pitch kI', self.balance_pitch_pid_controller.getI())
+        self.dashboard.putNumber(DASH_PREFIX + '/Balance Pitch kD', self.balance_pitch_pid_controller.getD())
 
-        self.dashboard.putNumber('/drive/Balance Yaw kP', self.balance_yaw_pid_controller.getP())
-        self.dashboard.putNumber('/drive/Balance Yaw kI', self.balance_yaw_pid_controller.getI())
-        self.dashboard.putNumber('/drive/Balance Yaw kD', self.balance_yaw_pid_controller.getD())
+        self.dashboard.putNumber(DASH_PREFIX + '/Balance Yaw kP', self.balance_yaw_pid_controller.getP())
+        self.dashboard.putNumber(DASH_PREFIX + '/Balance Yaw kI', self.balance_yaw_pid_controller.getI())
+        self.dashboard.putNumber(DASH_PREFIX + '/Balance Yaw kD', self.balance_yaw_pid_controller.getD())
 
         for key in self._requested_angles:
-            self.dashboard.putNumber('drive/%s_angle' % key, self._requested_angles[key])
-            self.dashboard.putNumber('drive/%s_speed' % key, self._requested_speeds[key])
+            self.dashboard.putNumber(DASH_PREFIX + '/%s_angle' % key, self._requested_angles[key])
+            self.dashboard.putNumber(DASH_PREFIX + '/%s_speed' % key, self._requested_speeds[key])
                 
