@@ -9,8 +9,9 @@ class Claw:
         self.motor = rev.CANSparkMax(motor_id, motor_type)
         self.encoder = self.motor.getEncoder()
 
-        # Just to make sure it's defined.
+        # Just to make sure it's defined and off.
         self.basePosition = self.encoder.getPosition()
+        self.motor.set(0)
 
         self.releaseSpeed = _release_speed
         self.releaseChange = _release_change
