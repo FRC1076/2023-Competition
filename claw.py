@@ -20,14 +20,6 @@ class Claw:
         # Resets maneuver. Note that this is also reset with off(), which is called in roboty.py: disabledExit()
         self.maneuverComplete = True
         
-    #run and stop motor
-    def toggle(self):
-        if self.is_running == False:
-            self.run()
-        else:
-            self.stop()
-        return True
-    
     # Expel the object by running motors to expel.
     def release(self):
         self.motor.set(self.releaseSpeed)
