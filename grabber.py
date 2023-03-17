@@ -1,5 +1,6 @@
 import wpilib
 import rev
+from wpimath.controller import PIDController
 
 class Grabber:
 
@@ -14,6 +15,7 @@ class Grabber:
         self.rotate_speed = _rotate_speed
         #0 is lowered state, 1 is raised state
         self.state = 0
+        self.pid_controller = PIDController(0.01, 0.01, 0.01) #CHANGE VALUES LATER
 
         #raise rotate motor
     def raise_motor(self, grabber_speed):
@@ -52,6 +54,11 @@ class Grabber:
             self.rotate_motor.set(0)
             return True
         return False
+    
+    def rotateToPos(self, targetPosition):
+        pid_value = self.pid_controller.calculate(self.getEncoderPosition, targetPosition)
+        self.rotate_motor.set(pid_value)
+        return self.pid_controller.atSetpoint()
 
     def atLowerLimit(self):
         return not self.bottom_switch.get()
@@ -70,3 +77,6 @@ class Grabber:
         else:
             self.raise_motor(0.15) #goes at speed of 0.15 * 0.7 = 0.105
             return False
+
+    def getEncoderPosition(self):
+        return self.rotate_motor_encoder.getPosition()
