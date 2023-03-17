@@ -650,10 +650,11 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.motor_off()
     
     def teleopClaw(self):
-        if (self.operator.getRightBumper()):
+        operator = self.operator.xboxController
+        if (operator.getRightBumper()):
             print("Claw: Intake")
             self.claw.intake()
-        elif (self.operator.getRightTriggerAxis() > 0.7):
+        elif (operator.getRightTriggerAxis() > 0.7):
             print("Claw: Release")
             self.claw.release()
         else:
