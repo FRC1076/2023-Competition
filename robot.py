@@ -102,6 +102,7 @@ class MyRobot(wpilib.TimedRobot):
             self.tester.initTestTeleop()
             self.tester.testCodePaths()
         
+        self.grabber_has_rest = False
         self.elevator_has_reset = False
 
     def disabledExit(self):
@@ -116,6 +117,7 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTaskCounter = 0
         self.maneuverTaskCounter = 0
 
+        self.grabber_has_rest = False
         self.elevator_has_reset = False
 
     def initControllers(self, config):
@@ -451,9 +453,21 @@ class MyRobot(wpilib.TimedRobot):
         return True
 
     def teleopPeriodic(self):
+
+        # Use only if limit switches BOTH break.
+        if (operator.getLeftBumperPressed() and operator.getRightBumperPressed()):
+            print("Elevator: Bypassing Elevator Lower Limit Switches")
+            self.elevator.bypassLimitSwitch()
+            print("Grabber: Bypassing Grabber Upper Limit Switches")
+            self.grabber.bypassLimitSwitch()
+            return
+
+        if self.grabber_has_reset == False:
+            self.grabber_has_reset = self.grabber.grabberReset()
+            return True
         if self.elevator_has_reset == False:
             self.elevator_has_reset = self.elevator.elevatorReset()
-            return
+            return True
         if self.teleopDrivetrain():
             print("TeleoDrivetrain returned true. In a maneuver.")
             return True
@@ -589,12 +603,6 @@ class MyRobot(wpilib.TimedRobot):
 
         operator = self.operator.xboxController
 
-        # Use only if limit switches BOTH break.
-        if (operator.getLeftBumperPressed() and operator.getRightBumperPressed()):
-            print("Elevator: Bypassing Elevator Lower Limit Switches")
-            self.elevator.bypassLimitSwitch()
-            return
-
         if (operator.getLeftBumperPressed()):
             print("Toggling Elevator Up/Down")
             self.elevator.toggle()
@@ -690,9 +698,15 @@ class MyRobot(wpilib.TimedRobot):
             return
         if not self.autonTimer:
             return
+
+        if self.grabber_has_reset == False:
+            self.grabber_has_reset = self.grabber.grabberReset()
+            return True
+            
         if self.elevator_has_reset == False:
             self.elevator_has_reset = self.elevator.elevatorReset()
             return
+        
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
 
