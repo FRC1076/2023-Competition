@@ -106,7 +106,11 @@ class MyRobot(wpilib.TimedRobot):
 
     def disabledExit(self):
         print("no longer disabled")
-        self.drivetrain.reset()
+        if self.drivetrain:
+            self.drivetrain.reset()
+
+        if self.claw:
+            self.claw.off()
 
         # Reset task counter.
         self.autonTaskCounter = 0
@@ -248,10 +252,7 @@ class MyRobot(wpilib.TimedRobot):
         return Grabber(config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'], config['GRABBER_ROTATE_SPEED'])
 
     def initClaw(self, config):
-        return Claw(
-                            config['SOLENOID_FORWARD_ID'], 
-                            config['SOLENOID_REVERSE_ID']
-        )
+        return Claw(config['MOTOR_ID'], config['RELEASE_SPEED'], config['RELEASE_CHANGE'], config['INTAKE_SPEED'], config['INTAKE_CHANGE'])
     
     def initDrivetrain(self, config):
         print("initDrivetrain ran")
@@ -445,7 +446,6 @@ class MyRobot(wpilib.TimedRobot):
         self.maneuverComplete = True
         self.startingManeuver = True
         self.maneuverTaskCounter = 0
-        self.allow_claw_toggle = True
 
         return True
 
@@ -641,12 +641,14 @@ class MyRobot(wpilib.TimedRobot):
             #print("Grabber: Motor Off")
             self.grabber.motor_off()
         
-        if (operator.getRightTriggerAxis() > 0.7 and self.allow_claw_toggle == True):
-            print("Claw: Toggle Claw")
-            self.claw.toggle()
-            self.allow_claw_toggle = False
-        elif(operator.getRightTriggerAxis() <= 0.7):
-            self.allow_claw_toggle = True
+        if (operator.getRightBumper()):
+            print("Claw: Intake")
+            self.claw.intake()
+        elif (operator.getRightTriggerAxis() > 0.7):
+            print("Claw: Release")
+            self.claw.release()
+        else:
+            self.claw.off()
         
         
     def autonomousInit(self):
@@ -694,14 +696,18 @@ class MyRobot(wpilib.TimedRobot):
             print("Auton: Timer: ", self.autonTimer.get())
             if self.autonTimer.get() > autonTask[1]:
                 self.autonTaskCounter += 1
-        elif (autonTask[0] == 'CLAW_CLOSE'):
-            print("Auton: Claw CLose: ", self.autonTaskCounter)
-            self.claw.close()
-            self.autonTaskCounter += 1
-        elif (autonTask[0] == 'CLAW_OPEN'):
-            print("Auton: Claw Open: ", self.autonTaskCounter)
-            self.claw.open()
-            self.autonTaskCounter += 1
+        elif (autonTask[0] == 'CLAW_INTAKE'):
+            print("Auton: Claw Intake: ", self.autonTaskCounter)
+            if self.claw.runAndStop(+1):
+                self.autonTaskCounter += 1
+        elif (autonTask[0] == 'CLAW_RELEASE'):
+            print("Auton: Claw Release: ", self.autonTaskCounter)
+            if self.claw.runAndStop(-1):
+                self.autonTaskCounter += 1
+        elif (autonTask[0] == 'CLAW_STOP'):
+            print("Auton: Claw Stop: ", self.autonTaskCounter)
+            if self.claw.off():
+                self.autonTaskCounter += 1
         elif (autonTask[0] == 'RAISE_GRABBER'):
             if self.grabber.raise_motor(0.6):
                 self.autonTaskCounter += 1
