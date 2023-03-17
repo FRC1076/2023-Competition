@@ -7,6 +7,7 @@ class Grabber:
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.rotate_motor = rev.CANSparkMax(rotate_motor_id, motor_type)
         self.rotate_motor_encoder = self.rotate_motor.getEncoder()
+        #self.rotate_motor_limitSwitch = self.getForward __
         self.bottom_switch = wpilib.DigitalInput(bottom_switch_id)
         self.top_switch = wpilib.DigitalInput(top_switch_id)
         self.isEngaged = False

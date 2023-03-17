@@ -6,7 +6,7 @@ from wpimath.controller import PIDController
 import math
 
 class Elevator:
-    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber, limit_switch_id):
+    def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber, left_limit_switch_id, right_limit_switch_id):
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
@@ -25,10 +25,11 @@ class Elevator:
         self.left_motor.setOpenLoopRampRate(0.50)
         self.upperSafety = upper_safety
         self.lowerSafety = lower_safety
-        self.limit_switch = wpilib.DigitalInput(limit_switch_id)
+        self.left_limit_switch = wpilib.DigitalInput(left_limit_switch_id)
+        self.right_limit_switch = wpilib.DigitalInput(right_limit_switch_id)
 
     #1.00917431193 inches per rotation
-    def extend(self, value):  # controls length of the elevator 
+    def extend(self, targetSpeed):  # controls length of the elevator 
         #print(self.getEncoderPosition())
 
         currentPosition = self.getEncoderPosition()
@@ -47,27 +48,27 @@ class Elevator:
         #    self.left_motor.set(0)
         #    return
             
-        if value > 1:
-            value = 1
-        if value < -1:
-            value = -1
+        if targetSpeed > 1:
+            targetSpeed = 1
+        if targetSpeed < -1:
+            targetSpeed = -1
             
         #make sure arm doesn't go past limit
-        if self.getEncoderPosition() > 33 and value < 0:
+        if self.getEncoderPosition() > 33 and targetSpeed < 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
-        if self.getEncoderPosition() < 1 and value > 0:
+        if self.getEncoderPosition() < 1 and targetSpeed > 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
-        #set to a tenth of the power
-        self.right_motor.set(-value)
-        self.left_motor.set(-value)
+        
+        self.right_motor.set(-targetSpeed)
+        self.left_motor.set(-targetSpeed)
 
     #automatically move to an elevator extension (position) using a pid controller
-    def moveToPos(self, value):
-        extend_value = self.pid_controller.calculate(self.getEncoderPosition(), value)
+    def moveToPos(self, targetPosition):
+        extendSpeed = self.pid_controller.calculate(self.getEncoderPosition(), targetPosition)
         print("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
         if(self.pid_controller.atSetpoint()):
             print("Elevator: At set point", self.getEncoderPosition())
@@ -75,7 +76,8 @@ class Elevator:
             return True
         else:
             print("Elevator: Moving")
-            self.extend(-extend_value)
+            extendSpeed *= -1 # Elevator motor moves reverse direction.
+            self.extend(extendSpeed * 0.1)
             return False
 
     def isElevatorDown(self):
@@ -111,12 +113,16 @@ class Elevator:
     def resetEncoders(self):
         self.left_encoder.setPosition(0)
         self.right_encoder.setPosition(0)
+
+    def bypassLimitSwitch(self):
+        print("Elevator: Bypassing limit switch reset.")
+        self.resetEncoders()
     
     def elevatorReset(self):
         print("Elevator: Reseting elevator")
-        return True
+        
         #reset grabber (lift it up) after elevator is all the way down
-        if self.limit_switch.get() == True:
+        if self.left_limit_switch.get() == True or self.right_limit_switch.get() == True:
             print("Elevator: Found the limit switch")
             self.resetEncoders()
             return self.grabber.grabberReset()
