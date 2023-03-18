@@ -71,7 +71,7 @@ class Grabber:
         self.updateTargetPosition()
         self.rotate_motor.set(0)
 
-    #called every loop, used for check if limit switch is activated
+    #called every loop, used for check if limit switch is activated and PID control
     def update(self):
         self.log("UP: top: ",  self.forward_limitSwitch.get(), " bottom: ",  self.reverse_limitSwitch.get())
         if self.forward_limitSwitch.get() == True and self.state == 1:

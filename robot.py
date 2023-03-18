@@ -465,7 +465,7 @@ class MyRobot(wpilib.TimedRobot):
         operator = self.operator.xboxController
 
         # Use only if limit switches BOTH break.
-        if (operator.getLeftBumperPressed() and operator.getRightBumperPressed()):
+        if (operator.getLeftBumper() and operator.getRightBumper()):
             print("Elevator: Bypassing Elevator Lower Limit Switches")
             self.elevator.bypassLimitSwitch()
             print("Grabber: Bypassing Grabber Upper Limit Switches")
@@ -614,7 +614,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.log("teleopElevator: In teleopElevator()")
 
-        if (operator.getLeftBumperPressed()):
+        if (operator.getLeftBumper()):
             self.log("teleopElevator: Toggling Elevator Up/Down")
             self.elevator.toggle()
 
@@ -631,7 +631,6 @@ class MyRobot(wpilib.TimedRobot):
         if controller_value != 0: # Drive in direction of controller
             self.elevator.extend(controller_value)
         else: # Go to preset destinations
-            self.elevator_destination = -1
             if operator.getAButton(): #Lowest Position
                 self.elevator_destination = self.retracted_height
                 self.log("Elevator: A Button")
@@ -666,9 +665,7 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.raise_motor(-grabber_speed)
         else:
             #self.log("Grabber: Motor Off")
-            self.grabber.motor_off()
-
-        self.grabber.update()
+            self.grabber.update()
     
     def teleopClaw(self):
         operator = self.operator.xboxController
