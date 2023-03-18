@@ -102,6 +102,7 @@ class Elevator:
 
     # contols the "lean" of the elevator
     def toggle(self):
+        self.log("Elevator: In toggle().")
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
             self.log("Elevator: Toggle: Set to reverse/up.")
@@ -127,7 +128,7 @@ class Elevator:
         if self.left_limit_switch.get() == True or self.right_limit_switch.get() == True:
             self.log("Elevator: Found the limit switch")
             self.resetEncoders()
-            return self.grabber.grabberReset()
+            return True
         else:
             self.right_motor.set(-0.1)
             self.left_motor.set(-0.1)

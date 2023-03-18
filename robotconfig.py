@@ -97,22 +97,22 @@ drivetrainConfig = {
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 1.0, # Improves maneuverability of bot.
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0,
-    'LOW_CONE_SCORE': [['CLAW_CLOSE'],
-                        ['RAISE_GRABBER'],
-                        ['ELEVATOR_UP'],
+    'LOW_CONE_SCORE': [['CLAW_INTAKE'],
+                        ['ELEVATOR_DOWN'],
+                        ['POSITION_GRABBER', 2],
+                        ['CLAW_RELEASE'],
                         ['ELEVATOR_LOWER_EXTEND'],
+                        ['CLAW_STOP']],
+    'HIGH_CONE_SCORE': [['CLAW_INTAKE'],
                         ['ELEVATOR_DOWN'],
-                        ['CLAW_OPEN']],
-    'HIGH_CONE_SCORE': [['CLAW_CLOSE'],
-                        ['RAISE_GRABBER'],
-                        ['MOVE_BACK', 6],
+                        ['POSITION_GRABBER', 2],
+                        ['CLAW_RELEASE'],
                         ['ELEVATOR_UPPER_EXTEND'],
+                        ['CLAW_STOP']],
+    'HUMAN_STATION_PICKUP': [['CLAW_INTAKE'],
                         ['ELEVATOR_DOWN'],
-                        ['CLAW_OPEN'],
-                        ['LOWER_GRABBER']],
-    'HUMAN_STATION_PICKUP': [['CLAW_OPEN'],
-                        ['RAISE_GRABBER'],
-                        ['ELEVATOR_DOWN'],
+                        ['POSITION_GRABBER', 2],
+                        ['CLAW_RELEASE'],
                         ['ELEVATOR_HUMAN_EXTEND']],
     'ROTATE_CLOCKWISE': [['ROTATE', 179]], # 179, not -180 to ensure direction
     'ROTATE_COUNTERCLOCKWISE': [['ROTATE', -179]], # -179, not -180, to ensure direction
@@ -150,10 +150,12 @@ elevatorConfig = {
 
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
-    'TOP_SWITCH_ID': 1,
-    'BOTTOM_SWITCH_ID': 0,
     'GRABBER_ROTATE_SPEED': 0.2,
-    'GRABBER_SUCTION_SPEED': 0.25,
+    'ROTATE_KP': 0.08, #0.2, #0.12,3
+    'ROTATE_KI': 0.0008, #0.0008, #0.0008,
+    'ROTATE_KD': 0.002, #0.002,
+    'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
+    'MIN_POSITION': 1, # Roughly 0 - 5 scale, with 0 at top
 }
 
 clawConfig = {

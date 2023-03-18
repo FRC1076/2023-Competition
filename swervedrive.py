@@ -150,6 +150,9 @@ class SwerveDrive:
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
+        self.reflective_kP = 0.1
+        self.reflective_kI = 0.00001
+        self.reflective_kD = 0.00001
         self.reflective_x_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
         self.reflective_y_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
         self.targetOffsetX = _target_offsetX

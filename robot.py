@@ -257,7 +257,7 @@ class MyRobot(wpilib.TimedRobot):
         return elevator
 
     def initGrabber(self, config):
-        return Grabber(config['ROTATE_MOTOR_ID'], config['BOTTOM_SWITCH_ID'], config['TOP_SWITCH_ID'], config['GRABBER_ROTATE_SPEED'])
+        return Grabber(config['ROTATE_MOTOR_ID'], config['GRABBER_ROTATE_SPEED'], config['ROTATE_KP'], config['ROTATE_KI'], config['ROTATE_KD'], config['MAX_POSITION'], config['MIN_POSITION'])
 
     def initClaw(self, config):
         return Claw(config['MOTOR_ID'], config['RELEASE_SPEED'], config['RELEASE_CHANGE'], config['INTAKE_SPEED'], config['INTAKE_CHANGE'])
@@ -319,7 +319,7 @@ class MyRobot(wpilib.TimedRobot):
         
         targetTargetSize = config['TARGET_TARGET_SIZE']
         targetOffsetX = config['TARGET_OFFSET_X']
-        
+
         #swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg)
         swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, targetOffsetX, targetTargetSize)
 
@@ -462,6 +462,8 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
 
+        operator = self.operator.xboxController
+
         # Use only if limit switches BOTH break.
         if (operator.getLeftBumperPressed() and operator.getRightBumperPressed()):
             print("Elevator: Bypassing Elevator Lower Limit Switches")
@@ -474,6 +476,7 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber_has_reset = self.grabber.grabberReset()
             return True
         if self.elevator_has_reset == False:
+            self.grabber.update()
             self.elevator_has_reset = self.elevator.elevatorReset()
             return True
         if self.teleopDrivetrain():
@@ -586,7 +589,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.drivetrain.execute()
             # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
-                self.move(0, 0, 0, self.drivetrain.getBearing())
+                self.drivetrain.move(0, 0, 0, self.drivetrain.getBearing())
                 self.drivetrain.execute()
             # Otherwise, make sure we are explicitly doing nothing, so bot does not drift.
             else:
@@ -606,13 +609,13 @@ class MyRobot(wpilib.TimedRobot):
     def teleopElevator(self):
         if (not self.elevator):
             return
-        if (not self.operator):
-            return False
-
+        
         operator = self.operator.xboxController
 
+        self.log("teleopElevator: In teleopElevator()")
+
         if (operator.getLeftBumperPressed()):
-            self.log("Toggling Elevator Up/Down")
+            self.log("teleopElevator: Toggling Elevator Up/Down")
             self.elevator.toggle()
 
         ## ignored for now
@@ -664,6 +667,8 @@ class MyRobot(wpilib.TimedRobot):
         else:
             #self.log("Grabber: Motor Off")
             self.grabber.motor_off()
+
+        self.grabber.update()
     
     def teleopClaw(self):
         operator = self.operator.xboxController
@@ -833,14 +838,18 @@ class MyRobot(wpilib.TimedRobot):
 
         self.log("WHICH TASK: ", maneuverTask[0])
 
-        if (maneuverTask[0] == 'CLAW_OPEN'):
-            self.claw.open()
+        if (maneuverTask[0] == 'CLAW_OFF'):
+            self.claw.off()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Open: ", self.maneuverTaskCounter)
-        elif (maneuverTask[0] == 'CLAW_CLOSE'):
-            self.claw.close()
+            self.log("Maneuver: Claw Off: ", self.maneuverTaskCounter)
+        elif (maneuverTask[0] == 'CLAW_INTAKE'):
+            self.claw.intake()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Close: ", self.maneuverTaskCounter)
+            self.log("Maneuver: Claw Intake: ", self.maneuverTaskCounter)
+        elif (maneuverTask[0] == 'CLAW_RELEASE'):
+            self.claw.release()
+            self.maneuverTaskCounter += 1
+            self.log("Maneuver: Claw Release: ", self.maneuverTaskCounter)
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
             if self.grabber.raise_motor(1.0):
                 self.maneuverTaskCounter += 1
@@ -849,6 +858,10 @@ class MyRobot(wpilib.TimedRobot):
             if self.grabber.lower_motor(1.0):
                 self.maneuverTaskCounter += 1
             self.log("Maneuver: Lower Grabber: ", self.maneuverTaskCounter)
+        elif (maneuverTask[0] == 'POSITION_GRABBER'):
+            if self.grabber.goToPosition(maneuverTask[1]):
+                self.maneuverTaskCounter += 1
+            self.log("Maneuver: Position Grabber: ", self.maneuverTaskCounter, " target position: ", maneuverTask[1])
         elif (maneuverTask[0] == 'ELEVATOR_TOGGLE'):
             if self.elevator.toggle():
                 self.maneuverTaskCounter += 1
