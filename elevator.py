@@ -4,9 +4,11 @@ from wpilib import DoubleSolenoid
 import wpimath.controller
 from wpimath.controller import PIDController
 import math
+from logger import Logger
 
 class Elevator:
     def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber, left_limit_switch_id, right_limit_switch_id):
+        self.logger = Logger.getLogger()
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
@@ -30,7 +32,7 @@ class Elevator:
 
     #1.00917431193 inches per rotation
     def extend(self, targetSpeed):  # controls length of the elevator 
-        #print(self.getEncoderPosition())
+        #self.log(self.getEncoderPosition())
 
         currentPosition = self.getEncoderPosition()
         #if currentPosition >= self.upperSafety:
@@ -69,13 +71,13 @@ class Elevator:
     #automatically move to an elevator extension (position) using a pid controller
     def moveToPos(self, targetPosition):
         extendSpeed = self.pid_controller.calculate(self.getEncoderPosition(), targetPosition)
-        print("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
+        self.log("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
         if(self.pid_controller.atSetpoint()):
-            print("Elevator: At set point", self.getEncoderPosition())
+            self.log("Elevator: At set point", self.getEncoderPosition())
             self.extend(0)
             return True
         else:
-            print("Elevator: Moving")
+            self.log("Elevator: Moving")
             extendSpeed *= -1 # Elevator motor moves reverse direction.
             self.extend(extendSpeed * 0.1)
             return False
@@ -102,12 +104,12 @@ class Elevator:
     def toggle(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
-            print("Elevator: Toggle: Set to reverse/up.")
+            self.log("Elevator: Toggle: Set to reverse/up.")
         elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             self.solenoid.set(DoubleSolenoid.Value.kForward)
-            print("Elevator: Toggle: Set forward/down.")
+            self.log("Elevator: Toggle: Set forward/down.")
         else:
-            print("Elevator: Toggle: How did we get here?")
+            self.log("Elevator: Toggle: How did we get here?")
         return True
     
     def resetEncoders(self):
@@ -115,15 +117,15 @@ class Elevator:
         self.right_encoder.setPosition(0)
 
     def bypassLimitSwitch(self):
-        print("Elevator: Bypassing limit switch reset.")
+        self.log("Elevator: Bypassing limit switch reset.")
         self.resetEncoders()
     
     def elevatorReset(self):
-        print("Elevator: Reseting elevator")
+        self.log("Elevator: Reseting elevator")
         
         #reset grabber (lift it up) after elevator is all the way down
         if self.left_limit_switch.get() == True or self.right_limit_switch.get() == True:
-            print("Elevator: Found the limit switch")
+            self.log("Elevator: Found the limit switch")
             self.resetEncoders()
             return self.grabber.grabberReset()
         else:
@@ -134,3 +136,6 @@ class Elevator:
     # only reading the right encoder, assuming that left and right will stay about the same
     def getEncoderPosition(self):
         return self.right_encoder.getPosition()
+
+    def log(self, *dataToLog):
+        self.logger.log(dataToLog)

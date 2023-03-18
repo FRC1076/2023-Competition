@@ -42,7 +42,9 @@ class SwerveDrive:
             _gyro, 
             _balance_cfg, 
             _target_cfg, 
-            _bearing_cfg):
+            _bearing_cfg,
+            _target_offsetX,
+            _target_target_size):
         
         self.logger = Logger.getLogger()
         self.frontLeftModule = _frontLeftModule
@@ -148,6 +150,10 @@ class SwerveDrive:
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
+        self.reflective_x_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
+        self.reflective_y_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
+        self.targetOffsetX = _target_offsetX
+        self.targetTargetSize = _target_target_size
 
     def getBearing(self):      
         return self.bearing
@@ -474,6 +480,18 @@ class SwerveDrive:
         rcw_new = self.steerStraight(rcw, bearing)
         self.set_rcw(rcw_new)
     
+    def goToReflectiveTapeCentered(self):
+        if self.vision:
+            self.offsetX = self.vision.getTargetOffsetHorizontalReflective() 
+            self.targetSize = self.vision.getTargetSizeReflective()
+
+            x_error = self.reflective_x_pid_controller.calculate(offsetX, self.targetOffsetX)
+            y_error = self.reflective_y_pid_controller.calculate(targetSize, self.targetTargetSize)
+
+            self.move(x_error, y_error, 0, self.getBearing())
+            self.execute()
+
+        
     def goToBalance(self, x, y, bearing, tolerance):
         self.logger.log("SWERVEDRIVE Going to balance:", x, y, bearing, tolerance)
 
