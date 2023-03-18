@@ -149,8 +149,7 @@ elevatorConfig = {
 }
 
 grabberConfig = {
-    'SUCTION_MOTOR_ID': 7,
-    'ROTATE_MOTOR_ID': 8,
+    'ROTATE_MOTOR_ID': 7,
     'TOP_SWITCH_ID': 1,
     'BOTTOM_SWITCH_ID': 0,
     'GRABBER_ROTATE_SPEED': 0.2,
@@ -158,7 +157,7 @@ grabberConfig = {
 }
 
 clawConfig = {
-    'MOTOR_ID': 7,
+    'MOTOR_ID': 8,
     'RELEASE_SPEED': 0.1, # Go slow on release, so piece drops straight down
     'RELEASE_CHANGE': 100, # Encoder change before we assume element is grabbed
     'INTAKE_SPEED': 0.1, # Go fast on intake
