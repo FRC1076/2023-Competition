@@ -437,6 +437,8 @@ class MyRobot(wpilib.TimedRobot):
         else: # No matching task list
             self.autonTaskCounter = -1
             self.autonTaskList = []
+
+        self.log("Init Auton: Task List: ", self.autonTaskList)
         return True
 
     def initCliffDetector(self, config):
@@ -726,6 +728,9 @@ class MyRobot(wpilib.TimedRobot):
             
         autonTask = self.autonTaskList[self.autonTaskCounter]
 
+        self.log("Autonomous Periodic: Past Grabber reset and Elevator reset ")
+        self.log("Current Task Counter: ", self.autonTaskCounter, "Current Task: ", autonTask)
+
         if (autonTask[0] == 'TIMER'):
             self.log("Auton: Timer: ", self.autonTimer.get())
             if self.autonTimer.get() > autonTask[1]:
@@ -734,13 +739,13 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_INTAKE'):
             self.log("Auton: Claw Intake: ", self.autonTaskCounter)
-            if self.claw.runAndStop(+1):
+            if self.claw.runAndStop(-1):
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_RELEASE'):
             self.log("Auton: Claw Release: ", self.autonTaskCounter)
-            if self.claw.runAndStop(-1):
+            if self.claw.runAndStop(+1):
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
@@ -781,7 +786,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
-            if self.elevator.moveToPos(self.elevator_retracted_height) and self.grabber.goToPosition(self.grabber_retracted_height):
+            if self.elevator.moveToPos(self.elevator_retracted_height): #and self.grabber.goToPosition(self.grabber_retracted_height):
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Retract: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'MOVE'):

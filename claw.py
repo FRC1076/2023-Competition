@@ -1,10 +1,11 @@
 import wpilib
 import rev
+from logger import Logger
 
 class Claw:
 
     def __init__(self, motor_id, _release_speed, _release_change, _intake_speed, _intake_change):
-
+        self.logger = Logger.getLogger()
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.motor = rev.CANSparkMax(motor_id, motor_type)
         self.encoder = self.motor.getEncoder()
@@ -44,15 +45,18 @@ class Claw:
             else:
                 self.targetPosition = self.basePosition - self.intakeChange
             self.maneuverComplete = False
+            self.log("Claw: RunNStop: FirstTime: basePosition: ", self.basePosition, " self.targetPosition", self.targetPosition)
     
         # Are we expelling game piece and not there yet?
         if (self.maneuverComplete == False) and (self.basePosition < self.targetPosition) and (self.encoder.getPosition() < self.targetPosition):
             self.motor.set(self.releaseSpeed)
+            self.log("Claw: RunNStop: Expelling / Not Done: basePosition: ", self.basePosition, " self.targetPosition", self.targetPosition, " getPOsition: ", self.encoder.getPosition())
             return False
 
         # Are we grabbing game piece and not there yet?
         elif (self.maneuverComplete == False) and (self.basePosition > self.targetPosition) and (self.encoder.getPosition() > self.targetPosition):
-            self.motor.set(self.intakeSpeed)
+            self.motor.set(-self.intakeSpeed)
+            self.log("Claw: RunNStop: Intake / Not Done: basePosition: ", self.basePosition, " self.targetPosition", self.targetPosition, " getPOsition: ", self.encoder.getPosition())
             return False
         
         # We must be done, so end maneuver.
@@ -60,3 +64,6 @@ class Claw:
             self.motor.set(0)
             self.maneuverComplete = True
             return True
+
+    def log(self, *dataToLog):
+        self.logger.log(dataToLog)

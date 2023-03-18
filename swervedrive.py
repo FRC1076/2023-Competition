@@ -481,6 +481,7 @@ class SwerveDrive:
         # self.set_strafe(strafe)
         
         rcw_new = self.steerStraight(rcw, bearing)
+
         self.set_rcw(rcw_new)
     
     def goToReflectiveTapeCentered(self):

@@ -25,7 +25,7 @@ controllerConfig = {
 
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': False, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'FIELD_START_POSITION': 'C', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -137,7 +137,7 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.12, #0.048, # 0.8 * 0.6
+    'ELEVATOR_KP': 0.3, #0.048, # 0.8 * 0.6
     'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
     'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
     'LOWER_SAFETY': 1,
@@ -145,7 +145,7 @@ elevatorConfig = {
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'ELEVATOR_HUMAN_POSITION': 25, # Assumes Elevator Down
-    'ELEVATOR_UPPER_SCORING_HEIGHT': 33, # Assumes Elevator Down
+    'ELEVATOR_UPPER_SCORING_HEIGHT': 32, # Assumes Elevator Down
     'ELEVATOR_LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
     'ELEVATOR_RETRACTED_HEIGHT': 7,
 }
@@ -167,9 +167,9 @@ grabberConfig = {
 
 clawConfig = {
     'MOTOR_ID': 8,
-    'RELEASE_SPEED': 0.1, # Go slow on release, so piece drops straight down
+    'RELEASE_SPEED': 0.125, # Go slow on release, so piece drops straight down
     'RELEASE_CHANGE': 10, # Encoder change before we assume element is grabbed
-    'INTAKE_SPEED': 0.2, # Go fast on intake
+    'INTAKE_SPEED': 0.5, # Go fast on intake
     'INTAKE_CHANGE': 10 # Encoder change before we assume element is expelled
 }
 
@@ -182,8 +182,8 @@ cliffDetectorConfig = {
 }
 
 autonConfig = {
-    'SCORE_EXISTING': False,
-    'BALANCE_BOT': True,
+    'SCORE_EXISTING': True,
+    'BALANCE_BOT': False,
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TF': [['CLAW_CLOSE'],
@@ -240,13 +240,12 @@ autonConfig = {
                         ['MOVE', -91.9375, -28.25, 0],
                         ['MOVE', -170, -28.25, 0],
                         ['BALANCE']],
-    'TASK_BLU_C_TF': [['CLAW_CLOSE'],
+    'TASK_BLU_C_TF': [['CLAW_INTAKE'],
                         ['RAISE_GRABBER'],
-                        ['ELEVATOR_EXTEND'],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['CLAW_OPEN'],
-                        ['TIMER', 6.0],
+                        ['ELEVATOR_EXTEND'],
+                        ['CLAW_RELEASE'],
                         ['ELEVATOR_RETRACT'],
                         ['MOVE', -91.9375, -137.90, 0],
                         ['IDLE']],
