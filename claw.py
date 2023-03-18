@@ -27,7 +27,7 @@ class Claw:
 
     # Expel the object by running motors to expel.
     def intake(self):
-        self.motor.set(self.intakeSpeed)
+        self.motor.set(-self.intakeSpeed)
 
     # Stop the claw motor.
     def off(self):

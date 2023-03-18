@@ -29,26 +29,13 @@ class Elevator:
         self.lowerSafety = lower_safety
         self.left_limit_switch = wpilib.DigitalInput(left_limit_switch_id)
         self.right_limit_switch = wpilib.DigitalInput(right_limit_switch_id)
+        self.targetPosition = self.getEncoderPosition()
+
+    def getTargetPosition(self):
+        return self.targetPosition
 
     #1.00917431193 inches per rotation
     def extend(self, targetSpeed):  # controls length of the elevator 
-        #self.log(self.getEncoderPosition())
-
-        currentPosition = self.getEncoderPosition()
-        #if currentPosition >= self.upperSafety:
-        #    self.grabber.lower_motor()
-        #if currentPosition <= self.lowerSafety:
-        #    self.grabber.raise_motor()
-        
-        #if currentPosition >= self.upperSafety and not self.grabber.atLowerLimit():
-        #    self.right_motor.set(0)
-        #    self.left_motor.set(0)
-        #    return
-        
-        #if currentPosition <= self.lowerSafety and not self.grabber.atUpperLimit():
-        #    self.right_motor.set(0)
-        #    self.left_motor.set(0)
-        #    return
             
         if targetSpeed > 1:
             targetSpeed = 1
@@ -56,11 +43,11 @@ class Elevator:
             targetSpeed = -1
             
         #make sure arm doesn't go past limit
-        if self.getEncoderPosition() > 33 and targetSpeed < 0:
+        if self.getEncoderPosition() > self.upperSafety and targetSpeed < 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
-        if self.getEncoderPosition() < 1 and targetSpeed > 0:
+        if self.getEncoderPosition() < self.lowerSafety and targetSpeed > 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
@@ -68,9 +55,16 @@ class Elevator:
         self.right_motor.set(-targetSpeed)
         self.left_motor.set(-targetSpeed)
 
+    # Move elevator and reset target to where you end up.
+    def move(self, targetSpeed):
+        self.extend(targetSpeed)
+        self.targetPosition = self.getEncoderPosition()
+
     #automatically move to an elevator extension (position) using a pid controller
-    def moveToPos(self, targetPosition):
-        extendSpeed = self.pid_controller.calculate(self.getEncoderPosition(), targetPosition)
+    def moveToPos(self, _targetPosition):
+        
+        self.targetPosition = _targetPosition
+        extendSpeed = self.pid_controller.calculate(self.getEncoderPosition(), self.targetPosition)
         self.log("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
         if(self.pid_controller.atSetpoint()):
             self.log("Elevator: At set point", self.getEncoderPosition())
@@ -82,6 +76,9 @@ class Elevator:
             self.extend(extendSpeed * 0.1)
             return False
 
+    def update(self):
+        self.moveToPos(self.targetPosition)
+    
     def isElevatorDown(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             return True
@@ -116,6 +113,7 @@ class Elevator:
     def resetEncoders(self):
         self.left_encoder.setPosition(0)
         self.right_encoder.setPosition(0)
+        self.targetPosition = self.getEncoderPosition()
 
     def bypassLimitSwitch(self):
         self.log("Elevator: Bypassing limit switch reset.")

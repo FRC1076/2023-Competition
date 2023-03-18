@@ -28,7 +28,7 @@ class Grabber:
         self.rotate_speed = _rotate_speed
         #0 is lowered state, 1 is raised state
         self.state = 0
-        self.bypassLimitSwitch = False
+        self.storeBypassLimitSwitch = False
 
     def faultReset(self):
         self.rotate_motor.clearFaults()
@@ -100,10 +100,11 @@ class Grabber:
             self.log("Grabber: goToPosition: Target position is too high: ", self.targetRotatePosition, " going to ", self.maxRotatePosition, " instead.")
             self.targetRotatePosition = self.maxRotatePosition
         rotate_error = self.rotate_pid_controller.calculate(self.rotate_motor_encoder.getPosition(), self.targetRotatePosition)
+        #rotate_error = clamp(rotate_error, 0, 0.2)
         rotate_error = -rotate_error
-        self.log("Grabber: goToPosition: Fixing encoder error: ", rotate_error, " target position: ", self.targetRotatePosition)
+        self.log("Grabber: goToPosition: adjustment: ", rotate_error, " target position: ", self.targetRotatePosition)
         self.rotate_motor.set(rotate_error)
-        return self.rotate_pid_controller.atSetPoint()
+        return self.rotate_pid_controller.atSetpoint()
         
     def atLowerLimit(self):
         result = self.reverse_limitSwitch.get()
@@ -122,19 +123,27 @@ class Grabber:
     
     def bypassLimitSwitch(self):
         self.log("Grabber: Bypassing limit switch reset.")
-        self.bypassLimitSwitch = True
+        self.storeBypassLimitSwitch = True
     
     #move grabber to the up position and reset encoders for the grabber (top position is encoder position 0)
     def grabberReset(self):
         self.targetRotatePosition = self.rotate_motor_encoder.getPosition()
         self.log("Grabber: grabberReset: ", self.targetRotatePosition)
-        if self.atUpperLimit() or self.bypassLimitSwitch == True:
+        if self.atUpperLimit() or self.storeBypassLimitSwitch == True:
             self.log("Grabber: grabberReset: completed task")
             self.resetEncoder()
             return True
         else:
             self.raise_motor(1.0) #goes at speed of 0.15 * 0.7 = 0.105
             return False
+
+    def clamp(num, min_value, max_value):
+        if num >= 0:
+            return max(min(num, max_value), min_value)
+        else:
+            neg_min = -min_value
+            neg_max = -max_value
+            return max(min(num, neg_min), neg_max)
 
     def log(self, *dataToLog):
         self.logger.log(dataToLog)

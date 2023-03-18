@@ -33,7 +33,7 @@
     "###Joysticks": {
       "Collapsed": "0",
       "Pos": "312,581",
-      "Size": "1156,316"
+      "Size": "1156,202"
     },
     "###NetworkTables": {
       "Collapsed": "0",
@@ -67,7 +67,7 @@
     },
     "Robot State": {
       "Collapsed": "0",
-      "Pos": "31,78",
+      "Pos": "41,33",
       "Size": "126,129"
     }
   }

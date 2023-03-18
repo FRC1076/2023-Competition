@@ -27,7 +27,7 @@ swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': False, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
-    'USE_COM_ADJUSTMENT': False, # Should robot compensate for CoM lever arms?
+    'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_RED_A_START_POSITION_X': 248.625, #159.0, # X-Coordinate of starting position A when on red team
@@ -54,7 +54,7 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_BUMPER_DIMENSION_Y': 3.0, # Width of bumper (Y-axis)
     'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
     'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
-    'ROBOT_COM_OFFSET_X': -3.5, #-4.0 X-offset of center of mass (relative to center of frame)
+    'ROBOT_COM_OFFSET_X': 2.0, # -3.5, #-4.0 X-offset of center of mass (relative to center of frame)
     'ROBOT_COM_OFFSET_Y': 0.0, # Y-offset of center of mass (relative to center of frame)
     'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
     'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)
@@ -95,22 +95,24 @@ drivetrainConfig = {
     'BEARING_KI': 0.00001,
     'BEARING_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
-    'TELEOP_OPEN_LOOP_RAMP_RATE': 1.0, # Improves maneuverability of bot.
-    'TELEOP_CLOSED_LOOP_RAMP_RATE': 1.0,
+    'TELEOP_OPEN_LOOP_RAMP_RATE': 0.125, # Improves maneuverability of bot.
+    'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.125,
     'LOW_CONE_SCORE': [['CLAW_INTAKE'],
                         ['ELEVATOR_DOWN'],
                         ['POSITION_GRABBER', 2],
-                        ['CLAW_RELEASE'],
                         ['ELEVATOR_LOWER_EXTEND'],
+                        ['CLAW_RELEASE'],
                         ['CLAW_STOP']],
     'HIGH_CONE_SCORE': [['CLAW_INTAKE'],
                         ['ELEVATOR_DOWN'],
                         ['POSITION_GRABBER', 2],
-                        ['CLAW_RELEASE'],
+                        ['MOVE_BACK', 10],
                         ['ELEVATOR_UPPER_EXTEND'],
+                        ['CLAW_RELEASE'],
                         ['CLAW_STOP']],
     'HUMAN_STATION_PICKUP': [['CLAW_INTAKE'],
                         ['ELEVATOR_DOWN'],
+                        ['MOVE_BACK', 10],
                         ['POSITION_GRABBER', 2],
                         ['CLAW_RELEASE'],
                         ['ELEVATOR_HUMAN_EXTEND']],
@@ -138,14 +140,14 @@ elevatorConfig = {
     'ELEVATOR_KP': 0.12, #0.048, # 0.8 * 0.6
     'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
     'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
-    'HUMAN_POSITION': 28, # Assumes Elevator Down
-    'UPPER_SCORING_HEIGHT': 33,
-    'LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
-    'RETRACTED_HEIGHT': 7,
-    'LOWER_SAFETY': 15,
-    'UPPER_SAFETY': 25,
+    'LOWER_SAFETY': 1,
+    'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
+    'ELEVATOR_HUMAN_POSITION': 25, # Assumes Elevator Down
+    'ELEVATOR_UPPER_SCORING_HEIGHT': 33, # Assumes Elevator Down
+    'ELEVATOR_LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
+    'ELEVATOR_RETRACTED_HEIGHT': 7,
 }
 
 grabberConfig = {
@@ -156,14 +158,19 @@ grabberConfig = {
     'ROTATE_KD': 0.002, #0.002,
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
     'MIN_POSITION': 1, # Roughly 0 - 5 scale, with 0 at top
+    'GRABBER_HUMAN_POSITION': 2.5, # Assumes Elevator Down
+    'GRABBER_UPPER_SCORING_HEIGHT': 2,
+    'GRABBER_LOWER_SCORING_HEIGHT': 2, # Assumes Elevator Down
+    'GRABBER_RETRACTED_HEIGHT': 2,
+    
 }
 
 clawConfig = {
     'MOTOR_ID': 8,
     'RELEASE_SPEED': 0.1, # Go slow on release, so piece drops straight down
-    'RELEASE_CHANGE': 100, # Encoder change before we assume element is grabbed
-    'INTAKE_SPEED': 0.1, # Go fast on intake
-    'INTAKE_CHANGE': 100 # Encoder change before we assume element is expelled
+    'RELEASE_CHANGE': 10, # Encoder change before we assume element is grabbed
+    'INTAKE_SPEED': 0.2, # Go fast on intake
+    'INTAKE_CHANGE': 10 # Encoder change before we assume element is expelled
 }
 
 cliffDetectorConfig = {
