@@ -4,9 +4,11 @@ from wpilib import DoubleSolenoid
 import wpimath.controller
 from wpimath.controller import PIDController
 import math
+from logger import Logger
 
 class Elevator:
     def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber, left_limit_switch_id, right_limit_switch_id):
+        self.logger = Logger.getLogger()
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.right_motor = rev.CANSparkMax(right_id, motor_type) # elevator up-down
         self.left_motor = rev.CANSparkMax(left_id, motor_type) # elevator up-down
@@ -27,26 +29,13 @@ class Elevator:
         self.lowerSafety = lower_safety
         self.left_limit_switch = wpilib.DigitalInput(left_limit_switch_id)
         self.right_limit_switch = wpilib.DigitalInput(right_limit_switch_id)
+        self.targetPosition = self.getEncoderPosition()
+
+    def getTargetPosition(self):
+        return self.targetPosition
 
     #1.00917431193 inches per rotation
     def extend(self, targetSpeed):  # controls length of the elevator 
-        #print(self.getEncoderPosition())
-
-        currentPosition = self.getEncoderPosition()
-        #if currentPosition >= self.upperSafety:
-        #    self.grabber.lower_motor()
-        #if currentPosition <= self.lowerSafety:
-        #    self.grabber.raise_motor()
-        
-        #if currentPosition >= self.upperSafety and not self.grabber.atLowerLimit():
-        #    self.right_motor.set(0)
-        #    self.left_motor.set(0)
-        #    return
-        
-        #if currentPosition <= self.lowerSafety and not self.grabber.atUpperLimit():
-        #    self.right_motor.set(0)
-        #    self.left_motor.set(0)
-        #    return
             
         if targetSpeed > 1:
             targetSpeed = 1
@@ -54,11 +43,11 @@ class Elevator:
             targetSpeed = -1
             
         #make sure arm doesn't go past limit
-        if self.getEncoderPosition() > 33 and targetSpeed < 0:
+        if self.getEncoderPosition() > self.upperSafety and targetSpeed < 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
-        if self.getEncoderPosition() < 1 and targetSpeed > 0:
+        if self.getEncoderPosition() < self.lowerSafety and targetSpeed > 0:
             self.right_motor.set(0)
             self.left_motor.set(0)
             return
@@ -66,20 +55,30 @@ class Elevator:
         self.right_motor.set(-targetSpeed)
         self.left_motor.set(-targetSpeed)
 
+    # Move elevator and reset target to where you end up.
+    def move(self, targetSpeed):
+        self.extend(targetSpeed)
+        self.targetPosition = self.getEncoderPosition()
+
     #automatically move to an elevator extension (position) using a pid controller
-    def moveToPos(self, targetPosition):
-        extendSpeed = self.pid_controller.calculate(self.getEncoderPosition(), targetPosition)
-        print("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
+    def moveToPos(self, _targetPosition):
+        
+        self.targetPosition = _targetPosition
+        extendSpeed = self.pid_controller.calculate(self.getEncoderPosition(), self.targetPosition)
+        self.log("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
         if(self.pid_controller.atSetpoint()):
-            print("Elevator: At set point", self.getEncoderPosition())
+            self.log("Elevator: At set point", self.getEncoderPosition())
             self.extend(0)
             return True
         else:
-            print("Elevator: Moving")
+            self.log("Elevator: Moving")
             extendSpeed *= -1 # Elevator motor moves reverse direction.
             self.extend(extendSpeed * 0.1)
             return False
 
+    def update(self):
+        self.moveToPos(self.targetPosition)
+    
     def isElevatorDown(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             return True
@@ -100,32 +99,34 @@ class Elevator:
 
     # contols the "lean" of the elevator
     def toggle(self):
+        self.log("Elevator: In toggle().")
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
-            print("Elevator: Toggle: Set to reverse/up.")
+            self.log("Elevator: Toggle: Set to reverse/up.")
         elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             self.solenoid.set(DoubleSolenoid.Value.kForward)
-            print("Elevator: Toggle: Set forward/down.")
+            self.log("Elevator: Toggle: Set forward/down.")
         else:
-            print("Elevator: Toggle: How did we get here?")
+            self.log("Elevator: Toggle: How did we get here?")
         return True
     
     def resetEncoders(self):
         self.left_encoder.setPosition(0)
         self.right_encoder.setPosition(0)
+        self.targetPosition = self.getEncoderPosition()
 
     def bypassLimitSwitch(self):
-        print("Elevator: Bypassing limit switch reset.")
+        self.log("Elevator: Bypassing limit switch reset.")
         self.resetEncoders()
     
     def elevatorReset(self):
-        print("Elevator: Reseting elevator")
+        self.log("Elevator: Reseting elevator")
         
         #reset grabber (lift it up) after elevator is all the way down
         if self.left_limit_switch.get() == True or self.right_limit_switch.get() == True:
-            print("Elevator: Found the limit switch")
+            self.log("Elevator: Found the limit switch")
             self.resetEncoders()
-            return self.grabber.grabberReset()
+            return True
         else:
             self.right_motor.set(-0.1)
             self.left_motor.set(-0.1)
@@ -134,3 +135,6 @@ class Elevator:
     # only reading the right encoder, assuming that left and right will stay about the same
     def getEncoderPosition(self):
         return self.right_encoder.getPosition()
+
+    def log(self, *dataToLog):
+        self.logger.log(dataToLog)
