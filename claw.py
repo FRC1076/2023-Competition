@@ -1,41 +1,62 @@
-
 import wpilib
-from wpilib import DoubleSolenoid
-
-SOLENOID_OPEN = DoubleSolenoid.Value.kForward
-SOLENOID_CLOSED = DoubleSolenoid.Value.kReverse
-SOLENOID_OFF = DoubleSolenoid.Value.kOff
+import rev
 
 class Claw:
 
-    def __init__(self, solenoid_forward_id, solenoid_reverse_id):
-        
-        self.solenoid_forward_id = solenoid_forward_id
-        self.solenoid_reverse_id = solenoid_reverse_id
+    def __init__(self, motor_id, _release_speed, _release_change, _intake_speed, _intake_change):
 
-        self.solenoid = wpilib.DoubleSolenoid(1, 
-            wpilib.PneumaticsModuleType.REVPH, 
-            solenoid_forward_id, 
-            solenoid_reverse_id)
+        motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
+        self.motor = rev.CANSparkMax(motor_id, motor_type)
+        self.encoder = self.motor.getEncoder()
+
+        # Just to make sure it's defined and off.
+        self.basePosition = self.encoder.getPosition()
+        self.motor.set(0)
+
+        self.releaseSpeed = _release_speed
+        self.releaseChange = _release_change
+        self.intakeSpeed = _intake_speed
+        self.intakeChange = _intake_change
+
+        # Resets maneuver. Note that this is also reset with off(), which is called in roboty.py: disabledExit()
+        self.maneuverComplete = True
         
-    # open and close
-    def toggle(self):
-        if self.solenoid.get() == SOLENOID_CLOSED:
-            self.open()
-            print("Claw: open via toggle")
-        elif self.solenoid.get() == SOLENOID_OPEN or self.solenoid.get() == SOLENOID_OFF:
-            self.close()
-            print("Claw: close via toggle")
-        else:
-            print("Claw: Toggle: How did we get here?")
-        return True
+    # Expel the object by running motors to expel.
+    def release(self):
+        self.motor.set(self.releaseSpeed)
+
+    # Expel the object by running motors to expel.
+    def intake(self):
+        self.motor.set(self.intakeSpeed)
+
+    # Stop the claw motor.
+    def off(self):
+        self.motor.set(0)
+        self.maneuverComplete = True
+
+    def runAndStop(self, direction):
+
+        # First time in, so figure out where we are and how far to go.
+        if self.maneuverComplete == True:
+            self.basePosition = self.encoder.getPosition()
+            if direction >= 0:
+                self.targetPosition = self.basePosition + self.releaseChange
+            else:
+                self.targetPosition = self.basePosition - self.intakeChange
+            self.maneuverComplete = False
     
-    def open(self):
-        self.solenoid.set(SOLENOID_OPEN)
-        print("Claw: Open")
-        return True
+        # Are we expelling game piece and not there yet?
+        if (self.maneuverComplete == False) and (self.basePosition < self.targetPosition) and (self.encoder.getPosition() < self.targetPosition):
+            self.motor.set(self.releaseSpeed)
+            return False
 
-    def close(self):
-        self.solenoid.set(SOLENOID_CLOSED)
-        print("Claw: Close")
-        return True
+        # Are we grabbing game piece and not there yet?
+        elif (self.maneuverComplete == False) and (self.basePosition > self.targetPosition) and (self.encoder.getPosition() > self.targetPosition):
+            self.motor.set(self.intakeSpeed)
+            return False
+        
+        # We must be done, so end maneuver.
+        else:
+            self.motor.set(0)
+            self.maneuverComplete = True
+            return True

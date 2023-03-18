@@ -114,6 +114,8 @@ drivetrainConfig = {
                         ['RAISE_GRABBER'],
                         ['ELEVATOR_DOWN'],
                         ['ELEVATOR_HUMAN_EXTEND']],
+    'ROTATE_CLOCKWISE': [['ROTATE', 179]], # 179, not -180 to ensure direction
+    'ROTATE_COUNTERCLOCKWISE': [['ROTATE', -179]], # -179, not -180, to ensure direction
 }
 
 visionConfig = {
@@ -140,7 +142,8 @@ elevatorConfig = {
     'RETRACTED_HEIGHT': 7,
     'LOWER_SAFETY': 15,
     'UPPER_SAFETY': 25,
-    'LIMIT_SWITCH': 2,
+    'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
+    'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
 }
 
 grabberConfig = {
@@ -153,8 +156,11 @@ grabberConfig = {
 }
 
 clawConfig = {
-    'SOLENOID_FORWARD_ID': 13,
-    'SOLENOID_REVERSE_ID': 12,
+    'MOTOR_ID': 7,
+    'RELEASE_SPEED': 0.1, # Go slow on release, so piece drops straight down
+    'RELEASE_CHANGE': 100, # Encoder change before we assume element is grabbed
+    'INTAKE_SPEED': 0.1, # Go fast on intake
+    'INTAKE_CHANGE': 100 # Encoder change before we assume element is expelled
 }
 
 cliffDetectorConfig = {
