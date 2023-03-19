@@ -13,7 +13,7 @@ import ctre
 from navx import AHRS
 from networktables import NetworkTables
 
-from robotconfig import robotconfig
+from robotconfig import robotconfig, MODULE_NAMES
 from controller import Controller
 from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
@@ -42,6 +42,8 @@ SWERVE = 3
 
 # Test Mode
 TEST_MODE = False
+
+DASH_PREFIX = MODULE_NAMES.ROBOT
 
 class MyRobot(wpilib.TimedRobot):
 
@@ -152,12 +154,12 @@ class MyRobot(wpilib.TimedRobot):
             teamGyroAdjustment = 0 # Blue Team faces 0 degrees at start.
             teamMoveAdjustment = -1 # Blue Team start is oriented 180 degrees from field.
 
-        self.dashboard.putBoolean('Team is Red', self.team_is_red)
+        self.dashboard.putBoolean(DASH_PREFIX, 'Team is Red', self.team_is_red)
 
         self.log("FIELD_START_POSITION:", config['FIELD_START_POSITION'])
 
         if (config['FIELD_START_POSITION'] == 'A'):
-            self.dashboard.putString('Field Start Position', 'A')
+            self.dashboard.putString(DASH_PREFIX, 'Field Start Position', 'A')
             self.fieldStartPosition = 'A'
             if self.team_is_red:
                 starting_position_x = config['FIELD_RED_A_START_POSITION_X']
@@ -168,7 +170,7 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_A_START_ANGLE']
         elif (config['FIELD_START_POSITION'] == 'B'):
-            self.dashboard.putString('Field Start Position', 'B')
+            self.dashboard.putString(DASH_PREFIX, 'Field Start Position', 'B')
             self.fieldStartPosition = 'B'
             if self.team_is_red:
                 starting_position_x = config['FIELD_RED_B_START_POSITION_X']
@@ -179,7 +181,7 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_B_START_ANGLE']
         else: # config['FIELD_START_POSITION'] == 'C'
-            self.dashboard.putString('Field Start Position', 'C')
+            self.dashboard.putString(DASH_PREFIX, 'Field Start Position', 'C')
             self.fieldStartPosition = 'C'
             if self.team_is_red:
                 starting_position_x = config['FIELD_RED_C_START_POSITION_X']
@@ -195,10 +197,10 @@ class MyRobot(wpilib.TimedRobot):
             actual_bumper_dimension_x = config['ROBOT_BUMPER_DIMENSION_X']
             actual_bumper_dimension_y = config['ROBOT_BUMPER_DIMENSION_Y']
         else:
-             actual_bumper_dimension_x = 0.0
-             actual_bumper_dimension_y = 0.0
+            actual_bumper_dimension_x = 0.0
+            actual_bumper_dimension_y = 0.0
 
-        self.dashboard.putBoolean('Has Bumpers Attached', bumpers_attached)
+        self.dashboard.putBoolean(DASH_PREFIX, 'Has Bumpers Attached', bumpers_attached)
 
         field_cfg = FieldConfig(sd_prefix='Field_Module',
                                 origin_x=config['FIELD_ORIGIN_X'],
@@ -334,8 +336,8 @@ class MyRobot(wpilib.TimedRobot):
         self.autonBalanceRobot = config['BALANCE_BOT']
         self.autonDoCommunity = config['DO_COMMUNITY']
 
-        self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
-        self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
+        self.dashboard.putNumber(DASH_PREFIX, 'Auton Score Existing Element', self.autonScoreExisting)
+        self.dashboard.putNumber(DASH_PREFIX, 'Auton Balance Robot', self.autonBalanceRobot)
 
         # Reset task counter.
         self.autonTaskCounter = 0
@@ -755,11 +757,11 @@ class MyRobot(wpilib.TimedRobot):
         if not self.autonTimer:
             return
 
-        if self.grabber_has_reset == False:
+        if self.grabber_has_reset == False and not TEST_MODE:
             self.grabber_has_reset = self.grabber.grabberReset()
             return True
             
-        if self.elevator_has_reset == False:
+        if self.elevator_has_reset == False and not TEST_MODE   :
             self.elevator_has_reset = self.elevator.elevatorReset()
             return
         
@@ -775,97 +777,125 @@ class MyRobot(wpilib.TimedRobot):
         self.log("Current Task Counter: ", self.autonTaskCounter, "Current Task: ", autonTask)
 
         if (autonTask[0] == 'TIMER'):
-            self.log("Auton: Timer: ", self.autonTimer.get())
+            self.log("RUNNING Auton Task TIMER, timer: ", self.autonTimer.get())
             if self.autonTimer.get() > autonTask[1]:
+                self.log("ENDING Auton Task: TIMER: ", self.autonTimer.get())
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_INTAKE_AND_STOP'):
-            self.log("Auton: Claw Intake: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task CLAW_INTAKE_AND_STOP, autonTaskCounter: ", self.autonTaskCounter)
             if self.claw.runAndStop(-1):
+                self.log("ENDING Auton Task CLAW_INTAKE_AND_STOP")
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_RELEASE_AND_STOP'):
-            self.log("Auton: Claw Release: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task CLAW_RELEASE_AND_STOP, autonTaskCounter: ", self.autonTaskCounter)
             if self.claw.runAndStop(+1):
+                self.log("ENDING Auton Task CLAW_RELEASE_AND_STOP")
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_STOP'):
-            self.log("Auton: Claw Stop: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task CLAW_STOP, autonTaskCounter: ", self.autonTaskCounter)
             if self.claw.off():
+                self.log("ENDING Auton Task CLAW_STOP")
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'RAISE_GRABBER'):
+            self.log("RUNNING Auton Task RAISE_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
             if self.grabber.raise_motor(0.6):
+                self.log("ENDING Auton Task RAISE_GRABBER")
                 self.autonTaskCounter += 1
             self.elevator.update()
         elif (autonTask[0] == 'LOWER_GRABBER'):
+            self.log("RUNNING Auton Task LOWER_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
             if self.grabber.lower_motor(0.2):
+                self.log("ENDING Auton Task LOWER_GRABBER")
                 self.autonTaskCounter += 1 
             self.elevator.update()
         elif (autonTask[0] == 'ELEVATOR_TOGGLE'):
+            self.log("RUNNING Auton Task ELEVATOR_TOGGLE, autonTaskCounter: ", self.autonTaskCounter)
             if self.elevator.toggle():
                 self.autonTaskCounter += 1
-            self.log("Auton: Elevator Toggle: ", self.elevator.getEncoderPosition())
+                self.log("ENDING Auton Task ELEVATOR_TOGGLE")
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_UP'):
-            if self.elevator.elevatorUp():
-                self.autonTaskCounter += 1
+            self.log("RUNNING Auton Task ELEVATOR_UP, autonTaskCounter: ", self.autonTaskCounter)
             self.log("Auton: Elevator Up: ", self.elevator.getEncoderPosition())
+            if self.elevator.elevatorUp():
+                self.log("ENDING Auton Task ELEVATOR_UP")
+                self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_DOWN'):
+            self.log("RUNNING Auton Task ELEVATOR_DOWN, autonTaskCounter: ", self.autonTaskCounter)
+            self.log("Auton: Elevator Down: ", self.elevator.getEncoderPosition())
             if self.elevator.elevatorDown():
+                self.log("ENDING Auton Task ELEVATOR_DOWN")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Down: ", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_UPPER_EXTEND'):
+            self.log("RUNNING Auton Task ELEVATOR_UPPER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
             if self.elevator.moveToPos(self.elevator_upper_scoring_height) and self.grabber.goToPosition(self.grabber_upper_scoring_height):
+                self.log("ENDING Auton Task ELEVATOR_UPPER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Upper Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_LOWER_EXTEND'):
+            self.log("RUNNING Auton Task ELEVATOR_LOWER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
             if self.elevator.moveToPos(self.elevator_lower_scoring_height) and self.grabber.goToPosition(self.grabber_lower_scoring_height):
+                self.log("ENDING Auton Task ELEVATOR_LOWER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Lower Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
+            self.log("RUNNING Auton Task ELEVATOR_RETRACT, autonTaskCounter: ", self.autonTaskCounter)
             if self.elevator.moveToPos(self.elevator_retracted_height): #and self.grabber.goToPosition(self.grabber_retracted_height):
+                self.log("ENDING Auton Task ELEVATOR_RETRACT")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Retract: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'MOVE'):
             x = autonTask[1]
             y = autonTask[2]
             bearing = autonTask[3]
+            
+            self.log("RUNNING Auton Task MOVE, autonTaskCounter: ", self.autonTaskCounter)
+
             self.log("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
             if self.drivetrain.goToPose(x, y, bearing):
-                self.autonTaskCounter += 1 # Move on to next task.
+                self.log("ENDING Auton Task MOVE")
                 self.log("Auton: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.autonTaskCounter += 1 # Move on to next task.
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
                 self.log("Auton: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'MOVE_TO_BALANCE'):
+            self.log("RUNNING Auton Task MOVE_TO_BALANCE, autonTaskCounter: ", self.autonTaskCounter)            
             x = autonTask[1]
             y = autonTask[2]
             bearing = autonTask[3]
             tolerance = autonTask[4]
-            self.log("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            self.log("Auton: MOVE_TO_BALANCE: Target: x: ", x, " y: ", y, " bearing: ", bearing)
             if self.drivetrain.goToBalance(x, y, bearing, tolerance):
+                self.log("ENDING Auton Task MOVE_TO_BALANCE")
+                self.log("Auton: MOVE_TO_BALANCE: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
                 self.autonTaskCounter += 1 # Move on to next task.
-                self.log("Auton: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
-                self.log("Auton: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("Auton: MOVE_TO_BALANCE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'BALANCE'):
-            self.log("Auton: Balance: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task BALANCE, autonTaskCounter: ", self.autonTaskCounter)            
+
             if self.drivetrain.balance():
+                self.log("ENDING Auton Task BALANCE")
                 self.autonTaskCounter += 1 # Move on to next task.
                 self.log("Auton: Balance: Leveled and oriented")
             else:
@@ -874,19 +904,21 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'WHEEL_LOCK'):
-            self.log("Auton: Wheel Lock: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task WHEEL_LOCK, autonTaskCounter: ", self.autonTaskCounter)            
             self.drivetrain.setWheelLock(True)
             self.drivetrain.goToPose(0, 0, self.drivetrain.getBearing())
+            self.log("ENDING Auton Task WHEEL_LOCK")
             self.autonTaskCounter += 1 # Move on to next task.
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'IDLE'):
-            self.log("Auton: Idle: ", self.autonTaskCounter)
+            ## this will never end?
+            self.log("RUNNING Auton Task IDLE, autonTaskCounter: ", self.autonTaskCounter)            
             self.drivetrain.idle()
             self.elevator.update()
             self.grabber.update()
         else:
-            self.log("Auton: ERROR: Unknown Task", self.autonTaskCounter)
+            self.log("Auton: ERROR: Unknown Task", self.autonTaskCounter, autonTask[0])
             self.autonTaskCounter += 1   
 
         return
@@ -1061,7 +1093,7 @@ class MyRobot(wpilib.TimedRobot):
             return x
 
     def log(self, *dataToLog):
-        self.logger.log(dataToLog)
+        self.logger.log(MODULE_NAMES.ROBOT,dataToLog)
 
 if __name__ == "__main__":
     if sys.argv[1] == 'sim':

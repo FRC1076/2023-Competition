@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 DEADZONE = 0.1
 
 # Drive Types
@@ -385,19 +387,65 @@ autonConfig = {
                         ['MOVE', 91.9375, -137.90, 180]],
 }
 
+#MODULE NAMES
+MODULE_NAMES = namedtuple('MODULE_NAMES', [
+    'ROBOT',
+    'SWERVEDRIVE',
+    'SWERVEMODULE',
+    'SWERVOMETER',
+    'ELEVATOR',
+    'GRABBER',
+    'CLAW',
+    'VISION'
+])
+
+
+# using a named tuple to make sure we always use the same names
+MODULE_NAMES.ROBOT = 'ROBOT'
+MODULE_NAMES.SWERVEDRIVE = 'SWERVEDRIVE'
+MODULE_NAMES.SWERVEMODULE = 'SWERVEMODULE'
+MODULE_NAMES.SWERVOMETER = 'SWERVOMETER'
+MODULE_NAMES.ELEVATOR = 'ELEVATOR'
+MODULE_NAMES.GRABBER = 'GRABBER'
+MODULE_NAMES.CLAW = 'CLAW'
+MODULE_NAMES.VISION = 'VISION'
+
+
+loggingConfig = {
+    MODULE_NAMES.ROBOT: True,
+    MODULE_NAMES.SWERVEDRIVE: True,
+    MODULE_NAMES.SWERVEMODULE: True,
+    MODULE_NAMES.SWERVOMETER: True,
+    MODULE_NAMES.ELEVATOR: True,
+    MODULE_NAMES.GRABBER: True,
+    MODULE_NAMES.CLAW: True,
+    MODULE_NAMES.VISION: True,    
+}
+
+dashboardConfig = {
+    MODULE_NAMES.ROBOT: True,
+    MODULE_NAMES.SWERVEDRIVE: True,
+    MODULE_NAMES.SWERVEMODULE: True,
+    MODULE_NAMES.SWERVOMETER: True,
+    MODULE_NAMES.ELEVATOR: True,
+    MODULE_NAMES.GRABBER: True,
+    MODULE_NAMES.CLAW: True,
+    MODULE_NAMES.VISION: True,   
+}
+
 #######################
 ###  ROBOT CONFIGS  ###
 #######################
-testbot = { # Always used for unit tests ($ python robot.py sim)
-    'CONTROLLERS': controllerConfig,
-    'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
-    'VISION': visionConfig, # Must be BEFORE drivetrain
-    'DRIVETRAIN': drivetrainConfig,
-    'CLIFFDETECTOR': cliffDetectorConfig,
-    'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
-    'ELEVATOR': elevatorConfig,
-    'AUTON': autonConfig,
-}
+# testbot = { # Always used for unit tests ($ python robot.py sim)
+#     'CONTROLLERS': controllerConfig,
+#     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
+#     'VISION': visionConfig, # Must be BEFORE drivetrain
+#     'DRIVETRAIN': drivetrainConfig,
+#     'CLIFFDETECTOR': cliffDetectorConfig,
+#     'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
+#     'ELEVATOR': elevatorConfig,
+#     'AUTON': autonConfig,
+# }
 
 showbot = {
     'CONTROLLERS': controllerConfig,
@@ -408,6 +456,8 @@ showbot = {
     'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
     'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
+    'LOGGING': loggingConfig,
+    'DASHBOARD': dashboardConfig
 }
 
 #showbot['DRIVETRAIN']['FRONTLEFT_DRIVEMOTOR'] = 1 # how to override just one thing

@@ -2,7 +2,11 @@ import wpilib
 import rev
 import wpimath.controller
 from wpimath.controller import PIDController
+
 from logger import Logger
+from robotconfig import MODULE_NAMES
+
+DASH_PREFIX = MODULE_NAMES.GRABBER
 
 class Grabber:
 
@@ -146,4 +150,4 @@ class Grabber:
             return max(min(num, neg_min), neg_max)
 
     def log(self, *dataToLog):
-        self.logger.log(dataToLog)
+        self.logger.log(DASH_PREFIX, dataToLog)

@@ -4,7 +4,11 @@ from wpilib import DoubleSolenoid
 import wpimath.controller
 from wpimath.controller import PIDController
 import math
+
 from logger import Logger
+from robotconfig import MODULE_NAMES
+
+DASH_PREFIX = MODULE_NAMES.ELEVATOR
 
 class Elevator:
     def __init__(self, right_id, left_id, solenoid_forward_id, solenoid_reverse_id, kP, kI, kD, lower_safety, upper_safety, grabber, left_limit_switch_id, right_limit_switch_id):
@@ -137,4 +141,4 @@ class Elevator:
         return self.right_encoder.getPosition()
 
     def log(self, *dataToLog):
-        self.logger.log(dataToLog)
+        self.logger.log(DASH_PREFIX, dataToLog)
