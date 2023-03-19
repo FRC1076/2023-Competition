@@ -50,13 +50,13 @@ class Claw:
         # Are we expelling game piece and not there yet?
         if (self.maneuverComplete == False) and (self.basePosition < self.targetPosition) and (self.encoder.getPosition() < self.targetPosition):
             self.motor.set(self.releaseSpeed)
-            self.log("Claw: RunNStop: Expelling / Not Done: basePosition: ", self.basePosition, " self.targetPosition", self.targetPosition, " getPOsition: ", self.encoder.getPosition())
+            self.log("Claw: RunNStop: Expelling / Not Done: basePosition: ", self.basePosition, " self.targetPosition", self.targetPosition, " getPosition: ", self.encoder.getPosition())
             return False
 
         # Are we grabbing game piece and not there yet?
         elif (self.maneuverComplete == False) and (self.basePosition > self.targetPosition) and (self.encoder.getPosition() > self.targetPosition):
             self.motor.set(-self.intakeSpeed)
-            self.log("Claw: RunNStop: Intake / Not Done: basePosition: ", self.basePosition, " self.targetPosition", self.targetPosition, " getPOsition: ", self.encoder.getPosition())
+            self.log("Claw: RunNStop: Intake / Not Done: basePosition: ", self.basePosition, " self.targetPosition", self.targetPosition, " getPosition: ", self.encoder.getPosition())
             return False
         
         # We must be done, so end maneuver.

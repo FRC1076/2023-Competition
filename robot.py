@@ -332,6 +332,7 @@ class MyRobot(wpilib.TimedRobot):
     def initAuton(self, config):
         self.autonScoreExisting = config['SCORE_EXISTING']
         self.autonBalanceRobot = config['BALANCE_BOT']
+        self.autonDoCommunity = config['DO_COMMUNITY']
 
         self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
         self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
@@ -360,6 +361,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_A_FT']
         elif (self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and not self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_A_FF']
+        elif (self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
@@ -368,12 +374,23 @@ class MyRobot(wpilib.TimedRobot):
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
             and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_B_TT']     
+                if self.autonDoCommunity:
+                    self.autonTaskList = config['TASK_RED_B_TTT']
+                else:
+                    self.autonTaskList = config['TASK_RED_B_TTF']     
         elif (self.team_is_red
             and self.fieldStartPosition == 'B'
             and not self.autonScoreExisting
             and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_RED_B_FT']     
+                if self.autonDoCommunity:
+                    self.autonTaskList = config['TASK_RED_B_FTT']
+                else:
+                    self.autonTaskList = config['TASK_RED_B_FTF']     
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and not self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_B_FF']     
         elif (self.team_is_red
             and self.fieldStartPosition == 'C'
             and self.autonScoreExisting
@@ -389,6 +406,11 @@ class MyRobot(wpilib.TimedRobot):
             and not self.autonScoreExisting
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_RED_C_FT']
+        elif (self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and not self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_RED_C_FF']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'A'
             and self.autonScoreExisting
@@ -405,6 +427,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_BLU_A_FT']     
         elif (not self.team_is_red
+            and self.fieldStartPosition == 'A'
+            and not self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_A_FF']     
+        elif (not self.team_is_red
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
@@ -413,12 +440,23 @@ class MyRobot(wpilib.TimedRobot):
             and self.fieldStartPosition == 'B'
             and self.autonScoreExisting
             and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_B_TT']
+                if self.autonDoCommunity:
+                    self.autonTaskList = config['TASK_BLU_B_TTT']
+                else:
+                    self.autonTaskList = config['TASK_BLU_B_TTF']     
         elif (not self.team_is_red
             and self.fieldStartPosition == 'B'
             and not self.autonScoreExisting
             and self.autonBalanceRobot):
-                self.autonTaskList = config['TASK_BLU_B_FT']
+                if self.autonDoCommunity:
+                    self.autonTaskList = config['TASK_BLU_B_FTT']
+                else:
+                    self.autonTaskList = config['TASK_BLU_B_FTF']     
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'B'
+            and not self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_B_FF']
         elif (not self.team_is_red
             and self.fieldStartPosition == 'C'
             and self.autonScoreExisting
@@ -434,6 +472,11 @@ class MyRobot(wpilib.TimedRobot):
             and self.autonScoreExisting
             and not self.autonBalanceRobot):
                 self.autonTaskList = config['TASK_BLU_C_TF']
+        elif (not self.team_is_red
+            and self.fieldStartPosition == 'C'
+            and not self.autonScoreExisting
+            and not self.autonBalanceRobot):
+                self.autonTaskList = config['TASK_BLU_C_FF']
         else: # No matching task list
             self.autonTaskCounter = -1
             self.autonTaskList = []
@@ -737,13 +780,13 @@ class MyRobot(wpilib.TimedRobot):
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
-        elif (autonTask[0] == 'CLAW_INTAKE'):
+        elif (autonTask[0] == 'CLAW_INTAKE_AND_STOP'):
             self.log("Auton: Claw Intake: ", self.autonTaskCounter)
             if self.claw.runAndStop(-1):
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
-        elif (autonTask[0] == 'CLAW_RELEASE'):
+        elif (autonTask[0] == 'CLAW_RELEASE_AND_STOP'):
             self.log("Auton: Claw Release: ", self.autonTaskCounter)
             if self.claw.runAndStop(+1):
                 self.autonTaskCounter += 1
@@ -781,10 +824,14 @@ class MyRobot(wpilib.TimedRobot):
             self.log("Auton: Elevator Down: ", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
-        elif (autonTask[0] == 'ELEVATOR_EXTEND'):
+        elif (autonTask[0] == 'ELEVATOR_UPPER_EXTEND'):
             if self.elevator.moveToPos(self.elevator_upper_scoring_height) and self.grabber.goToPosition(self.grabber_upper_scoring_height):
                 self.autonTaskCounter += 1
-            self.log("Auton: Elevator Extend: ", self.elevator.getEncoderPosition())
+            self.log("Auton: Elevator Upper Extend: ", self.elevator.getEncoderPosition())
+        elif (autonTask[0] == 'ELEVATOR_LOWER_EXTEND'):
+            if self.elevator.moveToPos(self.elevator_lower_scoring_height) and self.grabber.goToPosition(self.grabber_lower_scoring_height):
+                self.autonTaskCounter += 1
+            self.log("Auton: Elevator Lower Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
             if self.elevator.moveToPos(self.elevator_retracted_height): #and self.grabber.goToPosition(self.grabber_retracted_height):
                 self.autonTaskCounter += 1
@@ -867,19 +914,19 @@ class MyRobot(wpilib.TimedRobot):
         if (maneuverTask[0] == 'CLAW_OFF'):
             self.claw.off()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Off: ", self.maneuverTaskCounter)
+            self.log("Maneuver: Claw Off: ")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'CLAW_INTAKE'):
             self.claw.intake()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Intake: ", self.maneuverTaskCounter)
+            self.log("Maneuver: Claw Intake")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'CLAW_RELEASE'):
             self.claw.release()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Release: ", self.maneuverTaskCounter)
+            self.log("Maneuver: Claw Release")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
