@@ -946,81 +946,102 @@ class MyRobot(wpilib.TimedRobot):
         if (maneuverTask[0] == 'CLAW_OFF'):
             self.claw.off()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Off: ")
+            self.log("RUNNING AND ENDING Maneuver: Claw Off: ")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'CLAW_INTAKE'):
             self.claw.intake()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Intake")
+            self.log("RUNNING AND ENDING Maneuver: Claw Intake")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'CLAW_RELEASE'):
             self.claw.release()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Release")
+            self.log("RUNNING AND ENDING Maneuver: Claw Release")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
             if self.grabber.raise_motor(1.0):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Raise Grabber: ", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
             if self.grabber.lower_motor(1.0):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Lower Grabber: ", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
         elif (maneuverTask[0] == 'POSITION_GRABBER'):
             if self.grabber.goToPosition(maneuverTask[1]):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Position Grabber: ", self.maneuverTaskCounter, " target position: ", maneuverTask[1])
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Position Grabber target position: ", maneuverTask[1])
             self.elevator.update()
         elif (maneuverTask[0] == 'ELEVATOR_TOGGLE'):
             if self.elevator.toggle():
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Toggle: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Elevator Toggle: ", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ELEVATOR_UP'):
             if self.elevator.elevatorUp():
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Up: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Elevator position:", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ELEVATOR_DOWN'):
             if self.elevator.elevatorDown():
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Down: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Elevator position", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             if self.elevator.moveToPos(self.elevator_lower_scoring_height) and self.grabber.goToPosition(self.grabber_lower_scoring_height):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Extend: ", self.lower_scoring_height, " current position: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("lower scoring height ", self.lower_scoring_height, " current position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_HUMAN_EXTEND'):
             if self.elevator.moveToPos(self.elevator_human_position)and self.grabber.goToPosition(self.grabber_human_position):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_UPPER_EXTEND'):
             if self.elevator.moveToPos(self.elevator_upper_scoring_height) and self.grabber.goToPosition(self.grabber_upper_scoring_height):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_RETRACT'):
             if self.elevator.moveToPos(self.elevator_retracted_height) and self.grabber.goToPosition(self.grabber_retracted_height):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Retract: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'MOVE'):
             x = maneuverTask[1]
             y = maneuverTask[2]
             bearing = maneuverTask[3]
-            self.log("Maneuver: Move: ", self.maneuverTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            
+            self.log("Moving to Target: x: ", x, " y: ", y, " bearing: ", bearing)
             if self.drivetrain.goToPose(x, y, bearing):
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                self.log("Maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("ENDING Maneuver", maneuverTask[0])                            
+                self.log("MOVE: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+                self.log("MOVE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'MOVE_BACK'):
@@ -1032,10 +1053,12 @@ class MyRobot(wpilib.TimedRobot):
                 x += backDistance
             if self.drivetrain.goToPose(x, y, bearing):
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                self.log("Maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("ENDING Maneuver", maneuverTask[0])            
+                self.log("MOVE_BACK: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+                self.log("MOVE_BACK: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ROTATE'):
@@ -1044,36 +1067,39 @@ class MyRobot(wpilib.TimedRobot):
             bearing = (bearing + degrees) % 360
             if self.drivetrain.goToPose(x, y, bearing):
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                self.log("Maneuver: Rotate: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("ENDING Maneuver", maneuverTask[0])            
+                self.log("ROTATE: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Rotate: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+                self.log("ROTATE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'BALANCE'):
-            self.log("Maneuver: Balance: ", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver: BALANCE: ", self.maneuverTaskCounter)
             if self.drivetrain.balance():
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                print("Maneuver: Balance: Leveled and oriented")
+                self.log("ENDING Maneuver", maneuverTask[0])            
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Balance: Keep balancing and orienting")
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'WHEEL_LOCK'):
-            self.log("Maneuver: Wheel Lock: ", self.maneuverTaskCounter)
+            self.log("RUNNING AND ENDING Maneuver: Wheel Lock: ", self.maneuverTaskCounter)
             self.drivetrain.setWheelLock(True)
             self.drivetrain.goToPose(0, 0, self.drivetrain.getBearing())
             self.maneuverTaskCounter += 1 # Move on to next task
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'IDLE'):
-            self.log("Maneuver: Idle: ", self.maneuverTaskCounter)
+            ## will run forever?
+            self.log("RUNNING Maneuver: Idle: ", self.maneuverTaskCounter)
             self.drivetrain.idle()
             self.elevator.update()
             self.grabber.update()
         else:
-            self.log("Maneuver: ERROR: Unknown Task", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver: ERROR: Unknown Task", self.maneuverTaskCounter, maneuverTask[0])
             self.maneuverTaskCounter += 1   
         return
 
