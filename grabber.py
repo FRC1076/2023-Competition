@@ -86,6 +86,10 @@ class Grabber:
             return True
         else:
             rotate_error = self.rotate_pid_controller.calculate(self.rotate_motor_encoder.getPosition(), self.targetRotatePosition)
+            #if (self.rotate_motor_encoder.getPosition() < self.minRotatePosition) and rotate_error < 0:
+            #    rotate_error = 0
+            #if (self.rotate_motor_encoder.getPosition() > self.maxRotatePosition) and rotate_error > 0:
+            #    rotate_error = 0
             #rotate_error = -rotate_error
             self.log("Grabber: Update: Fixing encoder error: ", rotate_error, " target position: ", self.targetRotatePosition)
             self.rotate_motor.set(rotate_error)
@@ -100,6 +104,10 @@ class Grabber:
             self.log("Grabber: goToPosition: Target position is too high: ", self.targetRotatePosition, " going to ", self.maxRotatePosition, " instead.")
             self.targetRotatePosition = self.maxRotatePosition
         rotate_error = self.rotate_pid_controller.calculate(self.rotate_motor_encoder.getPosition(), self.targetRotatePosition)
+        #if (self.rotate_motor_encoder.getPosition() < self.minRotatePosition) and rotate_error < 0:
+        #    rotate_error = 0
+        #if (self.rotate_motor_encoder.getPosition() > self.maxRotatePosition) and rotate_error > 0:
+        #    rotate_error = 0
         #rotate_error = clamp(rotate_error, 0, 0.2)
         rotate_error = -rotate_error
         self.log("Grabber: goToPosition: adjustment: ", rotate_error, " target position: ", self.targetRotatePosition)
