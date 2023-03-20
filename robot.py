@@ -682,15 +682,19 @@ class MyRobot(wpilib.TimedRobot):
         else: # Go to preset destinations
             if operator.getAButton(): #Lowest Position
                 self.elevator.moveToPos(self.elevator_retracted_height)
+                self.grabber.goToPosition(self.grabber_retracted_height)
                 self.log("Elevator: A Button")
-            elif operator.getYButton() and self.elevator.isElevatorDown(): #Highest Position
+            elif operator.getYButton(): #and self.elevator.isElevatorDown(): #Highest Position
                 self.elevator.moveToPos(self.elevator_upper_scoring_height)
+                self.grabber.goToPosition(self.grabber_upper_scoring_height)
                 self.log("Elevator: Y Button")
-            elif operator.getBButton() and self.elevator.isElevatorDown(): #Medium Position
+            elif operator.getBButton(): #and self.elevator.isElevatorDown(): #Medium Position
                 self.elevator.moveToPos(self.elevator_lower_scoring_height)
+                self.grabber.goToPosition(self.grabber_lower_scoring_height)
                 self.log("Elevator: B Button")
-            elif operator.getXButton() and self.elevator.isElevatorDown(): #Human Position
+            elif operator.getXButton(): #and self.elevator.isElevatorDown(): #Human Position
                 self.elevator.moveToPos(self.elevator_human_position)
+                self.grabber.goToPosition(self.grabber_human_position)
                 self.log("Elevator: X Button")
             else: #Aim for last target.
                 self.elevator.moveToPos(self.elevator.getTargetPosition())

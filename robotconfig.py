@@ -54,8 +54,8 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_BUMPER_DIMENSION_Y': 3.0, # Width of bumper (Y-axis)
     'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
     'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
-    'ROBOT_COM_OFFSET_X': 2.0, # -3.5, #-4.0 X-offset of center of mass (relative to center of frame)
-    'ROBOT_COM_OFFSET_Y': 0.0, # Y-offset of center of mass (relative to center of frame)
+    'ROBOT_COM_OFFSET_X': -0.75, # X-offset of center of mass (relative to center of frame)
+    'ROBOT_COM_OFFSET_Y': -0.75, # Y-offset of center of mass (relative to center of frame)
     'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
     'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_X': 17.0, # X-offset of center of camera lens (relative to center of frame)
@@ -144,9 +144,9 @@ elevatorConfig = {
     'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
-    'ELEVATOR_HUMAN_POSITION': 25, # Assumes Elevator Down
-    'ELEVATOR_UPPER_SCORING_HEIGHT': 32, # Assumes Elevator Down
-    'ELEVATOR_LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
+    'ELEVATOR_HUMAN_POSITION': 24, # Assumes Elevator Down
+    'ELEVATOR_UPPER_SCORING_HEIGHT': 30, # Assumes Elevator Down
+    'ELEVATOR_LOWER_SCORING_HEIGHT': 23, # Assumes Elevator Down
     'ELEVATOR_RETRACTED_HEIGHT': 7,
 }
 
@@ -157,12 +157,11 @@ grabberConfig = {
     'ROTATE_KI': 0.0008, #0.0008, #0.0008,
     'ROTATE_KD': 0.002, #0.002,
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
-    'MIN_POSITION': 1, # Roughly 0 - 5 scale, with 0 at top
-    'GRABBER_HUMAN_POSITION': 2.5, # Assumes Elevator Down
-    'GRABBER_UPPER_SCORING_HEIGHT': 2,
-    'GRABBER_LOWER_SCORING_HEIGHT': 2, # Assumes Elevator Down
+    'MIN_POSITION': 0.5, # Roughly 0 - 5 scale, with 0 at top
+    'GRABBER_HUMAN_POSITION': 0.5, # Assumes Elevator Down
+    'GRABBER_UPPER_SCORING_HEIGHT': 0.5,
+    'GRABBER_LOWER_SCORING_HEIGHT': 0.5, # Assumes Elevator Down
     'GRABBER_RETRACTED_HEIGHT': 2,
-    
 }
 
 clawConfig = {
