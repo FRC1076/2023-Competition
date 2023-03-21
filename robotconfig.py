@@ -145,8 +145,8 @@ elevatorConfig = {
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'ELEVATOR_HUMAN_POSITION': 25, # Assumes Elevator Down
-    'ELEVATOR_UPPER_SCORING_HEIGHT': 32, # Assumes Elevator Down
-    'ELEVATOR_LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
+    'ELEVATOR_UPPER_SCORING_HEIGHT': 33, # Assumes Elevator Down
+    'ELEVATOR_LOWER_SCORING_HEIGHT': 22, # Assumes Elevator Down
     'ELEVATOR_RETRACTED_HEIGHT': 7,
 }
 
@@ -159,8 +159,8 @@ grabberConfig = {
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
     'MIN_POSITION': 1, # Roughly 0 - 5 scale, with 0 at top
     'GRABBER_HUMAN_POSITION': 2.5, # Assumes Elevator Down
-    'GRABBER_UPPER_SCORING_HEIGHT': 2,
-    'GRABBER_LOWER_SCORING_HEIGHT': 2, # Assumes Elevator Down
+    'GRABBER_UPPER_SCORING_HEIGHT': 1.5, #Asssumes Elevator Down
+    'GRABBER_LOWER_SCORING_HEIGHT': 1.5, # Assumes Elevator Down
     'GRABBER_RETRACTED_HEIGHT': 2,
     
 }
