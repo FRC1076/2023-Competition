@@ -605,17 +605,23 @@ class SwerveDrive:
         frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
-        theta = self.getGyroAngle()
-        if (theta > 45 and theta < 135) or (theta > 225 and theta < 315):
-            speedSign = -1
-        else:
-            speedSign = 1
+        #theta = self.getGyroAngle()
+        #if (theta > 45 and theta < 135) or (theta > 225 and theta < 315):
+        #    speedSign = -1
+        #else:
+        #    speedSign = 1
 
+        # Old velocities per quadrant
+        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        
         # Velocities per quadrant
-        rightY = (self._requested_vectors['strafe'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        leftY = (self._requested_vectors['strafe'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        rearX = (self._requested_vectors['fwd'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
-        frontX = (self._requested_vectors['fwd'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        #rightY = (self._requested_vectors['strafe'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        #leftY = (self._requested_vectors['strafe'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        #rearX = (self._requested_vectors['fwd'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        #frontX = (self._requested_vectors['fwd'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
         rearLeft_speed = math.hypot(frontX, rightY)
