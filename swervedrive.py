@@ -487,15 +487,24 @@ class SwerveDrive:
     
     def goToReflectiveTapeCentered(self):
         if self.vision:
-            self.offsetX = self.vision.getTargetOffsetHorizontalReflective() 
-            self.targetSize = self.vision.getTargetSizeReflective()
+            offsetX = self.vision.getTargetOffsetHorizontalReflective() 
+            targetSize = self.vision.getTargetSizeReflective()
+            if offsetX > 320 or targetSize < 0: # impossible values, there's no target
+                self.log('Aborting goToReflectiveTapeCentered() cuz no targets')
+                return False
 
             x_error = self.reflective_x_pid_controller.calculate(offsetX, self.targetOffsetX)
             y_error = self.reflective_y_pid_controller.calculate(targetSize, self.targetTargetSize)
 
-            self.move(x_error, y_error, 0, self.getBearing())
-            self.execute()
-
+            if self.reflective_x_pid_controller.atSetpoint() and  \
+               self.reflective_y_pid_controller.atSetpoint():
+                self.update_smartdash()
+                return True
+            else:
+                self.move(x_error, y_error, 0, self.getBearing())
+                self.execute()
+                self.update_smartdash()
+                return False
         
     def goToBalance(self, x, y, bearing, tolerance):
         self.log("SWERVEDRIVE Going to balance:", x, y, bearing, tolerance)
@@ -503,7 +512,6 @@ class SwerveDrive:
         if abs(self.getGyroBalance()) > tolerance:
             return True
         else:
-            return self.goToPose(x, y, bearing)
             return self.goToPose(x, y, bearing)
 
     def goToPose(self, x, y, bearing):

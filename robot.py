@@ -1085,6 +1085,13 @@ class MyRobot(wpilib.TimedRobot):
                 self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
             self.grabber.update()
+        elif (maneuverTask[0] == 'ALIGN_TO_POLE'):
+            if self.drivetrain.goToReflectiveTapeCentered():
+                self.maneuverTaskCounter += 1 # Move on to next task.
+                self.log("ENDING Maneuver", maneuverTask[0])            
+            else:
+                # Leave self.maneuverTaskCounter unchanged. Repeat this task.
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
         elif (maneuverTask[0] == 'WHEEL_LOCK'):
             self.log("RUNNING AND ENDING Maneuver: Wheel Lock: ", self.maneuverTaskCounter)
             self.drivetrain.setWheelLock(True)
