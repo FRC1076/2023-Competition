@@ -145,7 +145,7 @@ elevatorConfig = {
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'ELEVATOR_HUMAN_POSITION': 24, # Assumes Elevator Down
-    'ELEVATOR_UPPER_SCORING_HEIGHT': 30, # Assumes Elevator Down
+    'ELEVATOR_UPPER_SCORING_HEIGHT': 33, # Assumes Elevator Down
     'ELEVATOR_LOWER_SCORING_HEIGHT': 23, # Assumes Elevator Down
     'ELEVATOR_RETRACTED_HEIGHT': 7,
 }
@@ -153,15 +153,15 @@ elevatorConfig = {
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
     'GRABBER_ROTATE_SPEED': 0.2,
-    'ROTATE_KP': 0.08, #0.2, #0.12,3
-    'ROTATE_KI': 0.0008, #0.0008, #0.0008,
-    'ROTATE_KD': 0.002, #0.002,
+    'GRABBER_KP': 0.20, #0.2, #0.12,3
+    'GRABBER_KI': 0.0008, #0.0008, #0.0008,
+    'GRABBER_KD': 0.002, #0.002,
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
     'MIN_POSITION': 1, # Roughly 0 - 5 scale, with 0 at top
-    'GRABBER_HUMAN_POSITION': 2.5, # Assumes Elevator Down
-    'GRABBER_UPPER_SCORING_HEIGHT': 1.5, #Asssumes Elevator Down
-    'GRABBER_LOWER_SCORING_HEIGHT': 1.5, # Assumes Elevator Down
-    'GRABBER_RETRACTED_HEIGHT': 2,
+    'GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
+    'GRABBER_UPPER_SCORING_HEIGHT': 0.8, #Asssumes Elevator Down
+    'GRABBER_LOWER_SCORING_HEIGHT': 1.2, # Assumes Elevator Down
+    'GRABBER_RETRACTED_HEIGHT': 1.5,
 }
 
 clawConfig = {

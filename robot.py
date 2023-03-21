@@ -261,7 +261,7 @@ class MyRobot(wpilib.TimedRobot):
         self.grabber_upper_scoring_height = config['GRABBER_UPPER_SCORING_HEIGHT']
         self.grabber_lower_scoring_height = config['GRABBER_LOWER_SCORING_HEIGHT']
         self.grabber_retracted_height = config['GRABBER_RETRACTED_HEIGHT']
-        return Grabber(config['ROTATE_MOTOR_ID'], config['GRABBER_ROTATE_SPEED'], config['ROTATE_KP'], config['ROTATE_KI'], config['ROTATE_KD'], config['MAX_POSITION'], config['MIN_POSITION'])
+        return Grabber(config['ROTATE_MOTOR_ID'], config['GRABBER_ROTATE_SPEED'], config['GRABBER_KP'], config['GRABBER_KI'], config['GRABBER_KD'], config['MAX_POSITION'], config['MIN_POSITION'])
 
     def initClaw(self, config):
         return Claw(config['MOTOR_ID'], config['RELEASE_SPEED'], config['RELEASE_CHANGE'], config['INTAKE_SPEED'], config['INTAKE_CHANGE'])
@@ -533,8 +533,7 @@ class MyRobot(wpilib.TimedRobot):
             return True
         else:
             print("TeleoDrivetrain returned False. Not in a maneuver.")
-            self.teleopElevator()
-            self.teleopGrabber()
+            self.teleopElevatorGrabber()
             self.teleopClaw()
             return True
 
@@ -655,13 +654,15 @@ class MyRobot(wpilib.TimedRobot):
         #    self.drive.set_raw_strafe(-0.35)
         return False
 
-    def teleopElevator(self):
+    def teleopElevatorGrabber(self):
         if (not self.elevator):
+            return
+        if (not self.grabber):
             return
         
         operator = self.operator.xboxController
 
-        self.log("teleopElevator: In teleopElevator()")
+        self.log("teleopElevatorGrabber: In teleopElevatorGrabber()")
 
         if (operator.getLeftBumper()):
             self.log("teleopElevator: Toggling Elevator Up/Down")
@@ -673,50 +674,46 @@ class MyRobot(wpilib.TimedRobot):
         if(operator.getLeftTriggerAxis() > 0.7):
             clutch_factor = 0.4
         
-        
         #Find the value the arm will move at
-        controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
-        
-        if controller_value != 0: # Drive in direction of controller
-            self.elevator.move(controller_value)
-        else: # Go to preset destinations
-            if operator.getAButton(): #Lowest Position
-                self.elevator.moveToPos(self.elevator_retracted_height)
-                self.grabber.goToPosition(self.grabber_retracted_height)
-                self.log("Elevator: A Button")
-            elif operator.getYButton(): #and self.elevator.isElevatorDown(): #Highest Position
-                self.elevator.moveToPos(self.elevator_upper_scoring_height)
-                self.grabber.goToPosition(self.grabber_upper_scoring_height)
-                self.log("Elevator: Y Button")
-            elif operator.getBButton(): #and self.elevator.isElevatorDown(): #Medium Position
-                self.elevator.moveToPos(self.elevator_lower_scoring_height)
-                self.grabber.goToPosition(self.grabber_lower_scoring_height)
-                self.log("Elevator: B Button")
-            elif operator.getXButton(): #and self.elevator.isElevatorDown(): #Human Position
-                self.elevator.moveToPos(self.elevator_human_position)
-                self.grabber.goToPosition(self.grabber_human_position)
-                self.log("Elevator: X Button")
-            else: #Aim for last target.
-                self.elevator.moveToPos(self.elevator.getTargetPosition())
-        
-    def teleopGrabber(self):
-        operator = self.operator.xboxController
-        # if the operator is holding the bumper, keep the grab going. Otherwise release.
-        
-        grabber_speed = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
+        elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
+        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
 
-        print("TeleopGrabber: In teleopGrabber", grabber_speed)
+        if elevator_controller_value != 0 and grabber_controller_value != 0: # Move both in direction of controller
+            self.grabber.move_grabber(grabber_controller_value)
+            self.elevator.move(elevator_controller_value)
+            self.log("ElevatorGrabber: Move both elevator and grabber.")
+        elif elevator_controller_value !=0: # Move only elevator
+            self.grabber.update() # Grabber stay in place
+            self.elevator.move(elevator_controller_value)
+            self.log("ElevatorGrabber: Move elevator, maintain grabber.")
+        elif grabber_controller_value != 0: # Move only grabber
+            self.grabber.move_grabber(grabber_controller_value)
+            self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
+            self.log("ElevatorGrabber: Move grabber, maintain elevator.")
+        elif operator.getAButton(): #Lowest Position
+            self.grabber.goToPosition(self.grabber_retracted_height)
+            self.elevator.moveToPos(self.elevator_retracted_height)
+            self.log("ElevatorGrabber: A Button")
+        elif operator.getYButton(): # and self.elevator.isElevatorDown(): #Highest Position
+            self.grabber.goToPosition(self.grabber_upper_scoring_height)
+            self.elevator.moveToPos(self.elevator_upper_scoring_height)
+            self.log("ElevatorGrabber: Y Button")
+        elif operator.getBButton(): # and self.elevator.isElevatorDown(): #Medium Position
+            self.grabber.goToPosition(self.grabber_lower_scoring_height)
+            self.elevator.moveToPos(self.elevator_lower_scoring_height)
+            self.log("ElevatorGrabber: B Button")
+        elif operator.getXButton(): # and self.elevator.isElevatorDown(): #Human Position
+            self.grabber.goToPosition(self.grabber_human_position)
+            self.elevator.moveToPos(self.elevator_human_position)
+            self.log("ElevatorGrabber: X Button")
+        else: #Aim for last target.
+            self.grabber.update() # Grabber stay in place
+            #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
+            self.elevator.moveToPos(self.elevator.getTargetPosition())
+            self.log("ElevatorGrabber: Exiting after maintaining position.")
+        
+        return
 
-        if (grabber_speed > 0):
-            #self.log("Grabber: Raise Grabber")
-            self.grabber.lower_motor(-grabber_speed)
-        elif (grabber_speed < 0):
-            #self.log("Grabber: Lower Grabber")
-            self.grabber.raise_motor(-grabber_speed)
-        else:
-            #self.log("Grabber: Motor Off")
-            self.grabber.update()
-    
     def teleopClaw(self):
         operator = self.operator.xboxController
         if (operator.getRightBumper()):
