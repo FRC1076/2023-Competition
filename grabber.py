@@ -88,7 +88,7 @@ class Grabber:
             rotate_error = self.rotate_pid_controller.calculate(self.rotate_motor_encoder.getPosition(), self.targetRotatePosition)
             #if (self.rotate_motor_encoder.getPosition() < self.minRotatePosition) and rotate_error < 0:
             #    rotate_error = 0
-            #if (self.rotate_motor_encoder.getPositi#on() > self.maxRotatePosition) and rotate_error > 0:
+            #if (self.rotate_motor_encoder.getPosition() > self.maxRotatePosition) and rotate_error > 0:
             #    rotate_error = 0
             #rotate_error = -rotate_error
             self.log("Grabber: Update: Fixing encoder error: ", rotate_error, " target position: ", self.targetRotatePosition)
