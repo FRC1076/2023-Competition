@@ -627,7 +627,7 @@ class MyRobot(wpilib.TimedRobot):
             fwd = self.deadzoneCorrection(driver.getLeftY() * clutch, self.driver.deadzone)
             rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
             
-            strafe *= -1 # Because controller is backwards from you think
+            fwd *= -1 # Because controller is backwards from you think
             
             # Bot starts facing controller
             controller_at_180_to_bot = -1
@@ -637,7 +637,7 @@ class MyRobot(wpilib.TimedRobot):
             
             # If any joysticks are dictating movement.
             if fwd != 0 or strafe != 0 or rcw != 0:
-                self.drivetrain.move(strafe, fwd, rcw, self.drivetrain.getBearing())
+                self.drivetrain.move(fwd, strafe, rcw, self.drivetrain.getBearing())
                 self.drivetrain.execute()
             # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
