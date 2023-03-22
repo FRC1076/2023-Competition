@@ -472,17 +472,17 @@ class SwerveDrive:
         Negative fwd value = Backward robot movement\n
         Positive strafe value = Left robot movement\n
         Negative strafe value = Right robot movement
-        :param fwd: the requested movement in the Y direction 2D plane
-        :param strafe: the requested movement in the X direction of the 2D plane
-        :param rcw: the requestest magnatude of the rotational vector of a 2D plane
+        :param fwd: the requested movement in the X direction 2D plane
+        :param strafe: the requested movement in the Y direction of the 2D plane
+        :param rcw: the requestest magnitude of the rotational vector of a 2D plane
         """
         
         #Convert field-oriented translate to chassis-oriented translate
         
         current_angle = self.getGyroAngle() % 360
-        desired_angle = (math.degrees(math.atan2(fwd, strafe))) % 360
+        desired_angle = (math.degrees(math.atan2(strafe, fwd))) % 360
         chassis_angle = (desired_angle - current_angle) % 360
-        magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
+        magnitude = clamp(math.hypot(strafe, fwd), 0, 1)
         
         chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
         chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
