@@ -627,7 +627,7 @@ class MyRobot(wpilib.TimedRobot):
             fwd = self.deadzoneCorrection(driver.getLeftY() * clutch, self.driver.deadzone)
             rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
             
-            strafe *= -1 # Because controller is backwards from you think
+            fwd *= -1 # Because controller is backwards from you think
             
             # Bot starts facing controller
             controller_at_180_to_bot = -1
