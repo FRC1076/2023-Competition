@@ -70,4 +70,4 @@ class Claw:
             return True
 
     def log(self, *dataToLog):
-        self.logger.log(DASH_PREFIX, dataToLog)
+        self.logger.log(dataToLog)

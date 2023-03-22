@@ -56,8 +56,8 @@ swervometerConfig = { # All positions measured in inches
     'ROBOT_BUMPER_DIMENSION_Y': 3.0, # Width of bumper (Y-axis)
     'ROBOT_COF_OFFSET_X': 17.0, # X-offset of center of frame (assume half frame dimension)
     'ROBOT_COF_OFFSET_Y': 13.0, # Y-offset of center of frame (assume half frame dimension)
-    'ROBOT_COM_OFFSET_X': 2.0, # -3.5, #-4.0 X-offset of center of mass (relative to center of frame)
-    'ROBOT_COM_OFFSET_Y': 0.0, # Y-offset of center of mass (relative to center of frame)
+    'ROBOT_COM_OFFSET_X': -0.75, # X-offset of center of mass (relative to center of frame)
+    'ROBOT_COM_OFFSET_Y': -0.75, # Y-offset of center of mass (relative to center of frame)
     'ROBOT_GYRO_OFFSET_X': 15.0, # X-offset of center of gyro (relative to lower left frame)
     'ROBOT_GYRO_OFFSET_Y': 12.0, # Y-offset of center of gyro (relative to lower left frame)
     'ROBOT_CAMERA_OFFSET_X': 17.0, # X-offset of center of camera lens (relative to center of frame)
@@ -99,6 +99,8 @@ drivetrainConfig = {
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 0.125, # Improves maneuverability of bot.
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.125,
+    'AUTON_STEER_STRAIGHT': True,
+    'TELEOP_STEER_STRAIGHT': False,
     'LOW_CONE_SCORE': [['CLAW_INTAKE'],
                         ['ELEVATOR_DOWN'],
                         ['POSITION_GRABBER', 2],
@@ -146,25 +148,24 @@ elevatorConfig = {
     'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
-    'ELEVATOR_HUMAN_POSITION': 25, # Assumes Elevator Down
-    'ELEVATOR_UPPER_SCORING_HEIGHT': 32, # Assumes Elevator Down
-    'ELEVATOR_LOWER_SCORING_HEIGHT': 17, # Assumes Elevator Down
+    'ELEVATOR_HUMAN_POSITION': 24, # Assumes Elevator Down
+    'ELEVATOR_UPPER_SCORING_HEIGHT': 31.5, # Assumes Elevator Down
+    'ELEVATOR_LOWER_SCORING_HEIGHT': 21, # Assumes Elevator Down
     'ELEVATOR_RETRACTED_HEIGHT': 7,
 }
 
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
     'GRABBER_ROTATE_SPEED': 0.2,
-    'ROTATE_KP': 0.08, #0.2, #0.12,3
-    'ROTATE_KI': 0.0008, #0.0008, #0.0008,
-    'ROTATE_KD': 0.002, #0.002,
+    'GRABBER_KP': 0.20, #0.2, #0.12,3
+    'GRABBER_KI': 0.0008, #0.0008, #0.0008,
+    'GRABBER_KD': 0.002, #0.002,
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
     'MIN_POSITION': 1, # Roughly 0 - 5 scale, with 0 at top
-    'GRABBER_HUMAN_POSITION': 2.5, # Assumes Elevator Down
-    'GRABBER_UPPER_SCORING_HEIGHT': 2,
-    'GRABBER_LOWER_SCORING_HEIGHT': 2, # Assumes Elevator Down
-    'GRABBER_RETRACTED_HEIGHT': 2,
-    
+    'GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
+    'GRABBER_UPPER_SCORING_HEIGHT': 1.0, #Asssumes Elevator Down
+    'GRABBER_LOWER_SCORING_HEIGHT': 1.0, # Assumes Elevator Down
+    'GRABBER_RETRACTED_HEIGHT': 1.5,
 }
 
 clawConfig = {

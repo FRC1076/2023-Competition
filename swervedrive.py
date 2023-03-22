@@ -45,7 +45,9 @@ class SwerveDrive:
             _target_cfg, 
             _bearing_cfg,
             _target_offsetX,
-            _target_target_size):
+            _target_target_size,
+            _auton_steer_straight,
+            _teleop_steer_straight):
         
         self.logger = Logger.getLogger()
         self.frontLeftModule = _frontLeftModule
@@ -158,6 +160,20 @@ class SwerveDrive:
         self.reflective_y_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
         self.targetOffsetX = _target_offsetX
         self.targetTargetSize = _target_target_size
+
+        self.inAuton = True
+        self.autonSteerStraight = _auton_steer_straight
+        self.teleopSteerStraight = _teleop_steer_straight
+
+    def setInAuton(self, state):
+        self.inAuton = state
+        return
+
+    def shouldSteerStraight(self):
+        if self.inAuton:
+            return self.autonSteerStraight
+        else:
+            return self.teleopSteerStraight
 
     def getBearing(self):      
         return self.bearing
@@ -363,18 +379,8 @@ class SwerveDrive:
 
     def balance(self):
         
-        self.balance_pitch_pid_controller.setP(self.dashboard.getNumber('Balance Pitch kP', 0))
-        self.balance_pitch_pid_controller.setI(self.dashboard.getNumber('Balance Pitch kI', 0))
-        self.balance_pitch_pid_controller.setD(self.dashboard.getNumber('Balance Pitch kD', 0))
+        self.log("Balance starting")
 
-        #self.log("Pitch: kP = ", self.dashboard.getNumber('Balance Pitch kP', 0), ", kI = ", self.dashboard.getNumber('Balance Pitch kI', 0), ", kD =", self.dashboard.getNumber('Balance Pitch kD', 0))
-        
-        self.balance_yaw_pid_controller.setP(self.dashboard.getNumber('Balance Yaw kP', 0))
-        self.balance_yaw_pid_controller.setI(self.dashboard.getNumber('Balance Yaw kI', 0))
-        self.balance_yaw_pid_controller.setD(self.dashboard.getNumber('Balance Yaw kD', 0))
-
-        #self.log("Yaw: kP = ", self.dashboard.getNumber('Balance Yaw kP', 0), ", kI = ", self.dashboard.getNumber('Balance Yaw kI', 0), ", kD =", self.dashboard.getNumber('Balance Yaw kD', 0))
-        
         #self.printGyro()
 
         yawSign = -1
@@ -387,10 +393,11 @@ class SwerveDrive:
             yawSign = -1
         BALANCED_PITCH = 0.0
 
-        #self.log("Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
-
+        self.log("Balance: Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
+        self.log("Balance: pitch:", self.getGyroBalance())
         pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
-        yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW) 
+        yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW)
+        self.log("Balance: pitch_error:", pitch_error, ", yaw_error: ", yaw_error)
 
         # Set the output to 0 if at setpoint or to a value between (-1, 1)
         if self.balance_pitch_pid_controller.atSetpoint():
@@ -404,8 +411,8 @@ class SwerveDrive:
         else:
             yaw_output = clamp(yaw_error)
         
-        self.log("Pitch setpoint: ", self.balance_pitch_pid_controller.getSetpoint(), "pitch output: ", pitch_output, " pitch error: ", pitch_error)
-        self.log("Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
+        self.log("Balance: Pitch setpoint: ", self.balance_pitch_pid_controller.getSetpoint(), "pitch output: ", pitch_output, " pitch error: ", pitch_error)
+        self.log("Balance: Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
 
         # Put the output to the dashboard
         self.dashboard.putNumber('Balance pitch output', pitch_output)
@@ -417,8 +424,10 @@ class SwerveDrive:
         self.execute()
 
         if self.balance_pitch_pid_controller.atSetpoint() and self.balance_yaw_pid_controller.atSetpoint():
+            self.log("Balance: atSetpoint")
             return True
         else:
+            self.log("Balance: not atSetpoint")
             return False
 
     def steerStraight(self, rcw, bearing):
@@ -457,17 +466,17 @@ class SwerveDrive:
         Negative fwd value = Backward robot movement\n
         Positive strafe value = Left robot movement\n
         Negative strafe value = Right robot movement
-        :param fwd: the requested movement in the Y direction 2D plane
-        :param strafe: the requested movement in the X direction of the 2D plane
-        :param rcw: the requestest magnatude of the rotational vector of a 2D plane
+        :param fwd: the requested movement in the X direction 2D plane
+        :param strafe: the requested movement in the Y direction of the 2D plane
+        :param rcw: the requestest magnitude of the rotational vector of a 2D plane
         """
         
         #Convert field-oriented translate to chassis-oriented translate
         
         current_angle = self.getGyroAngle() % 360
-        desired_angle = (math.degrees(math.atan2(fwd, strafe))) % 360
+        desired_angle = (math.degrees(math.atan2(strafe, fwd))) % 360
         chassis_angle = (desired_angle - current_angle) % 360
-        magnitude = clamp(math.hypot(fwd, strafe), 0, 1)
+        magnitude = clamp(math.hypot(strafe, fwd), 0, 1)
         
         chassis_fwd = magnitude * math.sin(math.radians(chassis_angle))
         chassis_strafe = magnitude * math.cos(math.radians(chassis_angle))
@@ -481,9 +490,12 @@ class SwerveDrive:
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
         
-        rcw_new = self.steerStraight(rcw, bearing)
+        self.log("Drivetrain: Move: shouldSteerStraight:", self.shouldSteerStraight())
 
-        self.set_rcw(rcw_new)
+        if self.shouldSteerStraight():
+            self.set_rcw(self.steerStraight(rcw, bearing))
+        else:
+            self.set_rcw(rcw)
     
     def goToReflectiveTapeCentered(self):
         if self.vision:
