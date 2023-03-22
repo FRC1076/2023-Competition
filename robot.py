@@ -310,6 +310,8 @@ class MyRobot(wpilib.TimedRobot):
         # Set Open and Closed Loop Ramp Rate for Teleop
         self.teleopOpenLoopRampRate = config['TELEOP_OPEN_LOOP_RAMP_RATE']
         self.teleopClosedLoopRampRate = config['TELEOP_CLOSED_LOOP_RAMP_RATE']
+        self.autonSteerStraight = config['AUTON_STEER_STRAIGHT']
+        self.teleopSteerStraight = config['TELEOP_STEER_STRAIGHT']
 
         # Define maneuver task lists
         self.lowConeScoreTaskList = config['LOW_CONE_SCORE']
@@ -325,7 +327,7 @@ class MyRobot(wpilib.TimedRobot):
         targetOffsetX = config['TARGET_OFFSET_X']
 
         #swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg)
-        swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, targetOffsetX, targetTargetSize)
+        swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, targetOffsetX, targetTargetSize, self.autonSteerStraight, self.teleopSteerStraight)
 
         return swerve
 
@@ -507,6 +509,8 @@ class MyRobot(wpilib.TimedRobot):
         self.startingManeuver = True
         self.maneuverTaskCounter = 0
 
+        self.drivetrain.setInAuton(False)
+        
         return True
 
     def teleopPeriodic(self):
@@ -567,7 +571,7 @@ class MyRobot(wpilib.TimedRobot):
         rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
         if(driver.getAButton()):
             self.drivetrain.balance()
-            return False
+            return True
         elif (driver.getBButton()):
             if(self.startingManeuver == True):
                 self.log("B Button - Starting Maneuver")
@@ -633,7 +637,7 @@ class MyRobot(wpilib.TimedRobot):
             
             # If any joysticks are dictating movement.
             if fwd != 0 or strafe != 0 or rcw != 0:
-                self.drivetrain.move(fwd, strafe, rcw, self.drivetrain.getBearing())
+                self.drivetrain.move(strafe, fwd, rcw, self.drivetrain.getBearing())
                 self.drivetrain.execute()
             # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
@@ -735,6 +739,8 @@ class MyRobot(wpilib.TimedRobot):
 
         self.autonTimer = wpilib.Timer()
         self.autonTimer.start()
+
+        self.drivetrain.setInAuton(True)
 
         self.drivetrain.resetGyro()
         if self.team_is_red:

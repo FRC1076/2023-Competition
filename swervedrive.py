@@ -44,7 +44,9 @@ class SwerveDrive:
             _target_cfg, 
             _bearing_cfg,
             _target_offsetX,
-            _target_target_size):
+            _target_target_size,
+            _auton_steer_straight,
+            _teleop_steer_straight):
         
         self.logger = Logger.getLogger()
         self.frontLeftModule = _frontLeftModule
@@ -157,6 +159,20 @@ class SwerveDrive:
         self.reflective_y_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
         self.targetOffsetX = _target_offsetX
         self.targetTargetSize = _target_target_size
+
+        self.inAuton = True
+        self.autonSteerStraight = _auton_steer_straight
+        self.teleopSteerStraight = _teleop_steer_straight
+
+    def setInAuton(self, state):
+        self.inAuton = state
+        return
+
+    def shouldSteerStraight(self):
+        if self.inAuton:
+            return self.autonSteerStraight
+        else:
+            return self.teleopSteerStraight
 
     def getBearing(self):      
         return self.bearing
@@ -480,9 +496,12 @@ class SwerveDrive:
         # self.set_fwd(fwd)
         # self.set_strafe(strafe)
         
-        rcw_new = self.steerStraight(rcw, bearing)
+        self.logger.log("Drivetrain: Move: shouldSteerStraight:", self.shouldSteerStraight())
 
-        self.set_rcw(rcw_new)
+        if self.shouldSteerStraight():
+            self.set_rcw(self.steerStraight(rcw, bearing))
+        else:
+            self.set_rcw(rcw)
     
     def goToReflectiveTapeCentered(self):
         if self.vision:
@@ -596,17 +615,23 @@ class SwerveDrive:
         frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
-        theta = self.getGyroAngle()
-        if (theta > 45 and theta < 135) or (theta > 225 and theta < 315):
-            speedSign = -1
-        else:
-            speedSign = 1
+        #theta = self.getGyroAngle()
+        #if (theta > 45 and theta < 135) or (theta > 225 and theta < 315):
+        #    speedSign = -1
+        #else:
+        #    speedSign = 1
 
+        # Old velocities per quadrant
+        rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        
         # Velocities per quadrant
-        rightY = (self._requested_vectors['strafe'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        leftY = (self._requested_vectors['strafe'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
-        rearX = (self._requested_vectors['fwd'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
-        frontX = (self._requested_vectors['fwd'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        #rightY = (self._requested_vectors['strafe'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        #leftY = (self._requested_vectors['strafe'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+        #rearX = (self._requested_vectors['fwd'] * speedSign) + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+        #frontX = (self._requested_vectors['fwd'] * speedSign) - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
 
         # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
         rearLeft_speed = math.hypot(frontX, rightY)

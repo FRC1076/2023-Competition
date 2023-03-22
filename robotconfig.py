@@ -97,6 +97,8 @@ drivetrainConfig = {
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 0.125, # Improves maneuverability of bot.
     'TELEOP_CLOSED_LOOP_RAMP_RATE': 0.125,
+    'AUTON_STEER_STRAIGHT': True,
+    'TELEOP_STEER_STRAIGHT': False,
     'LOW_CONE_SCORE': [['CLAW_INTAKE'],
                         ['ELEVATOR_DOWN'],
                         ['POSITION_GRABBER', 2],
@@ -146,7 +148,7 @@ elevatorConfig = {
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'ELEVATOR_HUMAN_POSITION': 24, # Assumes Elevator Down
     'ELEVATOR_UPPER_SCORING_HEIGHT': 31.5, # Assumes Elevator Down
-    'ELEVATOR_LOWER_SCORING_HEIGHT': 22, # Assumes Elevator Down
+    'ELEVATOR_LOWER_SCORING_HEIGHT': 21, # Assumes Elevator Down
     'ELEVATOR_RETRACTED_HEIGHT': 7,
 }
 
