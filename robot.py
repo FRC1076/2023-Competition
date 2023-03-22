@@ -320,8 +320,8 @@ class MyRobot(wpilib.TimedRobot):
         self.rotateClockwiseTaskList = config['ROTATE_CLOCKWISE']
         self.rotateCounterclockwiseTaskList = config['ROTATE_COUNTERCLOCKWISE']
 
-        #gyro = AHRS.create_spi()
-        gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
+        gyro = AHRS.create_spi()
+        #gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
         targetTargetSize = config['TARGET_TARGET_SIZE']
         targetOffsetX = config['TARGET_OFFSET_X']
