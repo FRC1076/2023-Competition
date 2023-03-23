@@ -576,7 +576,7 @@ class MyRobot(wpilib.TimedRobot):
         if(driver.getAButton()):
             self.drivetrain.balance()
             return True
-        else if(driver.getYButton()):
+        elif(driver.getYButton()):
             self.drivetrain.goToReflectiveTapeCentered()
             return True
         elif (driver.getBButton()):
