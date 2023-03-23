@@ -16,9 +16,9 @@ from logger import Logger
 from robotconfig import MODULE_NAMES
 
 DASH_PREFIX = MODULE_NAMES.SWERVEDRIVE
+# TODO: make these into config vars
 MAX_TARGET_OFFSET_X = 90
 MIN_TARGET_SIZE = 0
-
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
@@ -141,6 +141,7 @@ class SwerveDrive:
         self.target_kP = self.target_config.target_kP
         self.target_kI = self.target_config.target_kI
         self.target_kD = self.target_config.target_kD
+        
         self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         self.target_x_pid_controller.setTolerance(5, 5)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
@@ -158,7 +159,13 @@ class SwerveDrive:
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
-        self.reflective_kP = 0.1
+
+        # TODO: 
+        # - make these config parameters
+        # - tune PID values
+        # - set tolerances for PID controllers
+        # - eithe rename these so they apply to April Tags too, or add separate PID for AprilTags
+        self.reflective_kP = 0.001
         self.reflective_kI = 0.00001
         self.reflective_kD = 0.00001
         self.reflective_x_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
@@ -422,8 +429,8 @@ class SwerveDrive:
         self.log("Balance: Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
 
         # Put the output to the dashboard
-        self.dashboard.putNumber('Balance pitch output', pitch_output)
-        self.dashboard.putNumber('Balance yaw output', yaw_output)
+        self.log('Balance pitch output', pitch_output)
+        self.log('Balance yaw output', yaw_output)
         self.move(yawSign * pitch_output, 0.0, yaw_output, self.bearing)
         
         self.update_smartdash()
@@ -527,7 +534,7 @@ class SwerveDrive:
             y_error = self.reflective_y_pid_controller.calculate(targetSize, targetTargetSize)
 
             if self.reflective_x_pid_controller.atSetpoint() and  \
-               self.reflective_y_pid_controller.atSetpoint():
+                self.reflective_y_pid_controller.atSetpoint():
                 self.update_smartdash()
                 return True
             else:
@@ -538,12 +545,14 @@ class SwerveDrive:
 
 
     def goToAprilTagCentered(self):
+        self.vision.setToAprilTagPipeline()
         return self.goToOffsetAndTargetSize(self.aprilTagTargetOffsetX,
-                                               self.aprilTagTargetTargetSize)
+                                            self.aprilTagTargetTargetSize)
 
     def goToReflectiveTapeCentered(self):
+        self.vision.setToReflectivePipeline()
         return self.goToOffsetAndTargetSize(self.reflectiveTargetOffsetX,
-                                               self.reflectiveTargetTargetSize)
+                                            self.reflectiveTargetTargetSize)
         
     def goToBalance(self, x, y, bearing, tolerance):
         self.log("SWERVEDRIVE Going to balance:", x, y, bearing, tolerance)

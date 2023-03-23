@@ -5,15 +5,18 @@ from networktables import NetworkTables
 APRILTAGS = 0
 RETROREFLECTIVE = 1
 
+# change these if you need to screen out multiple targets
+MIN_TARGET_ASPECT_RATIO_REFLECTIVE = 0.0 
+MAX_TARGET_ASPECT_RATIO_REFLECTIVE = 100.0 
+MIN_TARGET_ASPECT_RATIO_APRILTAG = 0.0
+MAX_TARGET_ASPECT_RATIO_APRILTAG = 100.0 
+
 class Vision:
     def __init__(self, _table, _shouldUpdatePose):
         self.table = _table
         self.pipeline = RETROREFLECTIVE
         self.table.putNumber('pipeline', RETROREFLECTIVE) # default to retro pipeline
         self.updatePose = _shouldUpdatePose
-        # desired aspect ratio should be something like 1/2
-        self.MIN_ASPECT_RATIO = 0.0
-        self.MAX_ASPECT_RATIO = 100.0
 
     def shouldUpdatePose(self):
         return self.updatePose
@@ -21,6 +24,12 @@ class Vision:
     def getPipeline(self):
         self.pipeline = self.table.getNumber('getpipe', 0)
         return self.pipeline
+
+    def setToReflectivePipeline(self):
+        self.setPipeline(RETROREFLECTIVE)
+
+    def setToAprilTagPipeline(self):
+        self.setPipeline(APRILTAGS)
 
     def setPipeline(self, pl : int):
         if 0 <= pl <= 1: # change numbers to reflect min/max pipelines
@@ -103,5 +112,31 @@ class Vision:
         targetHeight = self.table.getNumber('tvert', 100.0)
         targetWidth = self.table.getNumber('thor', 1.0)
         aspectRatio = targetWidth / targetHeight
-        return aspectRatio > self.MIN_ASPECT_RATIO and aspectRatio < self.MAX_ASPECT_RATIO
+        return aspectRatio > MIN_TARGET_ASPECT_RATIO_REFLECTIVE \
+            and aspectRatio < MIN_TARGET_ASPECT_RATIO_REFLECTIVE
+    
+    # get the target size within the frame in pixels
+    # can mulitply this by something to get the distance to the target
+    # can be compared with the desired distance to drive a PID
+    def getTargetSizeAprilTag(self):
+        if not self.hasValidTargetAprilTag():
+            return -1
+        return self.table.getNumber('ta', 0.0)
+    
+    # get the horizontal offset of the target from the 'crosshair'
+    # can be compared with the desired offset to drive PID
+    def getTargetOffsetHorizontalAprilTag(self):
+        if not self.hasValidTargetAprilTag():
+            return 1000 # more pixels than there are, indicates no valid offset
+        return self.table.getNumber('tx', 0.0)
+
+    def hasValidTargetsAprilTags(self):
+        hasTargets = self.hasTargets()
+        if not hasTargets:
+            return False
+        targetHeight = self.table.getNumber('tvert', 100.0)
+        targetWidth = self.table.getNumber('thor', 1.0)
+        aspectRatio = targetWidth / targetHeight
+        return aspectRatio > MIN_TARGET_ASPECT_RATIO_APRILTAG \
+            and aspectRatio < MIN_TARGET_ASPECT_RATIO_APRILTAG
     
