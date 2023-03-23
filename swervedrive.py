@@ -16,13 +16,11 @@ from logger import Logger
 from robotconfig import MODULE_NAMES
 
 DASH_PREFIX = MODULE_NAMES.SWERVEDRIVE
-# TODO: make these into config vars
-MAX_TARGET_OFFSET_X = 90
-MIN_TARGET_SIZE = 0
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
 BearingConfig = namedtuple('BearingConfig', ['sd_prefix', 'bearing_kP', 'bearing_kI', 'bearing_kD'])
+VisionDriveConfig = namedtuple('VisionDriveConfig', ['sd_prefix', 'visionDrive_kP', 'visionDrive_kI', 'visionDrive_kD', 'target_offsetX_reflective', 'target_target_size_reflective', 'target_offsetX_april', 'target_target_size_april', 'max_target_offset_x', 'min_target_size'])
 
 class SwerveDrive:
 
@@ -47,10 +45,7 @@ class SwerveDrive:
             _balance_cfg, 
             _target_cfg, 
             _bearing_cfg,
-            _target_offsetX_reflective,
-            _target_target_size_reflective,
-            _target_offsetX_april,
-            _target_target_size_april,
+            _visionDrive_cfg,
             _auton_steer_straight,
             _teleop_steer_straight):
         
@@ -159,21 +154,19 @@ class SwerveDrive:
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
-
         # TODO: 
-        # - make these config parameters
         # - tune PID values
-        # - set tolerances for PID controllers
-        # - eithe rename these so they apply to April Tags too, or add separate PID for AprilTags
-        self.reflective_kP = 0.001
-        self.reflective_kI = 0.00001
-        self.reflective_kD = 0.00001
-        self.reflective_x_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
-        self.reflective_y_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
-        self.reflectiveTargetOffsetX = _target_offsetX_reflective
-        self.reflectiveTargetTargetSize = _target_target_size_reflective
-        self.aprilTargetOffsetX = _target_offsetX_april
-        self.aprilTargetTargetSize = _target_target_size_april
+        self.visionDrive_config = _visionDrive_cfg
+        self.visionDrive_x_pid_controller = PIDController(self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP)
+        self.visionDrive_x_pid_controller.setTolerance(1, 1)
+        self.visionDrive_y_pid_controller = PIDController(self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP)
+        self.visionDrive_y_pid_controller.setTolerance(1, 1)
+        self.reflectiveTargetOffsetX = self.visionDrive_config.target_offsetX_reflective
+        self.reflectiveTargetTargetSize = self.visionDrive_config.target_target_size_reflective
+        self.aprilTargetOffsetX = self.visionDrive_config.target_offsetX_april
+        self.aprilTargetTargetSize = self.visionDrive_config.target_target_size_april
+        self.max_target_offset_x = self.visionDrive_config.max_target_offset_x
+        self.min_target_size = self.visionDrive_config.min_target_size
 
         self.inAuton = True
         self.autonSteerStraight = _auton_steer_straight
@@ -525,7 +518,7 @@ class SwerveDrive:
 
             offsetX = self.vision.getTargetOffsetHorizontalReflective() 
             targetSize = self.vision.getTargetSizeReflective()
-            if abs(offsetX) > MAX_TARGET_OFFSET_X or targetSize < MIN_TARGET_SIZE: # impossible values, there's no target
+            if abs(offsetX) > self.max_target_offset_x or targetSize < self.min_target_size: # impossible values, there's no target
                 self.log('Aborting goToReflectiveTapeCentered() cuz no targets')
                 self.log('Target offset X: ', abs(offsetX), ", Target area: ", targetSize)
                 return False
