@@ -136,6 +136,10 @@ visionConfig = {
     'SHOOTER_OFFSET': 1,
     'CAMERA_HEIGHT': 4,
     'CAMERA_PITCH': 0,
+    'MIN_TARGET_ASPECT_RATIO_REFLECTIVE': 0.0,
+    'MAX_TARGET_ASPECT_RATIO_REFLECTIVE': 100.0,
+    'MIN_TARGET_ASPECT_RATIO_APRILTAG': 0.0,
+    'MAX_TARGET_ASPECT_RATIO_APRILTAG': 100.0,
     'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
