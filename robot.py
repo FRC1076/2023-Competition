@@ -261,18 +261,26 @@ class MyRobot(wpilib.TimedRobot):
                             self.grabber,
                             config['LEFT_LIMIT_SWITCH'],
                             config['RIGHT_LIMIT_SWITCH'])
-        self.elevator_human_position = config['ELEVATOR_HUMAN_POSITION']
-        self.elevator_upper_scoring_height = config['ELEVATOR_UPPER_SCORING_HEIGHT']
-        self.elevator_lower_scoring_height = config['ELEVATOR_LOWER_SCORING_HEIGHT']
-        self.elevator_retracted_height = config['ELEVATOR_RETRACTED_HEIGHT']
-        self.elevator_destination = 0
+        self.cone_elevator_human_position = config['CONE_ELEVATOR_HUMAN_POSITION']
+        self.cone_elevator_upper_scoring_height = config['CONE_ELEVATOR_UPPER_SCORING_HEIGHT']
+        self.cone_elevator_lower_scoring_height = config['CONE_ELEVATOR_LOWER_SCORING_HEIGHT']
+        self.cone_elevator_retracted_height = config['CONE_ELEVATOR_RETRACTED_HEIGHT']
+        self.cube_elevator_human_position = config['CUBE_ELEVATOR_HUMAN_POSITION']
+        self.cube_elevator_upper_scoring_height = config['CUBE_ELEVATOR_UPPER_SCORING_HEIGHT']
+        self.cube_elevator_lower_scoring_height = config['CUBE_ELEVATOR_LOWER_SCORING_HEIGHT']
+        self.cube_elevator_retracted_height = config['CUBE_ELEVATOR_RETRACTED_HEIGHT']
+        self.cube_elevator_destination = 0
         return elevator
 
     def initGrabber(self, config):
-        self.grabber_human_position = config['GRABBER_HUMAN_POSITION']
-        self.grabber_upper_scoring_height = config['GRABBER_UPPER_SCORING_HEIGHT']
-        self.grabber_lower_scoring_height = config['GRABBER_LOWER_SCORING_HEIGHT']
-        self.grabber_retracted_height = config['GRABBER_RETRACTED_HEIGHT']
+        self.cone_grabber_human_position = config['CONE_GRABBER_HUMAN_POSITION']
+        self.cone_grabber_upper_scoring_height = config['CONE_GRABBER_UPPER_SCORING_HEIGHT']
+        self.cone_grabber_lower_scoring_height = config['CONE_GRABBER_LOWER_SCORING_HEIGHT']
+        self.cone_grabber_retracted_height = config['CONE_GRABBER_RETRACTED_HEIGHT']
+        self.cube_grabber_human_position = config['CUBE_GRABBER_HUMAN_POSITION']
+        self.cube_grabber_upper_scoring_height = config['CUBE_GRABBER_UPPER_SCORING_HEIGHT']
+        self.cube_grabber_lower_scoring_height = config['CUBE_GRABBER_LOWER_SCORING_HEIGHT']
+        self.cube_grabber_retracted_height = config['CUBE_GRABBER_RETRACTED_HEIGHT']
         return Grabber(config['ROTATE_MOTOR_ID'], config['GRABBER_ROTATE_SPEED'], config['GRABBER_KP'], config['GRABBER_KI'], config['GRABBER_KD'], config['MAX_POSITION'], config['MIN_POSITION'])
 
     def initClaw(self, config):
@@ -709,22 +717,38 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.move_grabber(grabber_controller_value)
             self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
             self.log("ElevatorGrabber: Move grabber, maintain elevator.")
-        elif operator.getAButton(): #Lowest Position
-            self.grabber.goToPosition(self.grabber_retracted_height)
-            self.elevator.moveToPos(self.elevator_retracted_height)
-            self.log("ElevatorGrabber: A Button")
+        elif operator.getAButton() and operator.getLeftTriggerAxis() > 0.7: #Lowest Position - Cube
+            self.grabber.goToPosition(self.cube_grabber_retracted_height)
+            self.elevator.moveToPos(self.cube_elevator_retracted_height)
+            self.log("ElevatorGrabber: Cube: A Button")
+        elif operator.getAButton(): #Lowest Position - Cone
+            self.grabber.goToPosition(self.cone_grabber_retracted_height)
+            self.elevator.moveToPos(self.cone_elevator_retracted_height)
+            self.log("ElevatorGrabber: Cone: A Button")
+        elif operator.getYButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Highest Position
+            self.grabber.goToPosition(self.cube_grabber_upper_scoring_height)
+            self.elevator.moveToPos(self.cube_elevator_upper_scoring_height)
+            self.log("ElevatorGrabber: Cube: Y Button")
         elif operator.getYButton(): # and self.elevator.isElevatorDown(): #Highest Position
-            self.grabber.goToPosition(self.grabber_upper_scoring_height)
-            self.elevator.moveToPos(self.elevator_upper_scoring_height)
-            self.log("ElevatorGrabber: Y Button")
+            self.grabber.goToPosition(self.cone_grabber_upper_scoring_height)
+            self.elevator.moveToPos(self.cone_elevator_upper_scoring_height)
+            self.log("ElevatorGrabber: Cone: Y Button")
+        elif operator.getBButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Medium Position
+            self.grabber.goToPosition(self.cube_grabber_lower_scoring_height)
+            self.elevator.moveToPos(self.cube_elevator_lower_scoring_height)
+            self.log("ElevatorGrabber: Cube: B Button")
         elif operator.getBButton(): # and self.elevator.isElevatorDown(): #Medium Position
-            self.grabber.goToPosition(self.grabber_lower_scoring_height)
-            self.elevator.moveToPos(self.elevator_lower_scoring_height)
-            self.log("ElevatorGrabber: B Button")
+            self.grabber.goToPosition(self.cone_grabber_lower_scoring_height)
+            self.elevator.moveToPos(self.cone_elevator_lower_scoring_height)
+            self.log("ElevatorGrabber: Cone: B Button")
+        elif operator.getXButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Human Position
+            self.grabber.goToPosition(self.cube_grabber_human_position)
+            self.elevator.moveToPos(self.cube_elevator_human_position)
+            self.log("ElevatorGrabber: Cube: X Button")
         elif operator.getXButton(): # and self.elevator.isElevatorDown(): #Human Position
-            self.grabber.goToPosition(self.grabber_human_position)
-            self.elevator.moveToPos(self.elevator_human_position)
-            self.log("ElevatorGrabber: X Button")
+            self.grabber.goToPosition(self.cone_grabber_human_position)
+            self.elevator.moveToPos(self.cone_elevator_human_position)
+            self.log("ElevatorGrabber: Cone: X Button")
         else: #Aim for last target.
             self.grabber.update() # Grabber stay in place
             #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
@@ -862,19 +886,19 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_UPPER_EXTEND'):
             self.log("RUNNING Auton Task ELEVATOR_UPPER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.elevator_upper_scoring_height) and self.grabber.goToPosition(self.grabber_upper_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_upper_scoring_height) and self.grabber.goToPosition(self.cone_grabber_upper_scoring_height):
                 self.log("ENDING Auton Task ELEVATOR_UPPER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Upper Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             self.log("RUNNING Auton Task ELEVATOR_LOWER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.elevator_lower_scoring_height) and self.grabber.goToPosition(self.grabber_lower_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_lower_scoring_height) and self.grabber.goToPosition(self.cone_grabber_lower_scoring_height):
                 self.log("ENDING Auton Task ELEVATOR_LOWER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Lower Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
             self.log("RUNNING Auton Task ELEVATOR_RETRACT, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.elevator_retracted_height): #and self.grabber.goToPosition(self.grabber_retracted_height):
+            if self.elevator.moveToPos(self.cone_elevator_retracted_height): #and self.grabber.goToPosition(self.cone_grabber_retracted_height):
                 self.log("ENDING Auton Task ELEVATOR_RETRACT")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Retract: ", self.elevator.getEncoderPosition())
@@ -1025,25 +1049,25 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ELEVATOR_LOWER_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_lower_scoring_height) and self.grabber.goToPosition(self.grabber_lower_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_lower_scoring_height) and self.grabber.goToPosition(self.cone_grabber_lower_scoring_height):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.log("lower scoring height ", self.lower_scoring_height, " current position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_HUMAN_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_human_position)and self.grabber.goToPosition(self.grabber_human_position):
+            if self.elevator.moveToPos(self.cone_elevator_human_position)and self.grabber.goToPosition(self.cone_grabber_human_position):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_UPPER_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_upper_scoring_height) and self.grabber.goToPosition(self.grabber_upper_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_upper_scoring_height) and self.grabber.goToPosition(self.cone_grabber_upper_scoring_height):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_RETRACT'):
-            if self.elevator.moveToPos(self.elevator_retracted_height) and self.grabber.goToPosition(self.grabber_retracted_height):
+            if self.elevator.moveToPos(self.cone_elevator_retracted_height) and self.grabber.goToPosition(self.cone_grabber_retracted_height):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
