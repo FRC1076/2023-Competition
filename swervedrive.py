@@ -509,6 +509,13 @@ class SwerveDrive:
 
     def goToOffsetAndTargetSize(self, targetOffsetX, targetTargetSize):
         if self.vision:
+
+            YAW = 0.0
+            if(self.getGyroYaw() >= -90 and self.getGyroYaw() <= 90):
+                YAW = 0.0
+            else:
+                YAW = 180.0
+
             offsetX = self.vision.getTargetOffsetHorizontalReflective() 
             targetSize = self.vision.getTargetSizeReflective()
             if offsetX > MAX_TARGET_OFFSET_X or targetSize < MIN_TARGET_SIZE: # impossible values, there's no target
@@ -523,7 +530,7 @@ class SwerveDrive:
                 self.update_smartdash()
                 return True
             else:
-                self.move(x_error, y_error, 0, self.getBearing())
+                self.move(x_error, y_error, 0, YAW)
                 self.execute()
                 self.update_smartdash()
                 return False
