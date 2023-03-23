@@ -325,11 +325,13 @@ class MyRobot(wpilib.TimedRobot):
         gyro = AHRS.create_spi()
         #gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
-        targetTargetSize = config['TARGET_TARGET_SIZE']
-        targetOffsetX = config['TARGET_OFFSET_X']
+        reflectiveTargetOffsetX = config['REFLECTIVE_TARGET_OFFSET_X']
+        reflectiveTargetTargetSize = config['REFLECTIVE_TARGET_TARGET_SIZE']
+        aprilTargetOffsetX = config['APRIL_TARGET_OFFSET_X']
+        aprilTargetTargetSize = config['APRIL_TARGET_TARGET_SIZE']
 
         #swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg)
-        swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, targetOffsetX, targetTargetSize, self.autonSteerStraight, self.teleopSteerStraight)
+        swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, reflectiveTargetOffsetX, reflectiveTargetTargetSize, aprilTargetOffsetX, aprilTargetTargetSize, self.autonSteerStraight, self.teleopSteerStraight)
 
         return swerve
 
