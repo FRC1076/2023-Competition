@@ -16,7 +16,7 @@ from logger import Logger
 from robotconfig import MODULE_NAMES
 
 DASH_PREFIX = MODULE_NAMES.SWERVEDRIVE
-MAX_TARGET_OFFSET_X = 320
+MAX_TARGET_OFFSET_X = 90
 MIN_TARGET_SIZE = 0
 
 
@@ -518,8 +518,9 @@ class SwerveDrive:
 
             offsetX = self.vision.getTargetOffsetHorizontalReflective() 
             targetSize = self.vision.getTargetSizeReflective()
-            if offsetX > MAX_TARGET_OFFSET_X or targetSize < MIN_TARGET_SIZE: # impossible values, there's no target
+            if abs(offsetX) > MAX_TARGET_OFFSET_X or targetSize < MIN_TARGET_SIZE: # impossible values, there's no target
                 self.log('Aborting goToReflectiveTapeCentered() cuz no targets')
+                self.log('Target offset X: ', abs(offsetX), ", Target area: ", targetSize)
                 return False
 
             x_error = self.reflective_x_pid_controller.calculate(offsetX, targetOffsetX)
@@ -537,11 +538,11 @@ class SwerveDrive:
 
 
     def goToAprilTagCentered(self):
-        return self.goToReflectiveTapeCentered(self.aprilTagTargetOffsetX,
+        return self.goToOffsetAndTargetSize(self.aprilTagTargetOffsetX,
                                                self.aprilTagTargetTargetSize)
 
     def goToReflectiveTapeCentered(self):
-        return self.goToReflectiveTapeCentered(self.reflectiveTargetOffsetX,
+        return self.goToOffsetAndTargetSize(self.reflectiveTargetOffsetX,
                                                self.reflectiveTargetTargetSize)
         
     def goToBalance(self, x, y, bearing, tolerance):

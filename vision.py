@@ -12,8 +12,8 @@ class Vision:
         self.table.putNumber('pipeline', RETROREFLECTIVE) # default to retro pipeline
         self.updatePose = _shouldUpdatePose
         # desired aspect ratio should be something like 1/2
-        self.MIN_ASPECT_RATIO = 0.2
-        self.MAX_ASPECT_RATIO = 1.0
+        self.MIN_ASPECT_RATIO = 0.0
+        self.MAX_ASPECT_RATIO = 100.0
 
     def shouldUpdatePose(self):
         return self.updatePose
@@ -85,19 +85,19 @@ class Vision:
     def getTargetSizeReflective(self):
         if not self.hasValidTargetReflective():
             return -1
-        return self.table.getNumber('ta')
+        return self.table.getNumber('ta', 0.0)
     
     # get the horizontal offset of the target from the 'crosshair'
     # can be compared with the desired offset to drive PID
     def getTargetOffsetHorizontalReflective(self):
         if not self.hasValidTargetReflective():
             return 1000 # more pixels than there are, indicates no valid offset
-        return self.table.getNumber('tx')
+        return self.table.getNumber('tx', 0.0)
 
     # determine whether we have one and only target
     # if we don't, we shouldn't use vision 
     def hasValidTargetReflective(self):
-        hasTargets = self.table.getBoolean('tv', False)
+        hasTargets = self.hasTargets()
         if not hasTargets:
             return False
         targetHeight = self.table.getNumber('tvert', 100.0)

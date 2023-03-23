@@ -124,8 +124,8 @@ drivetrainConfig = {
     'ROTATE_COUNTERCLOCKWISE': [['ROTATE', -179]], # -179, not -180, to ensure direction
     'REFLECTIVE_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
     'REFLECTIVE_TARGET_OFFSET_X': -17.8, # Needs to be figured out
-    'REFLECTIVE_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
-    'REFLECTIVE_TARGET_OFFSET_X': -17.8, # Needs to be figured out
+    'APRIL_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
+    'APRIL_TARGET_OFFSET_X': -17.8, # Needs to be figured out
 
 }
 
