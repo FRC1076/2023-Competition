@@ -2,20 +2,18 @@
 
 from networktables import NetworkTables
 
-APRILTAGS = 0
-RETROREFLECTIVE = 1
-
-# change these if you need to screen out multiple targets
-MIN_TARGET_ASPECT_RATIO_REFLECTIVE = 0.0 
-MAX_TARGET_ASPECT_RATIO_REFLECTIVE = 100.0 
-MIN_TARGET_ASPECT_RATIO_APRILTAG = 0.0
-MAX_TARGET_ASPECT_RATIO_APRILTAG = 100.0 
-
 class Vision:
-    def __init__(self, _table, _shouldUpdatePose):
+    def __init__(self, _table, _apriltags, _retroreflective, _min_target_aspect_ration_reflective, _max_target_aspect_ration_reflective, _min_target_aspect_ration_apriltag, _max_target_aspect_ration_apriltag, _shouldUpdatePose):
         self.table = _table
-        self.pipeline = RETROREFLECTIVE
-        self.table.putNumber('pipeline', RETROREFLECTIVE) # default to retro pipeline
+        self.apriltags = _apriltags
+        self.retroreflective = _retroreflective
+        self.minTargetAspectRatioReflective = _min_target_aspect_ration_reflective
+        self.maxTargetAspectRatioReflective = _max_target_aspect_ration_reflective
+        self.minTargetAspectRatioAprilTag = _min_target_aspect_ration_apriltag
+        self.maxTargetAspectRatioAprilTag = _max_target_aspect_ration_apriltag
+        
+        self.pipeline = self.retroreflective
+        self.table.putNumber('pipeline', self.retroreflective) # default to retro pipeline
         self.updatePose = _shouldUpdatePose
 
     def shouldUpdatePose(self):
@@ -26,10 +24,10 @@ class Vision:
         return self.pipeline
 
     def setToReflectivePipeline(self):
-        self.setPipeline(RETROREFLECTIVE)
+        self.setPipeline(self.retroreflective)
 
     def setToAprilTagPipeline(self):
-        self.setPipeline(APRILTAGS)
+        self.setPipeline(self.apriltags)
 
     def setPipeline(self, pl : int):
         if 0 <= pl <= 1: # change numbers to reflect min/max pipelines
@@ -112,8 +110,8 @@ class Vision:
         targetHeight = self.table.getNumber('tvert', 100.0)
         targetWidth = self.table.getNumber('thor', 1.0)
         aspectRatio = targetWidth / targetHeight
-        return aspectRatio > MIN_TARGET_ASPECT_RATIO_REFLECTIVE \
-            and aspectRatio < MIN_TARGET_ASPECT_RATIO_REFLECTIVE
+        return aspectRatio > self.minTargetAspectRatioReflective \
+            and aspectRatio < self.maxTargetAspectRatioReflective
     
     # get the target size within the frame in pixels
     # can mulitply this by something to get the distance to the target
@@ -137,6 +135,6 @@ class Vision:
         targetHeight = self.table.getNumber('tvert', 100.0)
         targetWidth = self.table.getNumber('thor', 1.0)
         aspectRatio = targetWidth / targetHeight
-        return aspectRatio > MIN_TARGET_ASPECT_RATIO_APRILTAG \
-            and aspectRatio < MIN_TARGET_ASPECT_RATIO_APRILTAG
+        return aspectRatio > self.minTargetAspectRatioAprilTag \
+            and aspectRatio < self.maxTargetAspectRatioAprilTag
     
