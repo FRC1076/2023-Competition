@@ -499,6 +499,13 @@ class SwerveDrive:
     
     def goToReflectiveTapeCentered(self):
         if self.vision:
+
+            YAW = 0.0
+            if(self.getGyroYaw() >= -90 and self.getGyroYaw() <= 90):
+                YAW = 0.0
+            else:
+                YAW = 180.0
+
             offsetX = self.vision.getTargetOffsetHorizontalReflective() 
             targetSize = self.vision.getTargetSizeReflective()
             if offsetX > 320 or targetSize < 0: # impossible values, there's no target
@@ -513,7 +520,7 @@ class SwerveDrive:
                 self.update_smartdash()
                 return True
             else:
-                self.move(x_error, y_error, 0, self.getBearing())
+                self.move(x_error, y_error, 0, YAW)
                 self.execute()
                 self.update_smartdash()
                 return False
