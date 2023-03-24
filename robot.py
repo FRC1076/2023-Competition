@@ -150,7 +150,7 @@ class MyRobot(wpilib.TimedRobot):
             self.team_is_red = True
             self.team_is_blu = False
             teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
-            teamMoveAdjustment = -1 # Red Team start is oriented in the same direction as field.
+            teamMoveAdjustment = 1 # Red Team start is oriented in the same direction as field.
         else:
             self.team_is_red = False
             self.team_is_blu = True
@@ -344,8 +344,8 @@ class MyRobot(wpilib.TimedRobot):
         self.rotateClockwiseTaskList = config['ROTATE_CLOCKWISE']
         self.rotateCounterclockwiseTaskList = config['ROTATE_COUNTERCLOCKWISE']
 
-        gyro = AHRS.create_spi()
-        #gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
+        #gyro = AHRS.create_spi()
+        gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
         swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, vision_cfg, self.autonSteerStraight, self.teleopSteerStraight)
 
@@ -547,19 +547,22 @@ class MyRobot(wpilib.TimedRobot):
 
         if self.grabber_has_reset == False:
             self.grabber_has_reset = self.grabber.grabberReset()
-            return True
+            self.log("TeleopPeriodic: grabber_has_reset: ", self.grabber_has_reset)
+            return
+        self.log("TeleopPeriodic: Grabber reset test complete")
         if self.elevator_has_reset == False:
             self.grabber.update()
             self.elevator_has_reset = self.elevator.elevatorReset()
-            return True
+            return
+        self.log("TeleopPeriodic: Elevator reset test complete")
         if self.teleopDrivetrain():
             print("TeleoDrivetrain returned true. In a maneuver.")
-            return True
+            return
         else:
             print("TeleoDrivetrain returned False. Not in a maneuver.")
             self.teleopElevatorGrabber()
             self.teleopClaw()
-            return True
+            return
 
     def teleopDrivetrain(self):
         if (not self.drivetrain):

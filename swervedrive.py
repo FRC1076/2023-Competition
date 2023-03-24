@@ -158,9 +158,9 @@ class SwerveDrive:
         # - tune PID values
         self.visionDrive_config = _visionDrive_cfg
         self.visionDrive_x_pid_controller = PIDController(self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP)
-        self.visionDrive_x_pid_controller.setTolerance(1, 1)
+        self.visionDrive_x_pid_controller.setTolerance(0.5, 0.5)
         self.visionDrive_y_pid_controller = PIDController(self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP)
-        self.visionDrive_y_pid_controller.setTolerance(1, 1)
+        self.visionDrive_y_pid_controller.setTolerance(0.01, 0.01)
         self.reflectiveTargetOffsetX = self.visionDrive_config.target_offsetX_reflective
         self.reflectiveTargetTargetSize = self.visionDrive_config.target_target_size_reflective
         self.aprilTargetOffsetX = self.visionDrive_config.target_offsetX_april
@@ -411,7 +411,7 @@ class SwerveDrive:
             pitch_output = 0
         else:
             #pitch_output = clamp(pitch_error)
-            pitch_output = pitch_error
+            pitch_output = -pitch_error # Deliberately flipping sign
 
         if self.balance_yaw_pid_controller.atSetpoint():
             yaw_output = 0
@@ -464,9 +464,8 @@ class SwerveDrive:
             self.log("SWERVEDRIVE steerStraight rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
-    def move(self, fwd, strafe, rcw, bearing):
-        self.log("SWERVEDRIVE Moving:", fwd, strafe, rcw, bearing)
-
+    def move(self, base_fwd, base_strafe, rcw, bearing):
+        
         """
         Calulates the speed and angle for each wheel given the requested movement
         Positive fwd value = Forward robot movement\n
@@ -477,7 +476,12 @@ class SwerveDrive:
         :param strafe: the requested movement in the Y direction of the 2D plane
         :param rcw: the requestest magnitude of the rotational vector of a 2D plane
         """
-        
+        self.log("SWERVEDRIVE: MoveAdjustment: ", self.swervometer.getTeamMoveAdjustment())
+        fwd = base_fwd * self.swervometer.getTeamMoveAdjustment()
+        strafe = base_strafe * self.swervometer.getTeamMoveAdjustment()
+
+        self.log("SWERVEDRIVE Moving:", fwd, strafe, rcw, bearing)
+
         #Convert field-oriented translate to chassis-oriented translate
         
         current_angle = self.getGyroAngle() % 360
@@ -509,29 +513,40 @@ class SwerveDrive:
 
     def goToOffsetAndTargetSize(self, targetOffsetX, targetTargetSize):
         if self.vision:
-
+            
+            self.log("goToOffsetAndTargetSize: targetOffsetX: ", targetOffsetX, " targetTargetSize: ", targetTargetSize)
             YAW = 0.0
             if(self.getGyroYaw() >= -90 and self.getGyroYaw() <= 90):
                 YAW = 0.0
             else:
                 YAW = 180.0
 
+            self.log("goToOffsetAndTargetSize: YAW: ", YAW)
+
             offsetX = self.vision.getTargetOffsetHorizontalReflective() 
             targetSize = self.vision.getTargetSizeReflective()
+
+            self.log("goToOffsetAndTargetSize: offsetX: ", offsetX, " targetSize: ", targetSize)
+
             if abs(offsetX) > self.max_target_offset_x or targetSize < self.min_target_size: # impossible values, there's no target
                 self.log('Aborting goToReflectiveTapeCentered() cuz no targets')
                 self.log('Target offset X: ', abs(offsetX), ", Target area: ", targetSize)
                 return False
 
-            x_error = self.reflective_x_pid_controller.calculate(offsetX, targetOffsetX)
-            y_error = self.reflective_y_pid_controller.calculate(targetSize, targetTargetSize)
-
-            if self.reflective_x_pid_controller.atSetpoint() and  \
-                self.reflective_y_pid_controller.atSetpoint():
+            x_error = self.visionDrive_x_pid_controller.calculate(offsetX, targetOffsetX)
+            x_error = -x_error
+            #x_error = 0
+            y_error = 10 * self.visionDrive_y_pid_controller.calculate(targetSize, targetTargetSize)
+            
+            self.log("goToOffsetAndTargetSize: x_error: ", x_error, " y_error: ", y_error)
+            
+            if self.visionDrive_x_pid_controller.atSetpoint() and  \
+                self.visionDrive_y_pid_controller.atSetpoint():
                 self.update_smartdash()
                 return True
             else:
-                self.move(x_error, y_error, 0, YAW)
+                #self.move(x_error, y_error, 0, YAW)
+                self.move(x_error, y_error, 0, self.bearing)
                 self.execute()
                 self.update_smartdash()
                 return False
@@ -582,8 +597,8 @@ class SwerveDrive:
         
         # Get x and y error corrections to go to new pose
         # Multiplying by TeamMoveAdjustment fixes the direction from the field perspective, not the controller perspective.
-        x_error = self.target_x_pid_controller.calculate(currentX, x) * self.swervometer.getTeamMoveAdjustment()
-        y_error = self.target_y_pid_controller.calculate(currentY, y) * self.swervometer.getTeamMoveAdjustment()
+        x_error = self.target_x_pid_controller.calculate(currentX, x)
+        y_error = self.target_y_pid_controller.calculate(currentY, y)
 
         # Debugging               
         #if self.target_x_pid_controller.atSetpoint():
@@ -634,10 +649,10 @@ class SwerveDrive:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defense)
 
-                    self._requested_angles['front_left'] = 45
-                    self._requested_angles['front_right'] = -45
-                    self._requested_angles['rear_left'] = -45
-                    self._requested_angles['rear_right'] = 45
+                    self._requested_angles['front_left'] = -45
+                    self._requested_angles['front_right'] = 45
+                    self._requested_angles['rear_left'] = 45
+                    self._requested_angles['rear_right'] = -45
 
                     #self.wheel_lock = False
                     #self.log("testing wheel lock")

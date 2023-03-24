@@ -26,7 +26,7 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
@@ -122,9 +122,9 @@ drivetrainConfig = {
                         ['ELEVATOR_HUMAN_EXTEND']],
     'ROTATE_CLOCKWISE': [['ROTATE', 179]], # 179, not -180 to ensure direction
     'ROTATE_COUNTERCLOCKWISE': [['ROTATE', -179]], # -179, not -180, to ensure direction
-    'VISION_DRIVE_KP': 0.001,
+    'VISION_DRIVE_KP': 0.005,
     'VISION_DRIVE_KI': 0.00001,
-    'VISION_DRIVE_KD': 0.00001,
+    'VISION_DRIVE_KD': 0.0005,
     'REFLECTIVE_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
     'REFLECTIVE_TARGET_OFFSET_X': -17.8, # Needs to be figured out
     'APRIL_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
