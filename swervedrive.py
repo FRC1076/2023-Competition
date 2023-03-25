@@ -138,9 +138,9 @@ class SwerveDrive:
         self.target_kD = self.target_config.target_kD
         
         self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_x_pid_controller.setTolerance(5, 5)
+        self.target_x_pid_controller.setTolerance(0.5, 0.5)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_y_pid_controller.setTolerance(5, 5)
+        self.target_y_pid_controller.setTolerance(0.5, 0.5)
         # self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         # self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
         # self.target_rcw_pid_controller.enableContinuousInput(0, 360)
@@ -580,8 +580,8 @@ class SwerveDrive:
         self.pose_target_bearing = bearing
 
         currentX, currentY, currentRCW = self.swervometer.getCOF()
-        x_error = -self.target_x_pid_controller.calculate(currentX, x)
-        y_error = self.target_y_pid_controller.calculate(currentY, y)
+        x_error = self.target_x_pid_controller.calculate(currentX, x)
+        y_error = -self.target_y_pid_controller.calculate(currentY, y)
         #rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
         #self.log("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
@@ -595,11 +595,6 @@ class SwerveDrive:
         # Get current pose                    
         currentX, currentY, currentBearing = self.swervometer.getCOF()
         
-        # Get x and y error corrections to go to new pose
-        # Multiplying by TeamMoveAdjustment fixes the direction from the field perspective, not the controller perspective.
-        x_error = self.target_x_pid_controller.calculate(currentX, x)
-        y_error = self.target_y_pid_controller.calculate(currentY, y)
-
         # Debugging               
         #if self.target_x_pid_controller.atSetpoint():
         #    print("X at set point")

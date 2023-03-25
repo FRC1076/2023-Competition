@@ -577,9 +577,14 @@ class MyRobot(wpilib.TimedRobot):
         deadzone = self.driver.deadzone
 
         # Implement clutch on driving and rotating.
-        clutch = 1.0
+        translational_clutch = 1.0
+        rotational_clutch = 1.0
         if (driver.getRightBumper()):
-            clutch = 0.4
+            translational_clutch = 0.4
+            rotational_clutch = 0.4
+        if (driver.getLeftBumper()): # This is deliberately an "if", not an "elif", to aid in driver transition.
+            translational_clutch = 0.2
+            rotational_clutch = 0.3 #0.2 was a little too slow for rotation, but perfect for translation
 
         # Reset the gyro in the direction bot is facing.
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
@@ -588,46 +593,46 @@ class MyRobot(wpilib.TimedRobot):
             self.drivetrain.printGyro()
 
         # Determine if Wheel Lock is needed.
-        if (driver.getLeftBumper()):
+        if (driver.getLeftTriggerAxis() > 0.7 and not driver.getRightTriggerAxis() > 0.7):
             self.drivetrain.setWheelLock(True)
         else:
             self.drivetrain.setWheelLock(False)
         
         #Manuevers
-        rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
+        rcw = self.deadzoneCorrection(driver.getRightX() * rotational_clutch, self.driver.deadzone)
         if(driver.getAButton()):
             self.drivetrain.balance()
             return True
         elif(driver.getYButton()):
             self.drivetrain.goToReflectiveTapeCentered()
             return True
-        elif (driver.getBButton()):
-            if(self.startingManeuver == True):
-                self.log("B Button - Starting Maneuver")
-                self.startingManeuver = False
-                self.maneuverComplete = False
-                self.maneuverTaskCounter = 0
-                self.maneuverTaskList = self.lowConeScoreTaskList
-            self.teleopManeuver()
-            return True
-        elif (driver.getYButton()):
-            if(self.startingManeuver == True):
-                self.log("Y Button - Starting Maneuver")
-                self.startingManeuver = False
-                self.maneuverComplete = False
-                self.maneuverTaskCounter = 0
-                self.maneuverTaskList = self.highConeScoreTaskList
-            self.teleopManeuver()
-            return True
-        elif (driver.getXButton()):
-            if(self.startingManeuver == True):
-                self.log("X Button - Starting Maneuver")
-                self.startingManeuver = False
-                self.maneuverComplete = False
-                self.maneuverTaskCounter = 0
-                self.maneuverTaskList = self.humanStationTaskList
-            self.teleopManeuver()
-            return True
+        #elif (driver.getBButton()):
+        #    if(self.startingManeuver == True):
+        #        self.log("B Button - Starting Maneuver")
+        #        self.startingManeuver = False
+        #        self.maneuverComplete = False
+        #        self.maneuverTaskCounter = 0
+        #        self.maneuverTaskList = self.lowConeScoreTaskList
+        #    self.teleopManeuver()
+        #    return True
+        #elif (driver.getYButton()):
+        #    if(self.startingManeuver == True):
+        #        self.log("Y Button - Starting Maneuver")
+        #        self.startingManeuver = False
+        #        self.maneuverComplete = False
+        #        self.maneuverTaskCounter = 0
+        #        self.maneuverTaskList = self.highConeScoreTaskList
+        #    self.teleopManeuver()
+        #    return True
+        #elif (driver.getXButton()):
+        #    if(self.startingManeuver == True):
+        #        self.log("X Button - Starting Maneuver")
+        #        self.startingManeuver = False
+        #        self.maneuverComplete = False
+        #        self.maneuverTaskCounter = 0
+        #        self.maneuverTaskList = self.humanStationTaskList
+        #    self.teleopManeuver()
+        #    return True
         elif (driver.getRightTriggerAxis() > 0.7 and rcw > 0):
             if(self.startingManeuver == True):
                 print("180 Clockwise Flip - Starting Maneuver")
@@ -652,9 +657,9 @@ class MyRobot(wpilib.TimedRobot):
         
         # Regular driving, not a maneuver
         else:
-            strafe = self.deadzoneCorrection(driver.getLeftX() * clutch, self.driver.deadzone)
-            fwd = self.deadzoneCorrection(driver.getLeftY() * clutch, self.driver.deadzone)
-            rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
+            strafe = self.deadzoneCorrection(driver.getLeftX() * translational_clutch, self.driver.deadzone)
+            fwd = self.deadzoneCorrection(driver.getLeftY() * translational_clutch, self.driver.deadzone)
+            rcw = self.deadzoneCorrection(driver.getRightX() * rotational_clutch, self.driver.deadzone)
             
             fwd *= -1 # Because controller is backwards from you think
             
@@ -697,11 +702,10 @@ class MyRobot(wpilib.TimedRobot):
 
         self.log("teleopElevatorGrabber: In teleopElevatorGrabber()")
 
-        if (operator.getLeftBumper()):
+        if (operator.getLeftBumper() and not operator.getRightBumper()):
             self.log("teleopElevator: Toggling Elevator Up/Down")
             self.elevator.toggle()
 
-        ## ignored for now
         clutch_factor = 1
         #Check for clutch
         if(operator.getLeftTriggerAxis() > 0.7):
@@ -709,7 +713,7 @@ class MyRobot(wpilib.TimedRobot):
         
         #Find the value the arm will move at
         elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
-        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
+        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone)) * clutch_factor
 
         if elevator_controller_value != 0 and grabber_controller_value != 0: # Move both in direction of controller
             self.grabber.move_grabber(grabber_controller_value)
@@ -829,7 +833,7 @@ class MyRobot(wpilib.TimedRobot):
         autonTask = self.autonTaskList[self.autonTaskCounter]
 
         self.log("Autonomous Periodic: Past Grabber reset and Elevator reset ")
-        self.log("Current Task Counter: ", self.autonTaskCounter, "Current Task: ", autonTask)
+        self.log("Current Task Counter: ", self.autonTaskCounter, "Current Task: ", autonTask, "Current Task List: ", self.autonTaskList)
 
         if (autonTask[0] == 'TIMER'):
             self.log("RUNNING Auton Task TIMER, timer: ", self.autonTimer.get())
