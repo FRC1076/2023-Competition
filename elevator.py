@@ -35,6 +35,16 @@ class Elevator:
         self.right_limit_switch = wpilib.DigitalInput(right_limit_switch_id)
         self.targetPosition = self.getEncoderPosition()
 
+        self.storeElevatorBypassLimitSwitch = False
+        self.elevatorHasReset = False
+
+    def resetElevator(self):
+        self.storeElevatorBypassLimitSwitch = False
+        self.elevatorHasReset = False
+
+    def hasElevatorReset(self):
+        return self.elevatorHasReset
+    
     def getTargetPosition(self):
         return self.targetPosition
 
@@ -124,19 +134,20 @@ class Elevator:
 
     def bypassLimitSwitch(self):
         self.log("Elevator: Bypassing limit switch reset.")
-        self.resetEncoders()
-    
+        self.storeElevatorBypassLimitSwitch = True
+        
     def elevatorReset(self):
         self.log("Elevator: Reseting elevator")
         
-        #reset grabber (lift it up) after elevator is all the way down
-        if self.left_limit_switch.get() == True or self.right_limit_switch.get() == True:
+        if self.left_limit_switch.get() or self.right_limit_switch.get() or self.storeElevatorBypassLimitSwitch:
             self.log("Elevator: Found the limit switch")
             self.resetEncoders()
+            self.elevatorHasReset = True
             return True
         else:
             self.right_motor.set(-0.1)
             self.left_motor.set(-0.1)
+            self.elevatorHasReset = False
             return False
     
     # only reading the right encoder, assuming that left and right will stay about the same

@@ -181,7 +181,7 @@ grabberConfig = {
     'GRABBER_KI': 0.0008, #0.0008, #0.0008,
     'GRABBER_KD': 0.002, #0.002,
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
-    'MIN_POSITION': 0.6, # Roughly 0 - 5 scale, with 0 at top
+    'MIN_POSITION': 0, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
     'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.8, # Assumes Elevator Down
@@ -318,6 +318,7 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
+                        ['MOVE', 230.9375, 40.15, 180],
                         #['MOVE', 91.9375, 40.15, 180],
                         ['IDLE']],
     'TASK_RED_A_TT': [['CLAW_INTAKE_AND_STOP'],

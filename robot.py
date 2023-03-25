@@ -103,13 +103,10 @@ class MyRobot(wpilib.TimedRobot):
 
         self.periods = 0
 
-        self.elevator_has_reset = True
-
         if self.drivetrain:
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
 
-        self.grabber_has_rest = False
         self.elevator_has_reset = False
 
     def disabledExit(self):
@@ -124,8 +121,9 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTaskCounter = 0
         self.maneuverTaskCounter = 0
 
-        self.grabber_has_reset = False
-        self.elevator_has_reset = False
+        self.grabber.resetGrabber()
+
+        self.elevator.resetElevator()
 
     def initLogger(self, dir):
         return Logger.getLogger(dir)
@@ -547,16 +545,19 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.bypassLimitSwitch()
             return
 
-        if self.grabber_has_reset == False:
-            self.grabber_has_reset = self.grabber.grabberReset()
-            self.log("TeleopPeriodic: grabber_has_reset: ", self.grabber_has_reset)
+        self.log("TeleopPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
+        if self.grabber.hasGrabberReset() == False:
+            self.grabber.grabberReset()
             return
         self.log("TeleopPeriodic: Grabber reset test complete")
-        if self.elevator_has_reset == False:
+        
+        self.log("TeleopPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
+        if self.elevator.hasElevatorReset == False:
+            self.elevator.elevatorReset()
             self.grabber.update()
-            self.elevator_has_reset = self.elevator.elevatorReset()
             return
         self.log("TeleopPeriodic: Elevator reset test complete")
+        
         if self.teleopDrivetrain():
             print("TeleoDrivetrain returned true. In a maneuver.")
             return
@@ -806,13 +807,18 @@ class MyRobot(wpilib.TimedRobot):
         if not self.autonTimer:
             return
 
-        if self.grabber_has_reset == False and not TEST_MODE:
-            self.grabber_has_reset = self.grabber.grabberReset()
-            return True
-            
-        if self.elevator_has_reset == False and not TEST_MODE   :
-            self.elevator_has_reset = self.elevator.elevatorReset()
+        self.log("AutonomousPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
+        if self.grabber.hasGrabberReset() == False:
+            self.grabber.grabberReset()
             return
+        self.log("AutonomousPeriodic: Grabber reset test complete")
+        
+        self.log("AutonomousPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
+        if self.elevator.hasElevatorReset == False:
+            self.elevator.elevatorReset()
+            self.grabber.update()
+            return
+        self.log("AutonomousPeriodic: Elevator reset test complete")
         
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
