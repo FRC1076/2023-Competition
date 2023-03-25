@@ -293,7 +293,9 @@ class MyRobot(wpilib.TimedRobot):
         balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
         target_cfg = TargetConfig(sd_prefix='Target_Module', target_kP=config['TARGET_KP'], target_kI=config['TARGET_KI'], target_kD=config['TARGET_KD'])
         bearing_cfg = BearingConfig(sd_prefix='Bearing_Module', bearing_kP=config['BEARING_KP'], bearing_kI=config['BEARING_KI'], bearing_kD=config['BEARING_KD'])
-        vision_cfg = VisionDriveConfig(sd_prefix='Vision_Module', visionDrive_kP=config['VISION_DRIVE_KP'], visionDrive_kI=config['VISION_DRIVE_KI'], visionDrive_kD=config['VISION_DRIVE_KD'],
+        vision_cfg = VisionDriveConfig(sd_prefix='Vision_Module',
+            x_visionDrive_kP=config['X_VISION_DRIVE_KP'], x_visionDrive_kI=config['X_VISION_DRIVE_KI'], x_visionDrive_kD=config['X_VISION_DRIVE_KD'],
+            y_visionDrive_kP=config['Y_VISION_DRIVE_KP'], y_visionDrive_kI=config['Y_VISION_DRIVE_KI'], y_visionDrive_kD=config['Y_VISION_DRIVE_KD'],
             target_offsetX_reflective=config['REFLECTIVE_TARGET_OFFSET_X'], target_target_size_reflective=config['REFLECTIVE_TARGET_TARGET_SIZE'],
             target_offsetX_april=config['APRIL_TARGET_OFFSET_X'], target_target_size_april=config['APRIL_TARGET_TARGET_SIZE'],
             max_target_offset_x=config['MAX_TARGET_OFFSET_X'], min_target_size=config['MIN_TARGET_SIZE'])
@@ -889,13 +891,13 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_UPPER_EXTEND'):
             self.log("RUNNING Auton Task ELEVATOR_UPPER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.cone_elevator_upper_scoring_height) and self.grabber.goToPosition(self.cone_grabber_upper_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_upper_scoring_height): #and self.grabber.goToPosition(self.cone_grabber_upper_scoring_height):
                 self.log("ENDING Auton Task ELEVATOR_UPPER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Upper Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             self.log("RUNNING Auton Task ELEVATOR_LOWER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.cone_elevator_lower_scoring_height) and self.grabber.goToPosition(self.cone_grabber_lower_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_lower_scoring_height): #and self.grabber.goToPosition(self.cone_grabber_lower_scoring_height):
                 self.log("ENDING Auton Task ELEVATOR_LOWER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Lower Extend: ", self.elevator.getEncoderPosition())

@@ -25,7 +25,7 @@ class Elevator:
             solenoid_forward_id, 
             solenoid_reverse_id)
         self.pid_controller = PIDController(kP, kI, kD)
-        self.pid_controller.setTolerance(0.6, 0.6)
+        self.pid_controller.setTolerance(0.3, 0.01)
         self.grabber = grabber
         self.right_motor.setOpenLoopRampRate(0.50)
         self.left_motor.setOpenLoopRampRate(0.50)
@@ -45,6 +45,9 @@ class Elevator:
             targetSpeed = 1
         if targetSpeed < -1:
             targetSpeed = -1
+        
+        if targetSpeed > 0:
+            targetSpeed *= 0.5
             
         #make sure arm doesn't go past limit
         if self.getEncoderPosition() > self.upperSafety and targetSpeed < 0:
@@ -77,7 +80,7 @@ class Elevator:
         else:
             self.log("Elevator: Moving")
             extendSpeed *= -1 # Elevator motor moves reverse direction.
-            self.extend(extendSpeed * 0.1)
+            self.extend(extendSpeed * 0.1125)
             return False
 
     def update(self):

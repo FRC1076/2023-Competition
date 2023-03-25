@@ -20,7 +20,7 @@ DASH_PREFIX = MODULE_NAMES.SWERVEDRIVE
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
 BearingConfig = namedtuple('BearingConfig', ['sd_prefix', 'bearing_kP', 'bearing_kI', 'bearing_kD'])
-VisionDriveConfig = namedtuple('VisionDriveConfig', ['sd_prefix', 'visionDrive_kP', 'visionDrive_kI', 'visionDrive_kD', 'target_offsetX_reflective', 'target_target_size_reflective', 'target_offsetX_april', 'target_target_size_april', 'max_target_offset_x', 'min_target_size'])
+VisionDriveConfig = namedtuple('VisionDriveConfig', ['sd_prefix', 'x_visionDrive_kP', 'x_visionDrive_kI', 'x_visionDrive_kD', 'y_visionDrive_kP', 'y_visionDrive_kI', 'y_visionDrive_kD', 'target_offsetX_reflective', 'target_target_size_reflective', 'target_offsetX_april', 'target_target_size_april', 'max_target_offset_x', 'min_target_size'])
 
 class SwerveDrive:
 
@@ -157,9 +157,9 @@ class SwerveDrive:
         # TODO: 
         # - tune PID values
         self.visionDrive_config = _visionDrive_cfg
-        self.visionDrive_x_pid_controller = PIDController(self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP)
+        self.visionDrive_x_pid_controller = PIDController(self.visionDrive_config.x_visionDrive_kP, self.visionDrive_config.x_visionDrive_kP, self.visionDrive_config.x_visionDrive_kP)
         self.visionDrive_x_pid_controller.setTolerance(0.5, 0.5)
-        self.visionDrive_y_pid_controller = PIDController(self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP, self.visionDrive_config.visionDrive_kP)
+        self.visionDrive_y_pid_controller = PIDController(self.visionDrive_config.y_visionDrive_kP, self.visionDrive_config.y_visionDrive_kP, self.visionDrive_config.y_visionDrive_kP)
         self.visionDrive_y_pid_controller.setTolerance(0.01, 0.01)
         self.reflectiveTargetOffsetX = self.visionDrive_config.target_offsetX_reflective
         self.reflectiveTargetTargetSize = self.visionDrive_config.target_target_size_reflective
@@ -535,8 +535,8 @@ class SwerveDrive:
 
             x_error = self.visionDrive_x_pid_controller.calculate(offsetX, targetOffsetX)
             x_error = -x_error
-            #x_error = 0
-            y_error = 10 * self.visionDrive_y_pid_controller.calculate(targetSize, targetTargetSize)
+            x_error = 0
+            y_error = -self.visionDrive_y_pid_controller.calculate(targetSize, targetTargetSize)
             
             self.log("goToOffsetAndTargetSize: x_error: ", x_error, " y_error: ", y_error)
             
