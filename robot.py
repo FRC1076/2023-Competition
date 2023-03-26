@@ -678,34 +678,38 @@ class MyRobot(wpilib.TimedRobot):
             if fwd != 0 or strafe != 0 or rcw != 0:
                 self.drivetrain.move(fwd, strafe, rcw, self.drivetrain.getBearing())
                 
-                if self.gamempad.getPOV() == 0:
-                    self.drivetrain.execute('Front_Left')
-                elif self.gamempad.getPOV() == 180:
-                    self.drivetrain.execute('Front_Left')
-                elif self.gamempad.getPOV() == 90:
-                    self.drivetrain.execute('Front_Left')
-                elif self.gamempad.getPOV() == 270:
-                    self.drivetrain.execute('Front_Left')
+                self.log("TeleopDriveTrain: POV: ", driver.getPOV())
+                if self.getPOVCorner(driver.getPOV()) == 'front_left':
+                    self.drivetrain.execute('front_left')
+                elif self.getPOVCorner(driver.getPOV()) == 'front_right':
+                    self.drivetrain.execute('front_left')
+                elif self.getPOVCorner(driver.getPOV()) == 'rear_left':
+                    self.drivetrain.execute('front_left')
+                elif self.getPOVCorner(driver.getPOV()) == 'rear_right':
+                    self.drivetrain.execute('front_left')
                 else:
-                    self.drivetrain.execute('Center')
+                    self.drivetrain.execute('center')
             # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
                 self.drivetrain.move(0, 0, 0, self.drivetrain.getBearing())
-                self.drivetrain.execute('Center')
+                self.drivetrain.execute('center')
             # Otherwise, make sure we are explicitly doing nothing, so bot does not drift.
             else:
                 self.drivetrain.idle()
 
-        # Vectoral Button Drive
-        #if self.gamempad.getPOV() == 0:
-        #    self.drive.set_raw_fwd(-0.35)
-        #elif self.gamempad.getPOV() == 180:
-        #    self.drive.set_raw_fwd(0.35)
-        #elif self.gamempad.getPOV() == 90:
-        #    self.drive.set_raw_strafe(0.35)
-        #elif self.gamempad.getPOV() == 270:
-        #    self.drive.set_raw_strafe(-0.35)
         return False
+
+    def getPOVCorner(self, value):
+        if (value >=0 and value < 90):
+            return 'front_right'
+        elif (value >=90 and value < 180):
+            return 'rear_right'
+        elif (value >=180 and value < 270):
+            return 'rear_left'
+        elif (value >= 270 and value < 360):
+            return 'front_left'
+        else:
+            return 'center'
 
     def teleopElevatorGrabber(self):
         if (not self.elevator):

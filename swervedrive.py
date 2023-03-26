@@ -428,7 +428,7 @@ class SwerveDrive:
         
         self.update_smartdash()
 
-        self.execute('Center')
+        self.execute('center')
 
         if self.balance_pitch_pid_controller.atSetpoint() and self.balance_yaw_pid_controller.atSetpoint():
             self.log("Balance: atSetpoint")
@@ -544,7 +544,7 @@ class SwerveDrive:
             else:
                 #self.move(x_error, y_error, 0, YAW)
                 self.move(x_error, y_error, 0, self.bearing)
-                self.execute()
+                self.execute('center')
                 self.update_smartdash()
                 return False
 
@@ -605,7 +605,7 @@ class SwerveDrive:
             self.move(x_error, y_error, 0, bearing)
             
             self.update_smartdash()
-            self.execute('Center')
+            self.execute('center')
             # self.log("xPositionError: ", self.target_x_pid_controller.getPositionError(), "yPositionError: ", self.target_y_pid_controller.getPositionError(), "rcwPositionError: ", self.target_rcw_pid_controller.getPositionError())
             # self.log("xPositionTolerance: ", self.target_x_pid_controller.getPositionTolerance(), "yPositionTolerance: ", self.target_y_pid_controller.getPositionTolerance(), "rcwPositionTolerance: ", self.target_rcw_pid_controller.getPositionTolerance())
             # self.log("currentX: ", currentX, " targetX: ", x, "x_error: ", x_error, " currentY: ", currentY, " targetY: ", y, " y_error: ", y_error, " currentBearing: ", currentRCW, " self.bearing: ", self.bearing, " target bearing: ", bearing)
@@ -724,7 +724,7 @@ class SwerveDrive:
                     self._requested_angles['rear_right'] = 45
 
                     #self.wheel_lock = False
-                    #self.log("testing wheel lock")
+                    #self.log("testing wheel lock"),
                 return
         
         frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
@@ -734,15 +734,17 @@ class SwerveDrive:
 
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
-        if (corner == 'front_left'):
+        self.log("Swoop: fwd: ", self._requested_vectors['fwd'], " strafe: ", self._requested_vectors['strafe'], "rcw: ", self._requested_vectors['rcw'])
+
+        if (axis_of_rotation == 'front_left'):
             #rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
             #leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
             #rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
             #frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
         
             # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-            frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'])
-            rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'])
+            frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+            rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * 0)
             rearLeft_speed = math.hypot(frontX, rightY)
             rearLeft_angle = math.degrees(math.atan2(frontX, rightY))
 
@@ -756,8 +758,8 @@ class SwerveDrive:
             rearRight_speed = math.hypot(rearX, rightY)
             rearRight_angle = math.degrees(math.atan2(rearX, rightY))
 
-            rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'])
-            leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'])
+            rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * 0)
+            leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
             frontRight_speed = math.hypot(rearX, leftY)
             frontRight_angle = math.degrees(math.atan2(rearX, leftY))
         else:
@@ -817,10 +819,13 @@ class SwerveDrive:
         """
         self.update_smartdash()
 
-        if axis_of_rotation == 'Center':
-            # Calculate each vector
+        self.log("Swervedrive: Execute: axis_of_rotation: ", axis_of_rotation)
+
+        if axis_of_rotation == 'center':
+            self.log("Swervedrive: No swoop")
             self._calculate_vectors()
         else:
+            self.log("Swervedrive: Swoop")
             self._calculate_swoop_vectors(axis_of_rotation)
 
         # Set the speed and angle for each module
