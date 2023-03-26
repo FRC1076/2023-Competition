@@ -27,7 +27,7 @@ controllerConfig = {
 
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'FIELD_START_POSITION': 'C', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -209,8 +209,8 @@ cliffDetectorConfig = {
 
 autonConfig = {
     'SCORE_EXISTING': True,
-    'BALANCE_BOT': True,
-    'DO_COMMUNITY': True, # Only applies for position B
+    'BALANCE_BOT': False,
+    'DO_COMMUNITY': False, # Only applies for position B
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TF': [['CLAW_INTAKE_AND_STOP'],
@@ -289,7 +289,9 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', -91.9375, -137.90, 0],
+                        ['MOVE', -230.9375, -137.90, 0],
+                        ['MOVE', -230.9375, -117.90, 0],
+                        #['MOVE', -91.9375, -137.90, 0],
                         ['IDLE']],
     'TASK_BLU_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -387,7 +389,9 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 91.9375, -137.90, 180],
+                        ['MOVE', 200.9375, -137.90, 180],
+                        ['MOVE', 200.9375, -117.90, 180],
+                        #['MOVE', 91.9375, -137.90, 180],
                         ['IDLE']],
     'TASK_RED_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],

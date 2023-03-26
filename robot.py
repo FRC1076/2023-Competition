@@ -667,6 +667,11 @@ class MyRobot(wpilib.TimedRobot):
             controller_at_180_to_bot = -1
             fwd *= controller_at_180_to_bot
             strafe *= controller_at_180_to_bot
+
+            # Need to adjust for Team:
+            fwd *= self.swervometer.getTeamMoveAdjustment()
+            strafe *= self.swervometer.getTeamMoveAdjustment()
+
             # No need to correct RCW, as clockwise is clockwise whether you are facing with or against bot.
             
             # If any joysticks are dictating movement.

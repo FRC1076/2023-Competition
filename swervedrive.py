@@ -477,8 +477,8 @@ class SwerveDrive:
         :param rcw: the requestest magnitude of the rotational vector of a 2D plane
         """
         self.log("SWERVEDRIVE: MoveAdjustment: ", self.swervometer.getTeamMoveAdjustment())
-        fwd = base_fwd * self.swervometer.getTeamMoveAdjustment()
-        strafe = base_strafe * self.swervometer.getTeamMoveAdjustment()
+        fwd = base_fwd #* self.swervometer.getTeamMoveAdjustment()
+        strafe = base_strafe #* self.swervometer.getTeamMoveAdjustment()
 
         self.log("SWERVEDRIVE Moving:", fwd, strafe, rcw, bearing)
 
@@ -507,9 +507,6 @@ class SwerveDrive:
             self.set_rcw(self.steerStraight(rcw, bearing))
         else:
             self.set_rcw(rcw)
-
-
-
 
     def goToOffsetAndTargetSize(self, targetOffsetX, targetTargetSize):
         if self.vision:
