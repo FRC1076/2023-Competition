@@ -2,6 +2,8 @@
 from datetime import datetime
 import wpilib
 
+from robotconfig import MODULE_NAMES, loggingConfig
+
 class Logger:
     theLogger = None 
 
@@ -9,13 +11,14 @@ class Logger:
         self.dataLog = wpilib.DataLogManager
         self.dataLog.start(dir)
 
-    def log(self, *dataToLog):
-        dataAsStrings = map(lambda x: str(x), dataToLog)
-        message = ', '.join(dataAsStrings)
+    def log(self, moduleName, *dataToLog):
+        if loggingConfig[moduleName]:
+            dataAsStrings = map(lambda x: str(x), dataToLog)
+            message = ', '.join(dataAsStrings)
 
-        timestamp = datetime.now().strftime("%m/%d/%Y-%m-%d-%H:%M:%S")
-        logEntry = 'LOG: (' + timestamp + ') ' + message
-        self.dataLog.log(logEntry)
+            timestamp = datetime.now().strftime("%m/%d/%Y-%m-%d-%H:%M:%S")
+            logEntry = 'LOG: (' + timestamp + ') ' + message
+            self.dataLog.log(logEntry)
 
     # singleton pattern!
     def getLogger(dir=''):

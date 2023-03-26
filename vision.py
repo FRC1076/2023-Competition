@@ -2,18 +2,19 @@
 
 from networktables import NetworkTables
 
-APRILTAGS = 0
-RETROREFLECTIVE = 1
-
 class Vision:
-    def __init__(self, _table, _shouldUpdatePose):
+    def __init__(self, _table, _apriltags, _retroreflective, _min_target_aspect_ration_reflective, _max_target_aspect_ration_reflective, _min_target_aspect_ration_apriltag, _max_target_aspect_ration_apriltag, _shouldUpdatePose):
         self.table = _table
-        self.pipeline = RETROREFLECTIVE
-        self.table.putNumber('pipeline', RETROREFLECTIVE) # default to retro pipeline
+        self.apriltags = _apriltags
+        self.retroreflective = _retroreflective
+        self.minTargetAspectRatioReflective = _min_target_aspect_ration_reflective
+        self.maxTargetAspectRatioReflective = _max_target_aspect_ration_reflective
+        self.minTargetAspectRatioAprilTag = _min_target_aspect_ration_apriltag
+        self.maxTargetAspectRatioAprilTag = _max_target_aspect_ration_apriltag
+        
+        self.pipeline = self.retroreflective
+        self.table.putNumber('pipeline', self.retroreflective) # default to retro pipeline
         self.updatePose = _shouldUpdatePose
-        # desired aspect ratio should be something like 1/2
-        self.MIN_ASPECT_RATIO = 0.2
-        self.MAX_ASPECT_RATIO = 1.0
 
     def shouldUpdatePose(self):
         return self.updatePose
@@ -21,6 +22,12 @@ class Vision:
     def getPipeline(self):
         self.pipeline = self.table.getNumber('getpipe', 0)
         return self.pipeline
+
+    def setToReflectivePipeline(self):
+        self.setPipeline(self.retroreflective)
+
+    def setToAprilTagPipeline(self):
+        self.setPipeline(self.apriltags)
 
     def setPipeline(self, pl : int):
         if 0 <= pl <= 1: # change numbers to reflect min/max pipelines
@@ -85,23 +92,49 @@ class Vision:
     def getTargetSizeReflective(self):
         if not self.hasValidTargetReflective():
             return -1
-        return self.table.getNumber('ta')
+        return self.table.getNumber('ta', 0.0)
     
     # get the horizontal offset of the target from the 'crosshair'
     # can be compared with the desired offset to drive PID
     def getTargetOffsetHorizontalReflective(self):
         if not self.hasValidTargetReflective():
             return 1000 # more pixels than there are, indicates no valid offset
-        return self.table.getNumber('tx')
+        return self.table.getNumber('tx', 0.0)
 
     # determine whether we have one and only target
     # if we don't, we shouldn't use vision 
     def hasValidTargetReflective(self):
-        hasTargets = self.table.getBoolean('tv', False)
+        hasTargets = self.hasTargets()
         if not hasTargets:
             return False
         targetHeight = self.table.getNumber('tvert', 100.0)
         targetWidth = self.table.getNumber('thor', 1.0)
         aspectRatio = targetWidth / targetHeight
-        return aspectRatio > self.MIN_ASPECT_RATIO and aspectRatio < self.MAX_ASPECT_RATIO
+        return aspectRatio > self.minTargetAspectRatioReflective \
+            and aspectRatio < self.maxTargetAspectRatioReflective
+    
+    # get the target size within the frame in pixels
+    # can mulitply this by something to get the distance to the target
+    # can be compared with the desired distance to drive a PID
+    def getTargetSizeAprilTag(self):
+        if not self.hasValidTargetAprilTag():
+            return -1
+        return self.table.getNumber('ta', 0.0)
+    
+    # get the horizontal offset of the target from the 'crosshair'
+    # can be compared with the desired offset to drive PID
+    def getTargetOffsetHorizontalAprilTag(self):
+        if not self.hasValidTargetAprilTag():
+            return 1000 # more pixels than there are, indicates no valid offset
+        return self.table.getNumber('tx', 0.0)
+
+    def hasValidTargetsAprilTags(self):
+        hasTargets = self.hasTargets()
+        if not hasTargets:
+            return False
+        targetHeight = self.table.getNumber('tvert', 100.0)
+        targetWidth = self.table.getNumber('thor', 1.0)
+        aspectRatio = targetWidth / targetHeight
+        return aspectRatio > self.minTargetAspectRatioAprilTag \
+            and aspectRatio < self.maxTargetAspectRatioAprilTag
     

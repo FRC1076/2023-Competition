@@ -2,6 +2,10 @@ import wpilib
 import rev
 from logger import Logger
 
+from robotconfig import MODULE_NAMES
+
+DASH_PREFIX = MODULE_NAMES.CLAW
+
 class Claw:
 
     def __init__(self, motor_id, _release_speed, _release_change, _intake_speed, _intake_change):
@@ -66,4 +70,4 @@ class Claw:
             return True
 
     def log(self, *dataToLog):
-        self.log(dataToLog)
+        self.logger.log(DASH_PREFIX, dataToLog)

@@ -12,12 +12,13 @@ from wpimath.controller import PIDController
 from collections import namedtuple
 
 from dashboard import Dashboard
+from robotconfig import MODULE_NAMES
 
 # Create the structure of the config: SmartDashboard prefix, Encoder's zero point, Drive motor inverted, Allow reverse
 ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse', 'position_conversion', 'heading_kP', 'heading_kI', 'heading_kD'])
 
 MAX_VOLTAGE = 5 # Absolute encoder measures from 0V to 5V
-DASH_PREFIX = 'SWERVEMODULE'
+DASH_PREFIX = MODULE_NAMES.SWERVEMODULE
 
 class SwerveModule:
 
@@ -60,8 +61,7 @@ class SwerveModule:
 
         # SmartDashboard
         self.sd = Dashboard.getDashboard()
-        self.sd = NetworkTables.getTable('SmartDashboard')
-        self.debugging = self.sd.getEntry(DASH_PREFIX + '/debugging')
+        self.debugging = False # should get rid of this
 
         # Motor
         self.driveMotor.setInverted(self.inverted)
@@ -76,9 +76,9 @@ class SwerveModule:
         self.heading_pid_controller.enableContinuousInput(0, 360)
         self.heading_pid_controller.setTolerance(0.5, 0.5) # may need to tweak this with PID testing
 
-        self.sd.putNumber('Heading kP', self.heading_pid_controller.getP())
-        self.sd.putNumber('Heading kI', self.heading_pid_controller.getI())
-        self.sd.putNumber('Heading kD', self.heading_pid_controller.getD())
+        self.sd.putNumber(DASH_PREFIX, 'Heading kP', self.heading_pid_controller.getP())
+        self.sd.putNumber(DASH_PREFIX, 'Heading kI', self.heading_pid_controller.getI())
+        self.sd.putNumber(DASH_PREFIX, 'Heading kD', self.heading_pid_controller.getD())
 
     def reset(self):
         
@@ -222,9 +222,9 @@ class SwerveModule:
         Called every robot iteration/loop.
         """
 
-        self.heading_pid_controller.setP(self.sd.getNumber('Heading kP', 0))
-        self.heading_pid_controller.setI(self.sd.getNumber('Heading kI', 0))
-        self.heading_pid_controller.setD(self.sd.getNumber('Heading kD', 0))
+        self.heading_pid_controller.setP(self.sd.getNumber(DASH_PREFIX, 'Heading kP', 0))
+        self.heading_pid_controller.setI(self.sd.getNumber(DASH_PREFIX, 'Heading kI', 0))
+        self.heading_pid_controller.setD(self.sd.getNumber(DASH_PREFIX, 'Heading kD', 0))
 
         # Calculate the error using the current voltage and the requested voltage.
         # DO NOT use the #self.get_voltage function here. It has to be the raw voltage.
@@ -242,7 +242,7 @@ class SwerveModule:
         #print('ERROR = ' + str(error) + ', OUTPUT = ' + str(output))
 
         # Put the output to the dashboard
-        self.sd.putNumber(DASH_PREFIX + '/%s/rotation_output' % self.sd_prefix, output)
+        self.sd.putNumber(DASH_PREFIX, '/%s/rotation_output' % self.sd_prefix, output)
         # Set the output as the rotateMotor's voltage
         self.rotateMotor.set(output) # will replace this with a set SETPOINT rather than actually setting the speed
         #SparkMax PID controller will take care of actually running the motors with PID values you instantiate it with
@@ -279,20 +279,20 @@ class SwerveModule:
         """
         Output a bunch on internal variables for debugging purposes.
         """
-        self.sd.putNumber(DASH_PREFIX + '/%s/current_angle' % self.sd_prefix, self.get_current_angle())
+        self.sd.putNumber(DASH_PREFIX, '/%s/current_angle' % self.sd_prefix, self.get_current_angle())
 
         # if self.debugging.getBoolean(False):
         # not sure why we need this or how it gets set in the first place
 
-        self.sd.putNumber(DASH_PREFIX + '/%s/requested_speed' % self.sd_prefix, self._requested_speed)
-        self.sd.putNumber(DASH_PREFIX + '/%s/requested_angle' % self.sd_prefix, self._requested_angle)
-        self.sd.putNumber(DASH_PREFIX + '/%s/rotate encoder absolute position' % self.sd_prefix, self.rotateEncoder.getPosition())
-        self.sd.putNumber(DASH_PREFIX + '/%s/drive encoder absolute position' % self.sd_prefix, self.driveEncoder.getPosition())
+        self.sd.putNumber(DASH_PREFIX, '/%s/requested_speed' % self.sd_prefix, self._requested_speed)
+        self.sd.putNumber(DASH_PREFIX, '/%s/requested_angle' % self.sd_prefix, self._requested_angle)
+        self.sd.putNumber(DASH_PREFIX, '/%s/rotate encoder absolute position' % self.sd_prefix, self.rotateEncoder.getPosition())
+        self.sd.putNumber(DASH_PREFIX, '/%s/drive encoder absolute position' % self.sd_prefix, self.driveEncoder.getPosition())
 
-        self.sd.putNumber(DASH_PREFIX + '/%s/Heading PID Setpoint' % self.sd_prefix, self.heading_pid_controller.getSetpoint())
-        self.sd.putNumber(DASH_PREFIX + '/%s/Heading PID Error' % self.sd_prefix, self.heading_pid_controller.getPositionError())
-        self.sd.putBoolean(DASH_PREFIX + '/%s/Heading PID isAligned' % self.sd_prefix, self.heading_pid_controller.atSetpoint())
+        self.sd.putNumber(DASH_PREFIX, '/%s/Heading PID Setpoint' % self.sd_prefix, self.heading_pid_controller.getSetpoint())
+        self.sd.putNumber(DASH_PREFIX, '/%s/Heading PID Error' % self.sd_prefix, self.heading_pid_controller.getPositionError())
+        self.sd.putBoolean(DASH_PREFIX, '/%s/Heading PID isAligned' % self.sd_prefix, self.heading_pid_controller.atSetpoint())
 
-        self.sd.putBoolean(DASH_PREFIX + '/%s/allow_reverse' % self.sd_prefix, self.allow_reverse)
-        self.sd.putBoolean(DASH_PREFIX + '/%s/is_flipped' % self.sd_prefix, self.moduleFlipped)
-        self.sd.putNumber(DASH_PREFIX + '/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
+        self.sd.putBoolean(DASH_PREFIX, '/%s/allow_reverse' % self.sd_prefix, self.allow_reverse)
+        self.sd.putBoolean(DASH_PREFIX, '/%s/is_flipped' % self.sd_prefix, self.moduleFlipped)
+        self.sd.putNumber(DASH_PREFIX, '/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
