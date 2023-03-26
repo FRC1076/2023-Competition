@@ -732,7 +732,7 @@ class MyRobot(wpilib.TimedRobot):
         
         #Find the value the arm will move at
         elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * operator_clutch
-        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone)) * operator_clutch
+        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone)) * self.grabber.getRotateSpeed()
 
         if elevator_controller_value != 0 and grabber_controller_value != 0: # Move both in direction of controller
             self.grabber.move_grabber(grabber_controller_value)
@@ -891,13 +891,13 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.update()
         elif (autonTask[0] == 'RAISE_GRABBER'):
             self.log("RUNNING Auton Task RAISE_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
-            if self.grabber.raise_motor(0.6):
+            if self.grabber.raise_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Auton Task RAISE_GRABBER")
                 self.autonTaskCounter += 1
             self.elevator.update()
         elif (autonTask[0] == 'LOWER_GRABBER'):
             self.log("RUNNING Auton Task LOWER_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
-            if self.grabber.lower_motor(0.2):
+            if self.grabber.lower_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Auton Task LOWER_GRABBER")
                 self.autonTaskCounter += 1 
             self.elevator.update()
@@ -1047,13 +1047,13 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
-            if self.grabber.raise_motor(1.0):
+            if self.grabber.raise_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
-            if self.grabber.lower_motor(1.0):
+            if self.grabber.lower_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)

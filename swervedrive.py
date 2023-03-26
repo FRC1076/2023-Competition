@@ -138,9 +138,9 @@ class SwerveDrive:
         self.target_kD = self.target_config.target_kD
         
         self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_x_pid_controller.setTolerance(0.5, 0.5)
+        self.target_x_pid_controller.setTolerance(5, 1)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_y_pid_controller.setTolerance(0.5, 0.5)
+        self.target_y_pid_controller.setTolerance(5, 1)
         # self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         # self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
         # self.target_rcw_pid_controller.enableContinuousInput(0, 360)
@@ -150,7 +150,8 @@ class SwerveDrive:
         self.bearing_kI = self.bearing_config.bearing_kI
         self.bearing_kD = self.bearing_config.bearing_kD
         self.bearing_pid_controller = PIDController(self.bearing_kP, self.bearing_kI, self.bearing_kD)
-
+        self.bearing_pid_controller.setTolerance(1, 1)
+        
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
@@ -729,8 +730,8 @@ class SwerveDrive:
         
         frame_dimension_x, frame_dimension_y = self.swervometer.getFrameDimensions()
         
-        frame_dimension_x *= 2 # Frame is effectively twice as big.
-        frame_dimension_y *= 2 # Frame is effectively twice as big.
+        #frame_dimension_x *= 2 # Frame is effectively twice as big.
+        #frame_dimension_y *= 2 # Frame is effectively twice as big.
 
         ratio = math.hypot(frame_dimension_x, frame_dimension_y)
 
@@ -743,7 +744,7 @@ class SwerveDrive:
             #frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
         
             # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-            frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
+            frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * 1)
             rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * 0)
             rearLeft_speed = math.hypot(frontX, rightY)
             rearLeft_angle = math.degrees(math.atan2(frontX, rightY))
@@ -759,7 +760,7 @@ class SwerveDrive:
             rearRight_angle = math.degrees(math.atan2(rearX, rightY))
 
             rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * 0)
-            leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (frame_dimension_y / ratio))
+            leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * 1)
             frontRight_speed = math.hypot(rearX, leftY)
             frontRight_angle = math.degrees(math.atan2(rearX, leftY))
         else:

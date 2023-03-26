@@ -27,7 +27,7 @@ controllerConfig = {
 
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'C', # Which of three starting positions is selected?
+    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -90,11 +90,11 @@ drivetrainConfig = {
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
-    'TARGET_KP': 0.005,
-    'TARGET_KI': 0.05, #0.005,
-    'TARGET_KD': 0.0001,
+    'TARGET_KP': 0.025,
+    'TARGET_KI': 0.001, #0.005,
+    'TARGET_KD': 0.00001,
     'BEARING_KP': 0.025,
-    'BEARING_KI': 0.00001,
+    'BEARING_KI': 0.01,
     'BEARING_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 0.125, # Improves maneuverability of bot.
@@ -176,12 +176,12 @@ elevatorConfig = {
 
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
-    'GRABBER_ROTATE_SPEED': 0.4,
+    'GRABBER_ROTATE_SPEED': 0.1,
     'GRABBER_KP': 0.20, #0.2, #0.12,3
     'GRABBER_KI': 0.0008, #0.0008, #0.0008,
     'GRABBER_KD': 0.002, #0.002,
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
-    'MIN_POSITION': 0, # Roughly 0 - 5 scale, with 0 at top
+    'MIN_POSITION': 0.5, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
     'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.8, # Assumes Elevator Down
@@ -193,7 +193,7 @@ grabberConfig = {
 
 clawConfig = {
     'MOTOR_ID': 8,
-    'RELEASE_SPEED': 0.2, #0.125, # Go slow on release, so piece drops straight down
+    'RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
     'RELEASE_CHANGE': 3, # Encoder change before we assume element is grabbed
     'INTAKE_SPEED': 0.5, # Go fast on intake
     'INTAKE_CHANGE': 1 # Encoder change before we assume element is expelled
@@ -209,7 +209,7 @@ cliffDetectorConfig = {
 
 autonConfig = {
     'SCORE_EXISTING': True,
-    'BALANCE_BOT': False,
+    'BALANCE_BOT': True,
     'DO_COMMUNITY': False, # Only applies for position B
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
@@ -444,7 +444,7 @@ loggingConfig = {
     MODULE_NAMES.SWERVEDRIVE: True,
     MODULE_NAMES.SWERVEMODULE: False,
     MODULE_NAMES.SWERVOMETER: False,
-    MODULE_NAMES.ELEVATOR: False,
+    MODULE_NAMES.ELEVATOR: True,
     MODULE_NAMES.GRABBER: False,
     MODULE_NAMES.CLAW: True,
     MODULE_NAMES.VISION: False,    
