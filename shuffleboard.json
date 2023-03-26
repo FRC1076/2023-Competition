@@ -11,51 +11,20 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {
-          "0,0": {
+          "4,0": {
             "size": [
               1,
               1
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/requested_voltage",
-              "_title": "drive/FrontLeft_Module/requested_voltage"
-            }
-          },
-          "1,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/requested_speed",
-              "_title": "drive/FrontLeft_Module/requested_speed"
-            }
-          },
-          "2,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/drive/lower_input_thresh",
-              "_title": "drive/drive/lower_input_thresh"
+              "_type": "Boolean Box",
+              "_source0": "network_table:///FMSInfo/IsRedAlliance",
+              "_title": "FMSInfo/IsRedAlliance",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           },
           "3,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/PID Error",
-              "_title": "drive/FrontLeft_Module/PID Error"
-            }
-          },
-          "4,0": {
             "size": [
               1,
               1
@@ -68,28 +37,28 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "5,0": {
+          "0,2": {
             "size": [
-              1,
+              2,
               1
             ],
             "content": {
               "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/PID isAligned",
-              "_title": "drive/FrontLeft_Module/PID isAligned",
+              "_source0": "network_table:///SmartDashboard/Team is Red",
+              "_title": "Team is Red",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "6,0": {
+          "0,3": {
             "size": [
-              1,
+              2,
               1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/output",
-              "_title": "drive/FrontLeft_Module/output"
+              "_source0": "network_table:///SmartDashboard/Field Start Position",
+              "_title": "Field Start Position"
             }
           },
           "7,0": {
@@ -98,9 +67,11 @@
               1
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/PID Setpoint",
-              "_title": "drive/FrontLeft_Module/PID Setpoint"
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Has Bumpers Attached",
+              "_title": "Has Bumpers Attached",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           },
           "8,0": {
@@ -110,11 +81,187 @@
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/encoder position",
-              "_title": "drive/FrontLeft_Module/encoder position"
+              "_source0": "network_table:///SmartDashboard/Heading kP",
+              "_title": "Heading kP"
             }
           },
           "9,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Heading kI",
+              "_title": "Heading kI"
+            }
+          },
+          "10,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Heading kD",
+              "_title": "Heading kD"
+            }
+          },
+          "11,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Balance Pitch kP",
+              "_title": "Balance Pitch kP"
+            }
+          },
+          "12,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Balance Pitch kI",
+              "_title": "Balance Pitch kI"
+            }
+          },
+          "0,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Balance Pitch kD",
+              "_title": "Balance Pitch kD"
+            }
+          },
+          "1,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Balance Yaw kP",
+              "_title": "Balance Yaw kP"
+            }
+          },
+          "2,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Balance Yaw kI",
+              "_title": "Balance Yaw kI"
+            }
+          },
+          "3,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Balance Yaw kD",
+              "_title": "Balance Yaw kD"
+            }
+          },
+          "3,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Toggle Button",
+              "_source0": "network_table:///SmartDashboard/Auton Score Existing Element",
+              "_title": "Auton Score Existing Element"
+            }
+          },
+          "5,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Toggle Button",
+              "_source0": "network_table:///SmartDashboard/Auton Pickup New Element",
+              "_title": "Auton Pickup New Element"
+            }
+          },
+          "5,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Toggle Button",
+              "_source0": "network_table:///SmartDashboard/Auton Score New Element",
+              "_title": "Auton Score New Element"
+            }
+          },
+          "3,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Toggle Button",
+              "_source0": "network_table:///SmartDashboard/Auton Balance Robot",
+              "_title": "Auton Balance Robot"
+            }
+          },
+          "5,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_PipelineName",
+              "_title": "limelight_PipelineName"
+            }
+          },
+          "6,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_Stream",
+              "_title": "limelight_Stream"
+            }
+          },
+          "4,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_Interface",
+              "_title": "limelight_Interface"
+            }
+          },
+          "0,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/drive/drive/lower_input_thresh",
+              "_title": "drive/drive/lower_input_thresh"
+            }
+          },
+          "1,0": {
             "size": [
               1,
               1
@@ -125,7 +272,7 @@
               "_title": "drive/drive/rotation_multiplier"
             }
           },
-          "10,0": {
+          "2,0": {
             "size": [
               1,
               1
@@ -136,46 +283,52 @@
               "_title": "drive/drive/xy_multiplier"
             }
           },
-          "11,0": {
+          "5,1": {
             "size": [
               1,
               1
             ],
             "content": {
               "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/allow_reverse",
-              "_title": "drive/FrontLeft_Module/allow_reverse",
+              "_source0": "network_table:///SmartDashboard/ROBOT/Team is Red",
+              "_title": "ROBOT/Team is Red",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "7,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Graph",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/degrees",
-              "_title": "drive/FrontLeft_Module/degrees",
-              "Graph/Visible time": 10.0,
-              "Graph/X-axis auto scrolling": true,
-              "Y-axis/Automatic bounds": true,
-              "Y-axis/Upper bound": 1.0,
-              "Y-axis/Lower bound": -1.0,
-              "Y-axis/Unit": "ul",
-              "Visible data/SmartDashboard/drive/FrontLeft_Module/degrees": true
-            }
-          },
-          "0,1": {
+          "6,1": {
             "size": [
               1,
               1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/drive/FrontLeft_Module/encoder_zero",
-              "_title": "drive/FrontLeft_Module/encoder_zero"
+              "_source0": "network_table:///SmartDashboard/ROBOT/Field Start Position",
+              "_title": "ROBOT/Field Start Position"
+            }
+          },
+          "7,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/ROBOT/Has Bumpers Attached",
+              "_title": "ROBOT/Has Bumpers Attached",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "8,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/SWERVEMODULE/Heading kP",
+              "_title": "SWERVEMODULE/Heading kP"
             }
           },
           "9,1": {
@@ -185,30 +338,41 @@
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/kP",
-              "_title": "kP"
+              "_source0": "network_table:///SmartDashboard/SWERVEMODULE/Heading kI",
+              "_title": "SWERVEMODULE/Heading kI"
             }
           },
-          "9,2": {
+          "10,1": {
             "size": [
               1,
               1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/kI",
-              "_title": "kI"
+              "_source0": "network_table:///SmartDashboard/SWERVEMODULE/Heading kD",
+              "_title": "SWERVEMODULE/Heading kD"
             }
           },
-          "9,3": {
+          "11,1": {
             "size": [
               1,
               1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/kD",
-              "_title": "kD"
+              "_source0": "network_table:///SmartDashboard/ROBOT/Auton Score Existing Element",
+              "_title": "ROBOT/Auton Score Existing Element"
+            }
+          },
+          "12,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ROBOT/Auton Balance Robot",
+              "_title": "ROBOT/Auton Balance Robot"
             }
           }
         }
@@ -226,12 +390,56 @@
         "titleType": 0,
         "tiles": {}
       }
+    },
+    {
+      "title": "Tab 3",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "titleType": 0,
+        "tiles": {
+          "0,0": {
+            "size": [
+              8,
+              4
+            ],
+            "content": {
+              "_type": "Camera Stream",
+              "_source0": "camera_server://limelight",
+              "_title": "limelight",
+              "Crosshair/Show crosshair": false,
+              "Crosshair/Crosshair color": "#FFFFFFFF",
+              "Controls/Show controls": true,
+              "Controls/Rotation": "NONE",
+              "compression": -1.0,
+              "fps": -1,
+              "imageWidth": -1,
+              "imageHeight": -1
+            }
+          },
+          "8,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///limelight/pipeline",
+              "_title": "limelight/pipeline"
+            }
+          }
+        }
+      }
     }
   ],
   "windowGeometry": {
-    "x": -8.0,
-    "y": -8.0,
-    "width": 1936.0,
-    "height": 1048.0
+    "x": 1.0,
+    "y": 1.0,
+    "width": 1918.0,
+    "height": 1030.0
   }
 }

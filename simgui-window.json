@@ -1,50 +1,64 @@
 {
+  "Docking": {
+    "Data": []
+  },
   "MainWindow": {
     "GLOBAL": {
-      "height": "900",
+      "fps": "120",
+      "height": "905",
       "maximized": "0",
       "style": "0",
       "userScale": "2",
-      "width": "1113",
-      "xpos": "664",
-      "ypos": "32"
+      "width": "1320",
+      "xpos": "0",
+      "ypos": "34"
     }
   },
   "Window": {
     "###/FMSInfo": {
       "Collapsed": "0",
       "Pos": "60,60",
-      "Size": "169,167"
+      "Size": "235,221"
+    },
+    "###/LiveWindow/Ungrouped/DigitalInput[0]": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "310,66"
     },
     "###FMS": {
       "Collapsed": "0",
       "Pos": "6,675",
-      "Size": "336,164"
+      "Size": "388,182"
     },
     "###Joysticks": {
       "Collapsed": "0",
       "Pos": "312,581",
-      "Size": "976,179"
+      "Size": "1156,202"
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "312,346",
-      "Size": "937,231"
+      "Pos": "665,271",
+      "Size": "937,310"
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1094,25",
-      "Size": "32,1004"
+      "Pos": "1301,49",
+      "Size": "395,1004"
+    },
+    "###Plot <0>": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "700,400"
     },
     "###System Joysticks": {
       "Collapsed": "0",
       "Pos": "6,437",
-      "Size": "232,254"
+      "Size": "273,290"
     },
     "###Timing": {
       "Collapsed": "0",
       "Pos": "6,187",
-      "Size": "162,194"
+      "Size": "188,215"
     },
     "Debug##Default": {
       "Collapsed": "0",
@@ -53,8 +67,8 @@
     },
     "Robot State": {
       "Collapsed": "0",
-      "Pos": "5,20",
-      "Size": "109,114"
+      "Pos": "41,33",
+      "Size": "126,129"
     }
   }
 }
