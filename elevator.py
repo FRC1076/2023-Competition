@@ -72,6 +72,10 @@ class Elevator:
         self.right_motor.set(-targetSpeed)
         self.left_motor.set(-targetSpeed)
 
+    def motors_off(self):
+        self.right_motor.set(0)
+        self.left_motor.set(0)
+
     # Move elevator and reset target to where you end up.
     def move(self, targetSpeed):
         self.extend(targetSpeed)

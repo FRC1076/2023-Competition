@@ -47,6 +47,9 @@ class Grabber:
     def faultReset(self):
         self.rotate_motor.clearFaults()
 
+    def getEncoderPosition(self):
+        return self.rotate_motor_encoder.getPosition()
+
     def getTargetRotatePosition(self):
         return self.targetRotatePosition
 
