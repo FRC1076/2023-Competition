@@ -638,11 +638,21 @@ class MyRobot(wpilib.TimedRobot):
             # If any joysticks are dictating movement.
             if fwd != 0 or strafe != 0 or rcw != 0:
                 self.drivetrain.move(fwd, strafe, rcw, self.drivetrain.getBearing())
-                self.drivetrain.execute()
+                
+                if self.gamempad.getPOV() == 0:
+                    self.drivetrain.execute('Front_Left')
+                elif self.gamempad.getPOV() == 180:
+                    self.drivetrain.execute('Front_Left')
+                elif self.gamempad.getPOV() == 90:
+                    self.drivetrain.execute('Front_Left')
+                elif self.gamempad.getPOV() == 270:
+                    self.drivetrain.execute('Front_Left')
+                else:
+                    self.drivetrain.execute('Center')
             # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
                 self.drivetrain.move(0, 0, 0, self.drivetrain.getBearing())
-                self.drivetrain.execute()
+                self.drivetrain.execute('Center')
             # Otherwise, make sure we are explicitly doing nothing, so bot does not drift.
             else:
                 self.drivetrain.idle()
