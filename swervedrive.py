@@ -13,12 +13,14 @@ from collections import namedtuple
 from wpimath.controller import PIDController
 from swervometer import Swervometer
 from logger import Logger
+from robotconfig import MODULE_NAMES
 
-DASH_PREFIX = 'SWERVEDRIVE'
+DASH_PREFIX = MODULE_NAMES.SWERVEDRIVE
 
 BalanceConfig = namedtuple('BalanceConfig', ['sd_prefix', 'balance_pitch_kP', 'balance_pitch_kI', 'balance_pitch_kD', 'balance_yaw_kP', 'balance_yaw_kI', 'balance_yaw_kD'])
 TargetConfig = namedtuple('TargetConfig', ['sd_prefix', 'target_kP', 'target_kI', 'target_kD'])
 BearingConfig = namedtuple('BearingConfig', ['sd_prefix', 'bearing_kP', 'bearing_kI', 'bearing_kD'])
+VisionDriveConfig = namedtuple('VisionDriveConfig', ['sd_prefix', 'x_visionDrive_kP', 'x_visionDrive_kI', 'x_visionDrive_kD', 'y_visionDrive_kP', 'y_visionDrive_kI', 'y_visionDrive_kD', 'target_offsetX_reflective', 'target_target_size_reflective', 'target_offsetX_april', 'target_target_size_april', 'max_target_offset_x', 'min_target_size'])
 
 class SwerveDrive:
 
@@ -43,8 +45,7 @@ class SwerveDrive:
             _balance_cfg, 
             _target_cfg, 
             _bearing_cfg,
-            _target_offsetX,
-            _target_target_size,
+            _visionDrive_cfg,
             _auton_steer_straight,
             _teleop_steer_straight):
         
@@ -135,10 +136,11 @@ class SwerveDrive:
         self.target_kP = self.target_config.target_kP
         self.target_kI = self.target_config.target_kI
         self.target_kD = self.target_config.target_kD
+        
         self.target_x_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_x_pid_controller.setTolerance(5, 5)
+        self.target_x_pid_controller.setTolerance(0.5, 0.5)
         self.target_y_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
-        self.target_y_pid_controller.setTolerance(5, 5)
+        self.target_y_pid_controller.setTolerance(0.5, 0.5)
         # self.target_rcw_pid_controller = PIDController(self.target_config.target_kP, self.target_config.target_kI, self.target_config.target_kD)
         # self.target_rcw_pid_controller.setTolerance(0.5, 0.5)
         # self.target_rcw_pid_controller.enableContinuousInput(0, 360)
@@ -152,13 +154,19 @@ class SwerveDrive:
         self.bearing = self.getGyroAngle()
         self.updateBearing = False
 
-        self.reflective_kP = 0.1
-        self.reflective_kI = 0.00001
-        self.reflective_kD = 0.00001
-        self.reflective_x_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
-        self.reflective_y_pid_controller = PIDController(self.reflective_kP, self.reflective_kI, self.reflective_kD)
-        self.targetOffsetX = _target_offsetX
-        self.targetTargetSize = _target_target_size
+        # TODO: 
+        # - tune PID values
+        self.visionDrive_config = _visionDrive_cfg
+        self.visionDrive_x_pid_controller = PIDController(self.visionDrive_config.x_visionDrive_kP, self.visionDrive_config.x_visionDrive_kP, self.visionDrive_config.x_visionDrive_kP)
+        self.visionDrive_x_pid_controller.setTolerance(0.5, 0.5)
+        self.visionDrive_y_pid_controller = PIDController(self.visionDrive_config.y_visionDrive_kP, self.visionDrive_config.y_visionDrive_kP, self.visionDrive_config.y_visionDrive_kP)
+        self.visionDrive_y_pid_controller.setTolerance(0.01, 0.01)
+        self.reflectiveTargetOffsetX = self.visionDrive_config.target_offsetX_reflective
+        self.reflectiveTargetTargetSize = self.visionDrive_config.target_target_size_reflective
+        self.aprilTargetOffsetX = self.visionDrive_config.target_offsetX_april
+        self.aprilTargetTargetSize = self.visionDrive_config.target_target_size_april
+        self.max_target_offset_x = self.visionDrive_config.max_target_offset_x
+        self.min_target_size = self.visionDrive_config.min_target_size
 
         self.inAuton = True
         self.autonSteerStraight = _auton_steer_straight
@@ -403,7 +411,7 @@ class SwerveDrive:
             pitch_output = 0
         else:
             #pitch_output = clamp(pitch_error)
-            pitch_output = pitch_error
+            pitch_output = -pitch_error # Deliberately flipping sign
 
         if self.balance_yaw_pid_controller.atSetpoint():
             yaw_output = 0
@@ -414,8 +422,8 @@ class SwerveDrive:
         self.log("Balance: Yaw setpoint: ", self.balance_yaw_pid_controller.getSetpoint(), "yaw output: ", yaw_output, " yaw error: ", yaw_error)
 
         # Put the output to the dashboard
-        self.dashboard.putNumber('Balance pitch output', pitch_output)
-        self.dashboard.putNumber('Balance yaw output', yaw_output)
+        self.log('Balance pitch output', pitch_output)
+        self.log('Balance yaw output', yaw_output)
         self.move(yawSign * pitch_output, 0.0, yaw_output, self.bearing)
         
         self.update_smartdash()
@@ -456,9 +464,8 @@ class SwerveDrive:
             self.log("SWERVEDRIVE steerStraight rcw: ", rcw, " rcw_error: ", rcw_error, " current_angle: ", current_angle, " bearing: ", self.bearing, " target_angle: ", target_angle)
             return rcw_error
 
-    def move(self, fwd, strafe, rcw, bearing):
-        self.log("SWERVEDRIVE Moving:", fwd, strafe, rcw, bearing)
-
+    def move(self, base_fwd, base_strafe, rcw, bearing):
+        
         """
         Calulates the speed and angle for each wheel given the requested movement
         Positive fwd value = Forward robot movement\n
@@ -469,7 +476,12 @@ class SwerveDrive:
         :param strafe: the requested movement in the Y direction of the 2D plane
         :param rcw: the requestest magnitude of the rotational vector of a 2D plane
         """
-        
+        self.log("SWERVEDRIVE: MoveAdjustment: ", self.swervometer.getTeamMoveAdjustment())
+        fwd = base_fwd #* self.swervometer.getTeamMoveAdjustment()
+        strafe = base_strafe #* self.swervometer.getTeamMoveAdjustment()
+
+        self.log("SWERVEDRIVE Moving:", fwd, strafe, rcw, bearing)
+
         #Convert field-oriented translate to chassis-oriented translate
         
         current_angle = self.getGyroAngle() % 360
@@ -495,18 +507,57 @@ class SwerveDrive:
             self.set_rcw(self.steerStraight(rcw, bearing))
         else:
             self.set_rcw(rcw)
-    
-    def goToReflectiveTapeCentered(self):
+
+    def goToOffsetAndTargetSize(self, targetOffsetX, targetTargetSize):
         if self.vision:
-            self.offsetX = self.vision.getTargetOffsetHorizontalReflective() 
-            self.targetSize = self.vision.getTargetSizeReflective()
+            
+            self.log("goToOffsetAndTargetSize: targetOffsetX: ", targetOffsetX, " targetTargetSize: ", targetTargetSize)
+            YAW = 0.0
+            if(self.getGyroYaw() >= -90 and self.getGyroYaw() <= 90):
+                YAW = 0.0
+            else:
+                YAW = 180.0
 
-            x_error = self.reflective_x_pid_controller.calculate(offsetX, self.targetOffsetX)
-            y_error = self.reflective_y_pid_controller.calculate(targetSize, self.targetTargetSize)
+            self.log("goToOffsetAndTargetSize: YAW: ", YAW)
 
-            self.move(x_error, y_error, 0, self.getBearing())
-            self.execute('Center')
+            offsetX = self.vision.getTargetOffsetHorizontalReflective() 
+            targetSize = self.vision.getTargetSizeReflective()
 
+            self.log("goToOffsetAndTargetSize: offsetX: ", offsetX, " targetSize: ", targetSize)
+
+            if abs(offsetX) > self.max_target_offset_x or targetSize < self.min_target_size: # impossible values, there's no target
+                self.log('Aborting goToReflectiveTapeCentered() cuz no targets')
+                self.log('Target offset X: ', abs(offsetX), ", Target area: ", targetSize)
+                return False
+
+            x_error = self.visionDrive_x_pid_controller.calculate(offsetX, targetOffsetX)
+            x_error = -x_error
+            x_error = 0
+            y_error = -self.visionDrive_y_pid_controller.calculate(targetSize, targetTargetSize)
+            
+            self.log("goToOffsetAndTargetSize: x_error: ", x_error, " y_error: ", y_error)
+            
+            if self.visionDrive_x_pid_controller.atSetpoint() and  \
+                self.visionDrive_y_pid_controller.atSetpoint():
+                self.update_smartdash()
+                return True
+            else:
+                #self.move(x_error, y_error, 0, YAW)
+                self.move(x_error, y_error, 0, self.bearing)
+                self.execute()
+                self.update_smartdash()
+                return False
+
+
+    def goToAprilTagCentered(self):
+        self.vision.setToAprilTagPipeline()
+        return self.goToOffsetAndTargetSize(self.aprilTagTargetOffsetX,
+                                            self.aprilTagTargetTargetSize)
+
+    def goToReflectiveTapeCentered(self):
+        self.vision.setToReflectivePipeline()
+        return self.goToOffsetAndTargetSize(self.reflectiveTargetOffsetX,
+                                            self.reflectiveTargetTargetSize)
         
     def goToBalance(self, x, y, bearing, tolerance):
         self.log("SWERVEDRIVE Going to balance:", x, y, bearing, tolerance)
@@ -514,7 +565,6 @@ class SwerveDrive:
         if abs(self.getGyroBalance()) > tolerance:
             return True
         else:
-            return self.goToPose(x, y, bearing)
             return self.goToPose(x, y, bearing)
 
     def goToPose(self, x, y, bearing):
@@ -527,8 +577,8 @@ class SwerveDrive:
         self.pose_target_bearing = bearing
 
         currentX, currentY, currentRCW = self.swervometer.getCOF()
-        x_error = -self.target_x_pid_controller.calculate(currentX, x)
-        y_error = self.target_y_pid_controller.calculate(currentY, y)
+        x_error = self.target_x_pid_controller.calculate(currentX, x)
+        y_error = -self.target_y_pid_controller.calculate(currentY, y)
         #rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
         #self.log("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
@@ -542,11 +592,6 @@ class SwerveDrive:
         # Get current pose                    
         currentX, currentY, currentBearing = self.swervometer.getCOF()
         
-        # Get x and y error corrections to go to new pose
-        # Multiplying by TeamMoveAdjustment fixes the direction from the field perspective, not the controller perspective.
-        x_error = self.target_x_pid_controller.calculate(currentX, x) * self.swervometer.getTeamMoveAdjustment()
-        y_error = self.target_y_pid_controller.calculate(currentY, y) * self.swervometer.getTeamMoveAdjustment()
-
         # Debugging               
         #if self.target_x_pid_controller.atSetpoint():
         #    print("X at set point")
@@ -596,10 +641,10 @@ class SwerveDrive:
                     # This is intended to set the wheels in such a way that it
                     # difficult to push the robot (intended for defense)
 
-                    self._requested_angles['front_left'] = 45
-                    self._requested_angles['front_right'] = -45
-                    self._requested_angles['rear_left'] = -45
-                    self._requested_angles['rear_right'] = 45
+                    self._requested_angles['front_left'] = -45
+                    self._requested_angles['front_right'] = 45
+                    self._requested_angles['rear_left'] = 45
+                    self._requested_angles['rear_right'] = -45
 
                     #self.wheel_lock = False
                     #self.log("testing wheel lock")
@@ -833,42 +878,44 @@ class SwerveDrive:
         """
         Log current state for telemetry
         """
-        self.dashboard.putNumber(DASH_PREFIX + '/front_left_req_ang', self._requested_angles['front_left'])
-        self.dashboard.putNumber(DASH_PREFIX + '/front_right_req_ang', self._requested_angles['front_right'])
-        self.dashboard.putNumber(DASH_PREFIX + '/rear_left_req_ang', self._requested_angles['rear_left'])
-        self.dashboard.putNumber(DASH_PREFIX + '/rear_right_req_ang', self._requested_angles['rear_right'])
+        self.dashboard.putNumber(DASH_PREFIX, '/front_left_req_ang', self._requested_angles['front_left'])
+        self.dashboard.putNumber(DASH_PREFIX, '/front_right_req_ang', self._requested_angles['front_right'])
+        self.dashboard.putNumber(DASH_PREFIX, '/rear_left_req_ang', self._requested_angles['rear_left'])
+        self.dashboard.putNumber(DASH_PREFIX, '/rear_right_req_ang', self._requested_angles['rear_right'])
         
-        self.dashboard.putNumber(DASH_PREFIX + '/front_left_req_spd', self._requested_speeds['front_left'])
-        self.dashboard.putNumber(DASH_PREFIX + '/front_right_req_ang', self._requested_speeds['front_right'])
-        self.dashboard.putNumber(DASH_PREFIX + '/rear_left_req_ang', self._requested_speeds['rear_left'])
-        self.dashboard.putNumber(DASH_PREFIX + '/rear_right_req_ang', self._requested_speeds['rear_right'])
+        self.dashboard.putNumber(DASH_PREFIX, '/front_left_req_spd', self._requested_speeds['front_left'])
+        self.dashboard.putNumber(DASH_PREFIX, '/front_right_req_ang', self._requested_speeds['front_right'])
+        self.dashboard.putNumber(DASH_PREFIX, '/rear_left_req_ang', self._requested_speeds['rear_left'])
+        self.dashboard.putNumber(DASH_PREFIX, '/rear_right_req_ang', self._requested_speeds['rear_right'])
         
         # Zero request vectors for saftey reasons
-        self.dashboard.putNumber(DASH_PREFIX + '/req_vector_fwd', self._requested_vectors['fwd'])
-        self.dashboard.putNumber(DASH_PREFIX + '/req_vector_strafe', self._requested_vectors['strafe'])
-        self.dashboard.putNumber(DASH_PREFIX + '/req_vector_rcw', self._requested_vectors['rcw'])
-        self.dashboard.putBoolean(DASH_PREFIX + '/wheel_lock', self.wheel_lock)
+        self.dashboard.putNumber(DASH_PREFIX, '/req_vector_fwd', self._requested_vectors['fwd'])
+        self.dashboard.putNumber(DASH_PREFIX, '/req_vector_strafe', self._requested_vectors['strafe'])
+        self.dashboard.putNumber(DASH_PREFIX, '/req_vector_rcw', self._requested_vectors['rcw'])
+        self.dashboard.putBoolean(DASH_PREFIX, '/wheel_lock', self.wheel_lock)
         
-        self.dashboard.putNumber(DASH_PREFIX + '/pose_target_x', self.pose_target_x)
-        self.dashboard.putNumber(DASH_PREFIX + '/pose_target_y', self.pose_target_y)
-        self.dashboard.putNumber(DASH_PREFIX + '/pose_target_bearing', self.pose_target_bearing)
+        self.dashboard.putNumber(DASH_PREFIX, '/pose_target_x', self.pose_target_x)
+        self.dashboard.putNumber(DASH_PREFIX, '/pose_target_y', self.pose_target_y)
+        self.dashboard.putNumber(DASH_PREFIX, '/pose_target_bearing', self.pose_target_bearing)
         
-        self.dashboard.putNumber(DASH_PREFIX + '/Bearing', self.getBearing())
-        self.dashboard.putNumber(DASH_PREFIX + '/Gyro Angle', self.getGyroAngle())
-        self.dashboard.putNumber(DASH_PREFIX + '/Gyro Balance', self.getGyroBalance())
-        self.dashboard.putNumber(DASH_PREFIX + '/Gyro Pitch', self.getGyroPitch())
-        self.dashboard.putNumber(DASH_PREFIX + '/Bearing', self.getGyroRoll())
-        self.dashboard.putNumber(DASH_PREFIX + '/Bearing', self.getGyroYaw())
+        self.dashboard.putNumber(DASH_PREFIX, '/Bearing', self.getBearing())
+        self.dashboard.putNumber(DASH_PREFIX, '/Gyro Angle', self.getGyroAngle())
+        self.dashboard.putNumber(DASH_PREFIX, '/Gyro Balance', self.getGyroBalance())
+        self.dashboard.putNumber(DASH_PREFIX, '/Gyro Pitch', self.getGyroPitch())
+        self.dashboard.putNumber(DASH_PREFIX, '/Bearing', self.getGyroRoll())
+        self.dashboard.putNumber(DASH_PREFIX, '/Bearing', self.getGyroYaw())
         
-        self.dashboard.putNumber(DASH_PREFIX + '/Balance Pitch kP', self.balance_pitch_pid_controller.getP())
-        self.dashboard.putNumber(DASH_PREFIX + '/Balance Pitch kI', self.balance_pitch_pid_controller.getI())
-        self.dashboard.putNumber(DASH_PREFIX + '/Balance Pitch kD', self.balance_pitch_pid_controller.getD())
+        self.dashboard.putNumber(DASH_PREFIX, '/Balance Pitch kP', self.balance_pitch_pid_controller.getP())
+        self.dashboard.putNumber(DASH_PREFIX, '/Balance Pitch kI', self.balance_pitch_pid_controller.getI())
+        self.dashboard.putNumber(DASH_PREFIX, '/Balance Pitch kD', self.balance_pitch_pid_controller.getD())
 
-        self.dashboard.putNumber(DASH_PREFIX + '/Balance Yaw kP', self.balance_yaw_pid_controller.getP())
-        self.dashboard.putNumber(DASH_PREFIX + '/Balance Yaw kI', self.balance_yaw_pid_controller.getI())
-        self.dashboard.putNumber(DASH_PREFIX + '/Balance Yaw kD', self.balance_yaw_pid_controller.getD())
+        self.dashboard.putNumber(DASH_PREFIX, '/Balance Yaw kP', self.balance_yaw_pid_controller.getP())
+        self.dashboard.putNumber(DASH_PREFIX, '/Balance Yaw kI', self.balance_yaw_pid_controller.getI())
+        self.dashboard.putNumber(DASH_PREFIX, '/Balance Yaw kD', self.balance_yaw_pid_controller.getD())
 
         for key in self._requested_angles:
-            self.dashboard.putNumber(DASH_PREFIX + '/%s_angle' % key, self._requested_angles[key])
-            self.dashboard.putNumber(DASH_PREFIX + '/%s_speed' % key, self._requested_speeds[key])
+            self.dashboard.putNumber(DASH_PREFIX, '/%s_angle' % key, self._requested_angles[key])
+            self.dashboard.putNumber(DASH_PREFIX, '/%s_speed' % key, self._requested_speeds[key])
                 
+    def log(self, *dataToLog):
+        self.logger.log(DASH_PREFIX, dataToLog)   

@@ -13,7 +13,7 @@ import ctre
 from navx import AHRS
 from networktables import NetworkTables
 
-from robotconfig import robotconfig
+from robotconfig import robotconfig, MODULE_NAMES
 from controller import Controller
 from swervedrive import SwerveDrive
 from swervemodule import SwerveModule
@@ -22,9 +22,12 @@ from swervemodule import ModuleConfig
 from swervedrive import BalanceConfig
 from swervedrive import TargetConfig
 from swervedrive import BearingConfig
+from swervedrive import VisionDriveConfig
+
 from swervometer import FieldConfig
 from swervometer import RobotPropertyConfig
 from swervometer import Swervometer
+
 from cliffdetector import CliffDetector
 from elevator import Elevator
 from grabber import Grabber
@@ -42,6 +45,8 @@ SWERVE = 3
 
 # Test Mode
 TEST_MODE = False
+
+DASH_PREFIX = MODULE_NAMES.ROBOT
 
 class MyRobot(wpilib.TimedRobot):
 
@@ -98,13 +103,10 @@ class MyRobot(wpilib.TimedRobot):
 
         self.periods = 0
 
-        self.elevator_has_reset = True
-
         if self.drivetrain:
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
 
-        self.grabber_has_rest = False
         self.elevator_has_reset = False
 
     def disabledExit(self):
@@ -119,8 +121,9 @@ class MyRobot(wpilib.TimedRobot):
         self.autonTaskCounter = 0
         self.maneuverTaskCounter = 0
 
-        self.grabber_has_reset = False
-        self.elevator_has_reset = False
+        self.grabber.resetGrabber()
+
+        self.elevator.resetElevator()
 
     def initLogger(self, dir):
         return Logger.getLogger(dir)
@@ -145,19 +148,19 @@ class MyRobot(wpilib.TimedRobot):
             self.team_is_red = True
             self.team_is_blu = False
             teamGyroAdjustment = 180 # Red Team faces 180 degrees at start.
-            teamMoveAdjustment = -1 # Red Team start is oriented in the same direction as field.
+            teamMoveAdjustment = 1 # Red Team start is oriented in the same direction as field.
         else:
             self.team_is_red = False
             self.team_is_blu = True
             teamGyroAdjustment = 0 # Blue Team faces 0 degrees at start.
             teamMoveAdjustment = -1 # Blue Team start is oriented 180 degrees from field.
 
-        self.dashboard.putBoolean('Team is Red', self.team_is_red)
+        self.dashboard.putBoolean(DASH_PREFIX, 'Team is Red', self.team_is_red)
 
         self.log("FIELD_START_POSITION:", config['FIELD_START_POSITION'])
 
         if (config['FIELD_START_POSITION'] == 'A'):
-            self.dashboard.putString('Field Start Position', 'A')
+            self.dashboard.putString(DASH_PREFIX, 'Field Start Position', 'A')
             self.fieldStartPosition = 'A'
             if self.team_is_red:
                 starting_position_x = config['FIELD_RED_A_START_POSITION_X']
@@ -168,7 +171,7 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_A_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_A_START_ANGLE']
         elif (config['FIELD_START_POSITION'] == 'B'):
-            self.dashboard.putString('Field Start Position', 'B')
+            self.dashboard.putString(DASH_PREFIX, 'Field Start Position', 'B')
             self.fieldStartPosition = 'B'
             if self.team_is_red:
                 starting_position_x = config['FIELD_RED_B_START_POSITION_X']
@@ -179,7 +182,7 @@ class MyRobot(wpilib.TimedRobot):
                 starting_position_y = config['FIELD_BLU_B_START_POSITION_Y']
                 starting_angle = config['FIELD_BLU_B_START_ANGLE']
         else: # config['FIELD_START_POSITION'] == 'C'
-            self.dashboard.putString('Field Start Position', 'C')
+            self.dashboard.putString(DASH_PREFIX, 'Field Start Position', 'C')
             self.fieldStartPosition = 'C'
             if self.team_is_red:
                 starting_position_x = config['FIELD_RED_C_START_POSITION_X']
@@ -195,10 +198,10 @@ class MyRobot(wpilib.TimedRobot):
             actual_bumper_dimension_x = config['ROBOT_BUMPER_DIMENSION_X']
             actual_bumper_dimension_y = config['ROBOT_BUMPER_DIMENSION_Y']
         else:
-             actual_bumper_dimension_x = 0.0
-             actual_bumper_dimension_y = 0.0
+            actual_bumper_dimension_x = 0.0
+            actual_bumper_dimension_y = 0.0
 
-        self.dashboard.putBoolean('Has Bumpers Attached', bumpers_attached)
+        self.dashboard.putBoolean(DASH_PREFIX, 'Has Bumpers Attached', bumpers_attached)
 
         field_cfg = FieldConfig(sd_prefix='Field_Module',
                                 origin_x=config['FIELD_ORIGIN_X'],
@@ -232,7 +235,14 @@ class MyRobot(wpilib.TimedRobot):
         return swervometer
     
     def initVision(self, config):
-        vision = Vision(NetworkTables.getTable('limelight'), config['UPDATE_POSE'])
+        vision = Vision(NetworkTables.getTable('limelight'),
+                        config['APRILTAGS'],
+                        config['RETROREFLECTIVE'],
+                        config['MIN_TARGET_ASPECT_RATIO_REFLECTIVE'],
+                        config['MAX_TARGET_ASPECT_RATIO_REFLECTIVE'],
+                        config['MIN_TARGET_ASPECT_RATIO_APRILTAG'],
+                        config['MAX_TARGET_ASPECT_RATIO_APRILTAG'],
+                        config['UPDATE_POSE'])
 
         return vision
 
@@ -249,18 +259,26 @@ class MyRobot(wpilib.TimedRobot):
                             self.grabber,
                             config['LEFT_LIMIT_SWITCH'],
                             config['RIGHT_LIMIT_SWITCH'])
-        self.elevator_human_position = config['ELEVATOR_HUMAN_POSITION']
-        self.elevator_upper_scoring_height = config['ELEVATOR_UPPER_SCORING_HEIGHT']
-        self.elevator_lower_scoring_height = config['ELEVATOR_LOWER_SCORING_HEIGHT']
-        self.elevator_retracted_height = config['ELEVATOR_RETRACTED_HEIGHT']
-        self.elevator_destination = 0
+        self.cone_elevator_human_position = config['CONE_ELEVATOR_HUMAN_POSITION']
+        self.cone_elevator_upper_scoring_height = config['CONE_ELEVATOR_UPPER_SCORING_HEIGHT']
+        self.cone_elevator_lower_scoring_height = config['CONE_ELEVATOR_LOWER_SCORING_HEIGHT']
+        self.cone_elevator_retracted_height = config['CONE_ELEVATOR_RETRACTED_HEIGHT']
+        self.cube_elevator_human_position = config['CUBE_ELEVATOR_HUMAN_POSITION']
+        self.cube_elevator_upper_scoring_height = config['CUBE_ELEVATOR_UPPER_SCORING_HEIGHT']
+        self.cube_elevator_lower_scoring_height = config['CUBE_ELEVATOR_LOWER_SCORING_HEIGHT']
+        self.cube_elevator_retracted_height = config['CUBE_ELEVATOR_RETRACTED_HEIGHT']
+        self.cube_elevator_destination = 0
         return elevator
 
     def initGrabber(self, config):
-        self.grabber_human_position = config['GRABBER_HUMAN_POSITION']
-        self.grabber_upper_scoring_height = config['GRABBER_UPPER_SCORING_HEIGHT']
-        self.grabber_lower_scoring_height = config['GRABBER_LOWER_SCORING_HEIGHT']
-        self.grabber_retracted_height = config['GRABBER_RETRACTED_HEIGHT']
+        self.cone_grabber_human_position = config['CONE_GRABBER_HUMAN_POSITION']
+        self.cone_grabber_upper_scoring_height = config['CONE_GRABBER_UPPER_SCORING_HEIGHT']
+        self.cone_grabber_lower_scoring_height = config['CONE_GRABBER_LOWER_SCORING_HEIGHT']
+        self.cone_grabber_retracted_height = config['CONE_GRABBER_RETRACTED_HEIGHT']
+        self.cube_grabber_human_position = config['CUBE_GRABBER_HUMAN_POSITION']
+        self.cube_grabber_upper_scoring_height = config['CUBE_GRABBER_UPPER_SCORING_HEIGHT']
+        self.cube_grabber_lower_scoring_height = config['CUBE_GRABBER_LOWER_SCORING_HEIGHT']
+        self.cube_grabber_retracted_height = config['CUBE_GRABBER_RETRACTED_HEIGHT']
         return Grabber(config['ROTATE_MOTOR_ID'], config['GRABBER_ROTATE_SPEED'], config['GRABBER_KP'], config['GRABBER_KI'], config['GRABBER_KD'], config['MAX_POSITION'], config['MIN_POSITION'])
 
     def initClaw(self, config):
@@ -273,7 +291,13 @@ class MyRobot(wpilib.TimedRobot):
         balance_cfg = BalanceConfig(sd_prefix='Balance_Module', balance_pitch_kP=config['BALANCE_PITCH_KP'], balance_pitch_kI=config['BALANCE_PITCH_KI'], balance_pitch_kD=config['BALANCE_PITCH_KD'], balance_yaw_kP=config['BALANCE_YAW_KP'], balance_yaw_kI=config['BALANCE_YAW_KI'], balance_yaw_kD=config['BALANCE_YAW_KD'])
         target_cfg = TargetConfig(sd_prefix='Target_Module', target_kP=config['TARGET_KP'], target_kI=config['TARGET_KI'], target_kD=config['TARGET_KD'])
         bearing_cfg = BearingConfig(sd_prefix='Bearing_Module', bearing_kP=config['BEARING_KP'], bearing_kI=config['BEARING_KI'], bearing_kD=config['BEARING_KD'])
-
+        vision_cfg = VisionDriveConfig(sd_prefix='Vision_Module',
+            x_visionDrive_kP=config['X_VISION_DRIVE_KP'], x_visionDrive_kI=config['X_VISION_DRIVE_KI'], x_visionDrive_kD=config['X_VISION_DRIVE_KD'],
+            y_visionDrive_kP=config['Y_VISION_DRIVE_KP'], y_visionDrive_kI=config['Y_VISION_DRIVE_KI'], y_visionDrive_kD=config['Y_VISION_DRIVE_KD'],
+            target_offsetX_reflective=config['REFLECTIVE_TARGET_OFFSET_X'], target_target_size_reflective=config['REFLECTIVE_TARGET_TARGET_SIZE'],
+            target_offsetX_april=config['APRIL_TARGET_OFFSET_X'], target_target_size_april=config['APRIL_TARGET_TARGET_SIZE'],
+            max_target_offset_x=config['MAX_TARGET_OFFSET_X'], min_target_size=config['MIN_TARGET_SIZE'])
+    
         flModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=190.5, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
         frModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=153.3, inverted=False, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
         rlModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=143.8, inverted=True, allow_reverse=True, position_conversion=config['ROBOT_INCHES_PER_ROTATION'], heading_kP=config['HEADING_KP'], heading_kI=config['HEADING_KI'], heading_kD=config['HEADING_KD'])
@@ -320,14 +344,10 @@ class MyRobot(wpilib.TimedRobot):
         self.rotateClockwiseTaskList = config['ROTATE_CLOCKWISE']
         self.rotateCounterclockwiseTaskList = config['ROTATE_COUNTERCLOCKWISE']
 
-        gyro = AHRS.create_spi()
-        #gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
+        #gyro = AHRS.create_spi()
+        gyro = AHRS.create_spi(wpilib._wpilib.SPI.Port.kMXP, 500000, 50) # https://www.chiefdelphi.com/t/navx2-disconnecting-reconnecting-intermittently-not-browning-out/425487/36
         
-        targetTargetSize = config['TARGET_TARGET_SIZE']
-        targetOffsetX = config['TARGET_OFFSET_X']
-
-        #swerve = SwerveDrive(rearLeftModule, frontLeftModule, rearRightModule, frontRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg)
-        swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, targetOffsetX, targetTargetSize, self.autonSteerStraight, self.teleopSteerStraight)
+        swerve = SwerveDrive(frontLeftModule, frontRightModule, rearLeftModule, rearRightModule, self.swervometer, self.vision, gyro, balance_cfg, target_cfg, bearing_cfg, vision_cfg, self.autonSteerStraight, self.teleopSteerStraight)
 
         return swerve
 
@@ -336,8 +356,8 @@ class MyRobot(wpilib.TimedRobot):
         self.autonBalanceRobot = config['BALANCE_BOT']
         self.autonDoCommunity = config['DO_COMMUNITY']
 
-        self.dashboard.putNumber('Auton Score Existing Element', self.autonScoreExisting)
-        self.dashboard.putNumber('Auton Balance Robot', self.autonBalanceRobot)
+        self.dashboard.putNumber(DASH_PREFIX, 'Auton Score Existing Element', self.autonScoreExisting)
+        self.dashboard.putNumber(DASH_PREFIX, 'Auton Balance Robot', self.autonBalanceRobot)
 
         # Reset task counter.
         self.autonTaskCounter = 0
@@ -525,21 +545,27 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.bypassLimitSwitch()
             return
 
-        if self.grabber_has_reset == False:
-            self.grabber_has_reset = self.grabber.grabberReset()
-            return True
-        if self.elevator_has_reset == False:
+        #elf.log("TeleopPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
+        if self.grabber.hasGrabberReset() == False:
+            self.grabber.grabberReset()
+            return
+        #self.log("TeleopPeriodic: Grabber reset test complete")
+        
+        #self.log("TeleopPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
+        if self.elevator.hasElevatorReset == False:
+            self.elevator.elevatorReset()
             self.grabber.update()
-            self.elevator_has_reset = self.elevator.elevatorReset()
-            return True
+            return
+        #self.log("TeleopPeriodic: Elevator reset test complete")
+        
         if self.teleopDrivetrain():
             print("TeleoDrivetrain returned true. In a maneuver.")
-            return True
+            return
         else:
             print("TeleoDrivetrain returned False. Not in a maneuver.")
             self.teleopElevatorGrabber()
             self.teleopClaw()
-            return True
+            return
 
     def teleopDrivetrain(self):
         if (not self.drivetrain):
@@ -551,9 +577,14 @@ class MyRobot(wpilib.TimedRobot):
         deadzone = self.driver.deadzone
 
         # Implement clutch on driving and rotating.
-        clutch = 1.0
+        translational_clutch = 1.0
+        rotational_clutch = 1.0
         if (driver.getRightBumper()):
-            clutch = 0.4
+            translational_clutch = 0.4
+            rotational_clutch = 0.4
+        if (driver.getLeftBumper()): # This is deliberately an "if", not an "elif", to aid in driver transition.
+            translational_clutch = 0.2
+            rotational_clutch = 0.3 #0.2 was a little too slow for rotation, but perfect for translation
 
         # Reset the gyro in the direction bot is facing.
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
@@ -562,43 +593,46 @@ class MyRobot(wpilib.TimedRobot):
             self.drivetrain.printGyro()
 
         # Determine if Wheel Lock is needed.
-        if (driver.getLeftBumper()):
+        if (driver.getLeftTriggerAxis() > 0.7 and not driver.getRightTriggerAxis() > 0.7):
             self.drivetrain.setWheelLock(True)
         else:
             self.drivetrain.setWheelLock(False)
         
         #Manuevers
-        rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
+        rcw = self.deadzoneCorrection(driver.getRightX() * rotational_clutch, self.driver.deadzone)
         if(driver.getAButton()):
             self.drivetrain.balance()
             return True
-        elif (driver.getBButton()):
-            if(self.startingManeuver == True):
-                self.log("B Button - Starting Maneuver")
-                self.startingManeuver = False
-                self.maneuverComplete = False
-                self.maneuverTaskCounter = 0
-                self.maneuverTaskList = self.lowConeScoreTaskList
-            self.teleopManeuver()
+        elif(driver.getYButton()):
+            self.drivetrain.goToReflectiveTapeCentered()
             return True
-        elif (driver.getYButton()):
-            if(self.startingManeuver == True):
-                self.log("Y Button - Starting Maneuver")
-                self.startingManeuver = False
-                self.maneuverComplete = False
-                self.maneuverTaskCounter = 0
-                self.maneuverTaskList = self.highConeScoreTaskList
-            self.teleopManeuver()
-            return True
-        elif (driver.getXButton()):
-            if(self.startingManeuver == True):
-                self.log("X Button - Starting Maneuver")
-                self.startingManeuver = False
-                self.maneuverComplete = False
-                self.maneuverTaskCounter = 0
-                self.maneuverTaskList = self.humanStationTaskList
-            self.teleopManeuver()
-            return True
+        #elif (driver.getBButton()):
+        #    if(self.startingManeuver == True):
+        #        self.log("B Button - Starting Maneuver")
+        #        self.startingManeuver = False
+        #        self.maneuverComplete = False
+        #        self.maneuverTaskCounter = 0
+        #        self.maneuverTaskList = self.lowConeScoreTaskList
+        #    self.teleopManeuver()
+        #    return True
+        #elif (driver.getYButton()):
+        #    if(self.startingManeuver == True):
+        #        self.log("Y Button - Starting Maneuver")
+        #        self.startingManeuver = False
+        #        self.maneuverComplete = False
+        #        self.maneuverTaskCounter = 0
+        #        self.maneuverTaskList = self.highConeScoreTaskList
+        #    self.teleopManeuver()
+        #    return True
+        #elif (driver.getXButton()):
+        #    if(self.startingManeuver == True):
+        #        self.log("X Button - Starting Maneuver")
+        #        self.startingManeuver = False
+        #        self.maneuverComplete = False
+        #        self.maneuverTaskCounter = 0
+        #        self.maneuverTaskList = self.humanStationTaskList
+        #    self.teleopManeuver()
+        #    return True
         elif (driver.getRightTriggerAxis() > 0.7 and rcw > 0):
             if(self.startingManeuver == True):
                 print("180 Clockwise Flip - Starting Maneuver")
@@ -623,9 +657,9 @@ class MyRobot(wpilib.TimedRobot):
         
         # Regular driving, not a maneuver
         else:
-            strafe = self.deadzoneCorrection(driver.getLeftX() * clutch, self.driver.deadzone)
-            fwd = self.deadzoneCorrection(driver.getLeftY() * clutch, self.driver.deadzone)
-            rcw = self.deadzoneCorrection(driver.getRightX() * clutch, self.driver.deadzone)
+            strafe = self.deadzoneCorrection(driver.getLeftX() * translational_clutch, self.driver.deadzone)
+            fwd = self.deadzoneCorrection(driver.getLeftY() * translational_clutch, self.driver.deadzone)
+            rcw = self.deadzoneCorrection(driver.getRightX() * rotational_clutch, self.driver.deadzone)
             
             fwd *= -1 # Because controller is backwards from you think
             
@@ -633,6 +667,11 @@ class MyRobot(wpilib.TimedRobot):
             controller_at_180_to_bot = -1
             fwd *= controller_at_180_to_bot
             strafe *= controller_at_180_to_bot
+
+            # Need to adjust for Team:
+            fwd *= self.swervometer.getTeamMoveAdjustment()
+            strafe *= self.swervometer.getTeamMoveAdjustment()
+
             # No need to correct RCW, as clockwise is clockwise whether you are facing with or against bot.
             
             # If any joysticks are dictating movement.
@@ -678,52 +717,73 @@ class MyRobot(wpilib.TimedRobot):
 
         self.log("teleopElevatorGrabber: In teleopElevatorGrabber()")
 
-        if (operator.getLeftBumper()):
+        if (operator.getLeftBumper() and not operator.getRightBumper()):
             self.log("teleopElevator: Toggling Elevator Up/Down")
             self.elevator.toggle()
 
-        ## ignored for now
-        clutch_factor = 1
+        operator_clutch = 1
         #Check for clutch
         if(operator.getLeftTriggerAxis() > 0.7):
-            clutch_factor = 0.4
+            operator_clutch = 0.4
         
         #Find the value the arm will move at
-        elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
-        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone))
+        elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * operator_clutch
+        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone)) * operator_clutch
 
         if elevator_controller_value != 0 and grabber_controller_value != 0: # Move both in direction of controller
             self.grabber.move_grabber(grabber_controller_value)
             self.elevator.move(elevator_controller_value)
             self.log("ElevatorGrabber: Move both elevator and grabber.")
         elif elevator_controller_value !=0: # Move only elevator
-            self.grabber.update() # Grabber stay in place
+            if not (operator.getLeftTriggerAxis() > 0.7):
+                self.grabber.update() # Grabber stay in place
             self.elevator.move(elevator_controller_value)
             self.log("ElevatorGrabber: Move elevator, maintain grabber.")
         elif grabber_controller_value != 0: # Move only grabber
             self.grabber.move_grabber(grabber_controller_value)
-            self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
+            if not (operator.getLeftTriggerAxis() > 0.7):
+                self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
             self.log("ElevatorGrabber: Move grabber, maintain elevator.")
-        elif operator.getAButton(): #Lowest Position
-            self.grabber.goToPosition(self.grabber_retracted_height)
-            self.elevator.moveToPos(self.elevator_retracted_height)
-            self.log("ElevatorGrabber: A Button")
+        elif operator.getAButton() and operator.getLeftTriggerAxis() > 0.7: #Lowest Position - Cube
+            self.grabber.goToPosition(self.cube_grabber_retracted_height)
+            self.elevator.moveToPos(self.cube_elevator_retracted_height)
+            self.log("ElevatorGrabber: Cube: A Button")
+        elif operator.getAButton(): #Lowest Position - Cone
+            self.grabber.goToPosition(self.cone_grabber_retracted_height)
+            self.elevator.moveToPos(self.cone_elevator_retracted_height)
+            self.log("ElevatorGrabber: Cone: A Button")
+        elif operator.getYButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Highest Position
+            self.grabber.goToPosition(self.cube_grabber_upper_scoring_height)
+            self.elevator.moveToPos(self.cube_elevator_upper_scoring_height)
+            self.log("ElevatorGrabber: Cube: Y Button")
         elif operator.getYButton(): # and self.elevator.isElevatorDown(): #Highest Position
-            self.grabber.goToPosition(self.grabber_upper_scoring_height)
-            self.elevator.moveToPos(self.elevator_upper_scoring_height)
-            self.log("ElevatorGrabber: Y Button")
+            self.grabber.goToPosition(self.cone_grabber_upper_scoring_height)
+            self.elevator.moveToPos(self.cone_elevator_upper_scoring_height)
+            self.log("ElevatorGrabber: Cone: Y Button")
+        elif operator.getBButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Medium Position
+            self.grabber.goToPosition(self.cube_grabber_lower_scoring_height)
+            self.elevator.moveToPos(self.cube_elevator_lower_scoring_height)
+            self.log("ElevatorGrabber: Cube: B Button")
         elif operator.getBButton(): # and self.elevator.isElevatorDown(): #Medium Position
-            self.grabber.goToPosition(self.grabber_lower_scoring_height)
-            self.elevator.moveToPos(self.elevator_lower_scoring_height)
-            self.log("ElevatorGrabber: B Button")
+            self.grabber.goToPosition(self.cone_grabber_lower_scoring_height)
+            self.elevator.moveToPos(self.cone_elevator_lower_scoring_height)
+            self.log("ElevatorGrabber: Cone: B Button")
+        elif operator.getXButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Human Position
+            self.grabber.goToPosition(self.cube_grabber_human_position)
+            self.elevator.moveToPos(self.cube_elevator_human_position)
+            self.log("ElevatorGrabber: Cube: X Button")
         elif operator.getXButton(): # and self.elevator.isElevatorDown(): #Human Position
-            self.grabber.goToPosition(self.grabber_human_position)
-            self.elevator.moveToPos(self.elevator_human_position)
-            self.log("ElevatorGrabber: X Button")
+            self.grabber.goToPosition(self.cone_grabber_human_position)
+            self.elevator.moveToPos(self.cone_elevator_human_position)
+            self.log("ElevatorGrabber: Cone: X Button")
         else: #Aim for last target.
-            self.grabber.update() # Grabber stay in place
-            #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
-            self.elevator.moveToPos(self.elevator.getTargetPosition())
+            if (operator.getLeftTriggerAxis() > 0.7):
+                self.grabber.motor_off()
+                self.elevator.motors_off()
+            else:
+                self.grabber.update() # Grabber stay in place with PID
+                #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
+                self.elevator.moveToPos(self.elevator.getTargetPosition()) #Elevator stay in place with PID
             self.log("ElevatorGrabber: Exiting after maintaining position.")
         
         return
@@ -735,6 +795,7 @@ class MyRobot(wpilib.TimedRobot):
             self.claw.intake()
         elif (operator.getRightTriggerAxis() > 0.7):
             self.log("Claw: Release")
+            self.log("Claw: At time of release: Elevator Position: ", self.elevator.getEncoderPosition(), " Grabber Position: ", self.grabber.getEncoderPosition())
             self.claw.release()
         else:
             self.claw.off()
@@ -772,13 +833,18 @@ class MyRobot(wpilib.TimedRobot):
         if not self.autonTimer:
             return
 
-        if self.grabber_has_reset == False:
-            self.grabber_has_reset = self.grabber.grabberReset()
-            return True
-            
-        if self.elevator_has_reset == False:
-            self.elevator_has_reset = self.elevator.elevatorReset()
+        #self.log("AutonomousPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
+        if self.grabber.hasGrabberReset() == False:
+            self.grabber.grabberReset()
             return
+        #self.log("AutonomousPeriodic: Grabber reset test complete")
+        
+        #self.log("AutonomousPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
+        if self.elevator.hasElevatorReset == False:
+            self.elevator.elevatorReset()
+            self.grabber.update()
+            return
+        #self.log("AutonomousPeriodic: Elevator reset test complete")
         
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
@@ -789,100 +855,128 @@ class MyRobot(wpilib.TimedRobot):
         autonTask = self.autonTaskList[self.autonTaskCounter]
 
         self.log("Autonomous Periodic: Past Grabber reset and Elevator reset ")
-        self.log("Current Task Counter: ", self.autonTaskCounter, "Current Task: ", autonTask)
+        self.log("Current Task Counter: ", self.autonTaskCounter, "Current Task: ", autonTask, "Current Task List: ", self.autonTaskList)
 
         if (autonTask[0] == 'TIMER'):
-            self.log("Auton: Timer: ", self.autonTimer.get())
+            self.log("RUNNING Auton Task TIMER, timer: ", self.autonTimer.get())
             if self.autonTimer.get() > autonTask[1]:
+                self.log("ENDING Auton Task: TIMER: ", self.autonTimer.get())
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_INTAKE_AND_STOP'):
-            self.log("Auton: Claw Intake: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task CLAW_INTAKE_AND_STOP, autonTaskCounter: ", self.autonTaskCounter)
             if self.claw.runAndStop(-1):
+                self.log("ENDING Auton Task CLAW_INTAKE_AND_STOP")
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_RELEASE_AND_STOP'):
-            self.log("Auton: Claw Release: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task CLAW_RELEASE_AND_STOP, autonTaskCounter: ", self.autonTaskCounter)
             if self.claw.runAndStop(+1):
+                self.log("ENDING Auton Task CLAW_RELEASE_AND_STOP")
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'CLAW_STOP'):
-            self.log("Auton: Claw Stop: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task CLAW_STOP, autonTaskCounter: ", self.autonTaskCounter)
             if self.claw.off():
+                self.log("ENDING Auton Task CLAW_STOP")
                 self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'RAISE_GRABBER'):
+            self.log("RUNNING Auton Task RAISE_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
             if self.grabber.raise_motor(0.6):
+                self.log("ENDING Auton Task RAISE_GRABBER")
                 self.autonTaskCounter += 1
             self.elevator.update()
         elif (autonTask[0] == 'LOWER_GRABBER'):
+            self.log("RUNNING Auton Task LOWER_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
             if self.grabber.lower_motor(0.2):
+                self.log("ENDING Auton Task LOWER_GRABBER")
                 self.autonTaskCounter += 1 
             self.elevator.update()
         elif (autonTask[0] == 'ELEVATOR_TOGGLE'):
+            self.log("RUNNING Auton Task ELEVATOR_TOGGLE, autonTaskCounter: ", self.autonTaskCounter)
             if self.elevator.toggle():
                 self.autonTaskCounter += 1
-            self.log("Auton: Elevator Toggle: ", self.elevator.getEncoderPosition())
+                self.log("ENDING Auton Task ELEVATOR_TOGGLE")
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_UP'):
-            if self.elevator.elevatorUp():
-                self.autonTaskCounter += 1
+            self.log("RUNNING Auton Task ELEVATOR_UP, autonTaskCounter: ", self.autonTaskCounter)
             self.log("Auton: Elevator Up: ", self.elevator.getEncoderPosition())
+            if self.elevator.elevatorUp():
+                self.log("ENDING Auton Task ELEVATOR_UP")
+                self.autonTaskCounter += 1
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_DOWN'):
+            self.log("RUNNING Auton Task ELEVATOR_DOWN, autonTaskCounter: ", self.autonTaskCounter)
+            self.log("Auton: Elevator Down: ", self.elevator.getEncoderPosition())
             if self.elevator.elevatorDown():
+                self.log("ENDING Auton Task ELEVATOR_DOWN")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Down: ", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'ELEVATOR_UPPER_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_upper_scoring_height) and self.grabber.goToPosition(self.grabber_upper_scoring_height):
+            self.log("RUNNING Auton Task ELEVATOR_UPPER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
+            if self.elevator.moveToPos(self.cone_elevator_upper_scoring_height): #and self.grabber.goToPosition(self.cone_grabber_upper_scoring_height):
+                self.log("ENDING Auton Task ELEVATOR_UPPER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Upper Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_LOWER_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_lower_scoring_height) and self.grabber.goToPosition(self.grabber_lower_scoring_height):
+            self.log("RUNNING Auton Task ELEVATOR_LOWER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
+            if self.elevator.moveToPos(self.cone_elevator_lower_scoring_height): #and self.grabber.goToPosition(self.cone_grabber_lower_scoring_height):
+                self.log("ENDING Auton Task ELEVATOR_LOWER_EXTEND")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Lower Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
-            if self.elevator.moveToPos(self.elevator_retracted_height): #and self.grabber.goToPosition(self.grabber_retracted_height):
+            self.log("RUNNING Auton Task ELEVATOR_RETRACT, autonTaskCounter: ", self.autonTaskCounter)
+            if self.elevator.moveToPos(self.cone_elevator_retracted_height): #and self.grabber.goToPosition(self.cone_grabber_retracted_height):
+                self.log("ENDING Auton Task ELEVATOR_RETRACT")
                 self.autonTaskCounter += 1
             self.log("Auton: Elevator Retract: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'MOVE'):
             x = autonTask[1]
             y = autonTask[2]
             bearing = autonTask[3]
+            
+            self.log("RUNNING Auton Task MOVE, autonTaskCounter: ", self.autonTaskCounter)
+
             self.log("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
             if self.drivetrain.goToPose(x, y, bearing):
-                self.autonTaskCounter += 1 # Move on to next task.
+                self.log("ENDING Auton Task MOVE")
                 self.log("Auton: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.autonTaskCounter += 1 # Move on to next task.
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
                 self.log("Auton: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'MOVE_TO_BALANCE'):
+            self.log("RUNNING Auton Task MOVE_TO_BALANCE, autonTaskCounter: ", self.autonTaskCounter)            
             x = autonTask[1]
             y = autonTask[2]
             bearing = autonTask[3]
             tolerance = autonTask[4]
-            self.log("Auton: Move: ", self.autonTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            self.log("Auton: MOVE_TO_BALANCE: Target: x: ", x, " y: ", y, " bearing: ", bearing)
             if self.drivetrain.goToBalance(x, y, bearing, tolerance):
+                self.log("ENDING Auton Task MOVE_TO_BALANCE")
+                self.log("Auton: MOVE_TO_BALANCE: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
                 self.autonTaskCounter += 1 # Move on to next task.
-                self.log("Auton: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
-                self.log("Auton: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("Auton: MOVE_TO_BALANCE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'BALANCE'):
-            self.log("Auton: Balance: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task BALANCE, autonTaskCounter: ", self.autonTaskCounter)            
+
             if self.drivetrain.balance():
+                self.log("ENDING Auton Task BALANCE")
                 self.autonTaskCounter += 1 # Move on to next task.
                 self.log("Auton: Balance: Leveled and oriented")
             else:
@@ -891,19 +985,21 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'WHEEL_LOCK'):
-            self.log("Auton: Wheel Lock: ", self.autonTaskCounter)
+            self.log("RUNNING Auton Task WHEEL_LOCK, autonTaskCounter: ", self.autonTaskCounter)            
             self.drivetrain.setWheelLock(True)
             self.drivetrain.goToPose(0, 0, self.drivetrain.getBearing())
+            self.log("ENDING Auton Task WHEEL_LOCK")
             self.autonTaskCounter += 1 # Move on to next task.
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'IDLE'):
-            self.log("Auton: Idle: ", self.autonTaskCounter)
+            ## this will never end?
+            self.log("RUNNING Auton Task IDLE, autonTaskCounter: ", self.autonTaskCounter)            
             self.drivetrain.idle()
             self.elevator.update()
             self.grabber.update()
         else:
-            self.log("Auton: ERROR: Unknown Task", self.autonTaskCounter)
+            self.log("Auton: ERROR: Unknown Task", self.autonTaskCounter, autonTask[0])
             self.autonTaskCounter += 1   
 
         return
@@ -931,81 +1027,102 @@ class MyRobot(wpilib.TimedRobot):
         if (maneuverTask[0] == 'CLAW_OFF'):
             self.claw.off()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Off: ")
+            self.log("RUNNING AND ENDING Maneuver: Claw Off: ")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'CLAW_INTAKE'):
             self.claw.intake()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Intake")
+            self.log("RUNNING AND ENDING Maneuver: Claw Intake")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'CLAW_RELEASE'):
             self.claw.release()
             self.maneuverTaskCounter += 1
-            self.log("Maneuver: Claw Release")
+            self.log("RUNNING AND ENDING Maneuver: Claw Release")
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
             if self.grabber.raise_motor(1.0):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Raise Grabber: ", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
             if self.grabber.lower_motor(1.0):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Lower Grabber: ", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
         elif (maneuverTask[0] == 'POSITION_GRABBER'):
             if self.grabber.goToPosition(maneuverTask[1]):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Position Grabber: ", self.maneuverTaskCounter, " target position: ", maneuverTask[1])
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Position Grabber target position: ", maneuverTask[1])
             self.elevator.update()
         elif (maneuverTask[0] == 'ELEVATOR_TOGGLE'):
             if self.elevator.toggle():
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Toggle: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Elevator Toggle: ", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ELEVATOR_UP'):
             if self.elevator.elevatorUp():
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Up: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Elevator position:", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ELEVATOR_DOWN'):
             if self.elevator.elevatorDown():
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Down: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("Elevator position", self.elevator.getEncoderPosition())
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ELEVATOR_LOWER_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_lower_scoring_height) and self.grabber.goToPosition(self.grabber_lower_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_lower_scoring_height) and self.grabber.goToPosition(self.cone_grabber_lower_scoring_height):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Extend: ", self.lower_scoring_height, " current position: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("lower scoring height ", self.lower_scoring_height, " current position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_HUMAN_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_human_position)and self.grabber.goToPosition(self.grabber_human_position):
+            if self.elevator.moveToPos(self.cone_elevator_human_position)and self.grabber.goToPosition(self.cone_grabber_human_position):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_UPPER_EXTEND'):
-            if self.elevator.moveToPos(self.elevator_upper_scoring_height) and self.grabber.goToPosition(self.grabber_upper_scoring_height):
+            if self.elevator.moveToPos(self.cone_elevator_upper_scoring_height) and self.grabber.goToPosition(self.cone_grabber_upper_scoring_height):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Extend: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'ELEVATOR_RETRACT'):
-            if self.elevator.moveToPos(self.elevator_retracted_height) and self.grabber.goToPosition(self.grabber_retracted_height):
+            if self.elevator.moveToPos(self.cone_elevator_retracted_height) and self.grabber.goToPosition(self.cone_grabber_retracted_height):
+                self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
-            self.log("Maneuver: Elevator Retract: ", self.elevator.getEncoderPosition())
+            self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+            self.log("elevator position: ", self.elevator.getEncoderPosition())
         elif (maneuverTask[0] == 'MOVE'):
             x = maneuverTask[1]
             y = maneuverTask[2]
             bearing = maneuverTask[3]
-            self.log("Maneuver: Move: ", self.maneuverTaskCounter, " Target: x: ", x, " y: ", y, " bearing: ", bearing)
+            
+            self.log("Moving to Target: x: ", x, " y: ", y, " bearing: ", bearing)
             if self.drivetrain.goToPose(x, y, bearing):
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                self.log("Maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("ENDING Maneuver", maneuverTask[0])                            
+                self.log("MOVE: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+                self.log("MOVE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'MOVE_BACK'):
@@ -1017,10 +1134,12 @@ class MyRobot(wpilib.TimedRobot):
                 x += backDistance
             if self.drivetrain.goToPose(x, y, bearing):
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                self.log("Maneuver: Move: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("ENDING Maneuver", maneuverTask[0])            
+                self.log("MOVE_BACK: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Move: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+                self.log("MOVE_BACK: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'ROTATE'):
@@ -1029,36 +1148,46 @@ class MyRobot(wpilib.TimedRobot):
             bearing = (bearing + degrees) % 360
             if self.drivetrain.goToPose(x, y, bearing):
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                self.log("Maneuver: Rotate: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("ENDING Maneuver", maneuverTask[0])            
+                self.log("ROTATE: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Rotate: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
+                self.log("ROTATE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'BALANCE'):
-            self.log("Maneuver: Balance: ", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver: BALANCE: ", self.maneuverTaskCounter)
             if self.drivetrain.balance():
                 self.maneuverTaskCounter += 1 # Move on to next task.
-                print("Maneuver: Balance: Leveled and oriented")
+                self.log("ENDING Maneuver", maneuverTask[0])            
             else:
                 # Leave self.maneuverTaskCounter unchanged. Repeat this task.
-                self.log("Maneuver: Balance: Keep balancing and orienting")
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
             self.grabber.update()
+        elif (maneuverTask[0] == 'ALIGN_TO_POLE'):
+            if self.drivetrain.goToReflectiveTapeCentered():
+                self.maneuverTaskCounter += 1 # Move on to next task.
+                self.log("ENDING Maneuver", maneuverTask[0])            
+            else:
+                # Leave self.maneuverTaskCounter unchanged. Repeat this task.
+                self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
         elif (maneuverTask[0] == 'WHEEL_LOCK'):
-            self.log("Maneuver: Wheel Lock: ", self.maneuverTaskCounter)
+            self.log("RUNNING AND ENDING Maneuver: Wheel Lock: ", self.maneuverTaskCounter)
             self.drivetrain.setWheelLock(True)
             self.drivetrain.goToPose(0, 0, self.drivetrain.getBearing())
             self.maneuverTaskCounter += 1 # Move on to next task
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'IDLE'):
-            self.log("Maneuver: Idle: ", self.maneuverTaskCounter)
+            ## will run forever?
+            self.log("RUNNING Maneuver: Idle: ", self.maneuverTaskCounter)
             self.drivetrain.idle()
             self.elevator.update()
             self.grabber.update()
         else:
-            self.log("Maneuver: ERROR: Unknown Task", self.maneuverTaskCounter)
+            self.log("RUNNING Maneuver: ERROR: Unknown Task", self.maneuverTaskCounter, maneuverTask[0])
             self.maneuverTaskCounter += 1   
         return
 
@@ -1078,7 +1207,7 @@ class MyRobot(wpilib.TimedRobot):
             return x
 
     def log(self, *dataToLog):
-        self.logger.log(dataToLog)
+        self.logger.log(MODULE_NAMES.ROBOT,dataToLog)
 
 if __name__ == "__main__":
     if sys.argv[1] == 'sim':

@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 DEADZONE = 0.1
 
 # Drive Types
@@ -24,8 +26,8 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'FIELD_START_POSITION': 'C', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -89,7 +91,7 @@ drivetrainConfig = {
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
     'TARGET_KP': 0.005,
-    'TARGET_KI': 0.005,
+    'TARGET_KI': 0.05, #0.005,
     'TARGET_KD': 0.0001,
     'BEARING_KP': 0.025,
     'BEARING_KI': 0.00001,
@@ -120,8 +122,18 @@ drivetrainConfig = {
                         ['ELEVATOR_HUMAN_EXTEND']],
     'ROTATE_CLOCKWISE': [['ROTATE', 179]], # 179, not -180 to ensure direction
     'ROTATE_COUNTERCLOCKWISE': [['ROTATE', -179]], # -179, not -180, to ensure direction
-    'TARGET_TARGET_SIZE': 0.1, # Needs to be figured out
-    'TARGET_OFFSET_X': 0, # Needs to be figured out
+    'X_VISION_DRIVE_KP': 0.005,
+    'X_VISION_DRIVE_KI': 0.00001,
+    'X_VISION_DRIVE_KD': 0.0005,
+    'Y_VISION_DRIVE_KP': 0.0125,
+    'Y_VISION_DRIVE_KI': 0.00001,
+    'Y_VISION_DRIVE_KD': 0.0005,
+    'REFLECTIVE_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
+    'REFLECTIVE_TARGET_OFFSET_X': -17.8, # Needs to be figured out
+    'APRIL_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
+    'APRIL_TARGET_OFFSET_X': -17.8, # Needs to be figured out
+    'MAX_TARGET_OFFSET_X': 90,
+    'MIN_TARGET_SIZE': 0,
 }
 
 visionConfig = {
@@ -131,6 +143,12 @@ visionConfig = {
     'SHOOTER_OFFSET': 1,
     'CAMERA_HEIGHT': 4,
     'CAMERA_PITCH': 0,
+    'APRILTAGS': 0,
+    'RETROREFLECTIVE': 1,
+    'MIN_TARGET_ASPECT_RATIO_REFLECTIVE': 0.0,
+    'MAX_TARGET_ASPECT_RATIO_REFLECTIVE': 100.0,
+    'MIN_TARGET_ASPECT_RATIO_APRILTAG': 0.0,
+    'MAX_TARGET_ASPECT_RATIO_APRILTAG': 100.0,
     'UPDATE_POSE': False, # True if should correct position with Limelight information. Otherwise informational.
 }
 
@@ -139,39 +157,46 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.3, #0.048, # 0.8 * 0.6
-    'ELEVATOR_KI': 0.0008, # 0.0525, # 2 * 0.048 / 1.62
-    'ELEVATOR_KD': 0.02, # 0.00972, # 0.048 * 1.62 / 8
+    'ELEVATOR_KP': 0.2, #0.8, #0.3, #0.48
+    'ELEVATOR_KI': 1.0, #0.0008, #0.0008, #0.0008
+    'ELEVATOR_KD': 0, #0.25, #0.2, #0.03
     'LOWER_SAFETY': 1,
     'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
-    'ELEVATOR_HUMAN_POSITION': 24, # Assumes Elevator Down
-    'ELEVATOR_UPPER_SCORING_HEIGHT': 31.5, # Assumes Elevator Down
-    'ELEVATOR_LOWER_SCORING_HEIGHT': 21, # Assumes Elevator Down
-    'ELEVATOR_RETRACTED_HEIGHT': 7,
+    'CONE_ELEVATOR_HUMAN_POSITION': 21.5, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 29.5, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 19.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
+    'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
+    'CUBE_ELEVATOR_UPPER_SCORING_HEIGHT': 25.5, # Assumes Elevator Down
+    'CUBE_ELEVATOR_LOWER_SCORING_HEIGHT': 15.25, # Assumes Elevator Down
+    'CUBE_ELEVATOR_RETRACTED_HEIGHT': 7,
 }
 
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
-    'GRABBER_ROTATE_SPEED': 0.2,
+    'GRABBER_ROTATE_SPEED': 0.4,
     'GRABBER_KP': 0.20, #0.2, #0.12,3
     'GRABBER_KI': 0.0008, #0.0008, #0.0008,
     'GRABBER_KD': 0.002, #0.002,
     'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
-    'MIN_POSITION': 1, # Roughly 0 - 5 scale, with 0 at top
-    'GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
-    'GRABBER_UPPER_SCORING_HEIGHT': 1.0, #Asssumes Elevator Down
-    'GRABBER_LOWER_SCORING_HEIGHT': 1.0, # Assumes Elevator Down
-    'GRABBER_RETRACTED_HEIGHT': 1.5,
-}
+    'MIN_POSITION': 0, # Roughly 0 - 5 scale, with 0 at top
+    'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
+    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
+    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.8, # Assumes Elevator Down
+    'CONE_GRABBER_RETRACTED_HEIGHT': 1.3,
+    'CUBE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
+    'CUBE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
+    'CUBE_GRABBER_LOWER_SCORING_HEIGHT': 0.8, # Assumes Elevator Down
+    'CUBE_GRABBER_RETRACTED_HEIGHT': 1.3,}
 
 clawConfig = {
     'MOTOR_ID': 8,
-    'RELEASE_SPEED': 0.125, # Go slow on release, so piece drops straight down
-    'RELEASE_CHANGE': 10, # Encoder change before we assume element is grabbed
+    'RELEASE_SPEED': 0.2, #0.125, # Go slow on release, so piece drops straight down
+    'RELEASE_CHANGE': 3, # Encoder change before we assume element is grabbed
     'INTAKE_SPEED': 0.5, # Go fast on intake
-    'INTAKE_CHANGE': 10 # Encoder change before we assume element is expelled
+    'INTAKE_CHANGE': 1 # Encoder change before we assume element is expelled
 }
 
 cliffDetectorConfig = {
@@ -184,8 +209,8 @@ cliffDetectorConfig = {
 
 autonConfig = {
     'SCORE_EXISTING': True,
-    'BALANCE_BOT': True,
-    'DO_COMMUNITY': True, # Only applies for position B
+    'BALANCE_BOT': False,
+    'DO_COMMUNITY': False, # Only applies for position B
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TF': [['CLAW_INTAKE_AND_STOP'],
@@ -264,7 +289,9 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', -91.9375, -137.90, 0],
+                        ['MOVE', -230.9375, -137.90, 0],
+                        ['MOVE', -230.9375, -117.90, 0],
+                        #['MOVE', -91.9375, -137.90, 0],
                         ['IDLE']],
     'TASK_BLU_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -289,7 +316,7 @@ autonConfig = {
     'TASK_RED_A_TF': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
-                        ['TIMER', 2.0],
+                        ['TIMER', 5.0],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -362,7 +389,9 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 91.9375, -137.90, 180],
+                        ['MOVE', 200.9375, -137.90, 180],
+                        ['MOVE', 200.9375, -117.90, 180],
+                        #['MOVE', 91.9375, -137.90, 180],
                         ['IDLE']],
     'TASK_RED_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -386,19 +415,65 @@ autonConfig = {
                         ['MOVE', 91.9375, -137.90, 180]],
 }
 
+#MODULE NAMES
+MODULE_NAMES = namedtuple('MODULE_NAMES', [
+    'ROBOT',
+    'SWERVEDRIVE',
+    'SWERVEMODULE',
+    'SWERVOMETER',
+    'ELEVATOR',
+    'GRABBER',
+    'CLAW',
+    'VISION'
+])
+
+
+# using a named tuple to make sure we always use the same names
+MODULE_NAMES.ROBOT = 'ROBOT'
+MODULE_NAMES.SWERVEDRIVE = 'SWERVEDRIVE'
+MODULE_NAMES.SWERVEMODULE = 'SWERVEMODULE'
+MODULE_NAMES.SWERVOMETER = 'SWERVOMETER'
+MODULE_NAMES.ELEVATOR = 'ELEVATOR'
+MODULE_NAMES.GRABBER = 'GRABBER'
+MODULE_NAMES.CLAW = 'CLAW'
+MODULE_NAMES.VISION = 'VISION'
+
+
+loggingConfig = {
+    MODULE_NAMES.ROBOT: True,
+    MODULE_NAMES.SWERVEDRIVE: False,
+    MODULE_NAMES.SWERVEMODULE: False,
+    MODULE_NAMES.SWERVOMETER: False,
+    MODULE_NAMES.ELEVATOR: False,
+    MODULE_NAMES.GRABBER: False,
+    MODULE_NAMES.CLAW: True,
+    MODULE_NAMES.VISION: False,    
+}
+
+dashboardConfig = {
+    MODULE_NAMES.ROBOT: True,
+    MODULE_NAMES.SWERVEDRIVE: True,
+    MODULE_NAMES.SWERVEMODULE: True,
+    MODULE_NAMES.SWERVOMETER: True,
+    MODULE_NAMES.ELEVATOR: True,
+    MODULE_NAMES.GRABBER: True,
+    MODULE_NAMES.CLAW: True,
+    MODULE_NAMES.VISION: True,   
+}
+
 #######################
 ###  ROBOT CONFIGS  ###
 #######################
-testbot = { # Always used for unit tests ($ python robot.py sim)
-    'CONTROLLERS': controllerConfig,
-    'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
-    'VISION': visionConfig, # Must be BEFORE drivetrain
-    'DRIVETRAIN': drivetrainConfig,
-    'CLIFFDETECTOR': cliffDetectorConfig,
-    'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
-    'ELEVATOR': elevatorConfig,
-    'AUTON': autonConfig,
-}
+# testbot = { # Always used for unit tests ($ python robot.py sim)
+#     'CONTROLLERS': controllerConfig,
+#     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
+#     'VISION': visionConfig, # Must be BEFORE drivetrain
+#     'DRIVETRAIN': drivetrainConfig,
+#     'CLIFFDETECTOR': cliffDetectorConfig,
+#     'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
+#     'ELEVATOR': elevatorConfig,
+#     'AUTON': autonConfig,
+# }
 
 showbot = {
     'CONTROLLERS': controllerConfig,
@@ -409,6 +484,8 @@ showbot = {
     'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
     'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
+    'LOGGING': loggingConfig,
+    'DASHBOARD': dashboardConfig
 }
 
 #showbot['DRIVETRAIN']['FRONTLEFT_DRIVEMOTOR'] = 1 # how to override just one thing
