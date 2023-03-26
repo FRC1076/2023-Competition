@@ -109,6 +109,9 @@ class MyRobot(wpilib.TimedRobot):
 
         self.elevator_has_reset = False
 
+        self.motorTestTimer = wpilib.Timer()
+        self.motorTestTimerHasRun = False
+
     def disabledExit(self):
         self.log("no longer disabled")
         if self.drivetrain:
@@ -534,6 +537,9 @@ class MyRobot(wpilib.TimedRobot):
         return True
 
     def teleopPeriodic(self):
+        if (TEST_MODE):
+            self.motorTest()
+            return
 
         operator = self.operator.xboxController
 
@@ -1168,6 +1174,44 @@ class MyRobot(wpilib.TimedRobot):
             self.log("RUNNING Maneuver: ERROR: Unknown Task", self.maneuverTaskCounter, maneuverTask[0])
             self.maneuverTaskCounter += 1   
         return
+
+    def motorTest(self):
+
+        if not self.motorTestTimerHasRun:
+            self.motorTestTimerHasRun = True
+            self.motorTestTimer.reset()
+            self.motorTestTimer.start()
+            self.log('Resest motor test timer')
+        if self.motorTestTimer.get() < 1:
+            self.drivetrain.move(0.2, 0.0, 0.0, 0.0)
+            self.drivetrain.execute()
+            self.log('motor test: drivetrain move - fwd')
+        elif self.motorTestTimer.get() < 2:
+            self.drivetrain.move(0.0, 0.2, 0.0, 0.0)
+            self.drivetrain.execute()
+            self.log('motor test: drivetrain move - strafe')
+        elif self.motorTestTimer.get() < 3:
+            self.drivetrain.move(0.0, 0.0, 45.0, 0.0)
+            self.drivetrain.execute()
+            self.log('motor test: drivetrain move - rcw')
+        elif self.motorTestTimer.get() < 4:
+            self.elevator.move(0.2)
+            self.log('motor test: elevator up')
+        elif self.motorTestTimer.get() < 5:
+            self.elevator.move(-0.2)
+            self.log('motor test: elevator down')
+        elif self.motorTestTimer.get() < 6:
+            self.grabber.move_grabber(0.1)
+            self.log('motor test: grabber up')
+        elif self.motorTestTimer.get() < 7:
+            self.grabber.move_grabber(-0.1)
+            self.log('motor test: grabber down')
+        else:
+            self.motorTestTimerHasRun = False
+            self.motorTestTimer.stop()
+            self.motorTestTimer.reset()
+
+
 
     def deadzoneCorrection(self, val, deadzone):
         """
