@@ -161,7 +161,7 @@ class SwerveDrive:
         self.visionDrive_x_pid_controller = PIDController(self.visionDrive_config.x_visionDrive_kP, self.visionDrive_config.x_visionDrive_kP, self.visionDrive_config.x_visionDrive_kP)
         self.visionDrive_x_pid_controller.setTolerance(0.5, 0.5)
         self.visionDrive_y_pid_controller = PIDController(self.visionDrive_config.y_visionDrive_kP, self.visionDrive_config.y_visionDrive_kP, self.visionDrive_config.y_visionDrive_kP)
-        self.visionDrive_y_pid_controller.setTolerance(0.01, 0.01)
+        self.visionDrive_y_pid_controller.setTolerance(0.001, 0.001)
         self.reflectiveTargetOffsetX = self.visionDrive_config.target_offsetX_reflective
         self.reflectiveTargetTargetSize = self.visionDrive_config.target_target_size_reflective
         self.aprilTargetOffsetX = self.visionDrive_config.target_offsetX_april
@@ -529,26 +529,46 @@ class SwerveDrive:
             if abs(offsetX) > self.max_target_offset_x or targetSize < self.min_target_size: # impossible values, there's no target
                 self.log('Aborting goToReflectiveTapeCentered() cuz no targets')
                 self.log('Target offset X: ', abs(offsetX), ", Target area: ", targetSize)
+                self.idle()
                 return False
 
             x_error = self.visionDrive_x_pid_controller.calculate(offsetX, targetOffsetX)
             x_error = -x_error
-            x_error = 0
-            y_error = -self.visionDrive_y_pid_controller.calculate(targetSize, targetTargetSize)
+            x_error = self.vision_drive_clamp(x_error, 0, 0.1)
             
+            y_error = 10 * self.visionDrive_y_pid_controller.calculate(targetSize, targetTargetSize)
+            #y_error = -y_error
+            y_error = self.vision_drive_clamp(y_error, 0, 0.1)
+
             self.log("goToOffsetAndTargetSize: x_error: ", x_error, " y_error: ", y_error)
             
-            if self.visionDrive_x_pid_controller.atSetpoint() and  \
-                self.visionDrive_y_pid_controller.atSetpoint():
-                self.update_smartdash()
-                return True
+            #x_error = 0
+            #y_error = 0
+
+            if self.visionDrive_x_pid_controller.atSetpoint():
+                if self.visionDrive_y_pid_controller.atSetpoint():
+                    self.idle()
+                    self.update_smartdash()
+                    return True
+                else:
+                    self.move(0, y_error, 0, self.bearing)
+                    self.execute('center')
+                    self.update_smartdash()
+                    return False
             else:
                 #self.move(x_error, y_error, 0, YAW)
-                self.move(x_error, y_error, 0, self.bearing)
+                self.move(x_error, 0, 0, self.bearing)
                 self.execute('center')
                 self.update_smartdash()
                 return False
 
+    def vision_drive_clamp(self, num, min_value, max_value):
+        if num >= 0:
+            return max(min(num, max_value), min_value)
+        else:
+            neg_min = -min_value
+            neg_max = -max_value
+            return max(min(num, neg_min), neg_max)
 
     def goToAprilTagCentered(self):
         self.vision.setToAprilTagPipeline()

@@ -59,6 +59,8 @@ class Elevator:
         if targetSpeed > 0:
             targetSpeed *= 0.5
             
+        self.log("Elevator: Extend: getEncoderPosition: ", self.getEncoderPosition(), " targetSpeed: ", targetSpeed)
+        
         #make sure arm doesn't go past limit
         if self.getEncoderPosition() > self.upperSafety and targetSpeed < 0:
             self.right_motor.set(0)

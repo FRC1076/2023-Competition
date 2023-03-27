@@ -559,10 +559,10 @@ class MyRobot(wpilib.TimedRobot):
         #self.log("TeleopPeriodic: Elevator reset test complete")
         
         if self.teleopDrivetrain():
-            print("TeleoDrivetrain returned true. In a maneuver.")
+            self.log("TeleoDrivetrain returned true. In a maneuver.")
             return
         else:
-            print("TeleoDrivetrain returned False. Not in a maneuver.")
+            self.log("TeleoDrivetrain returned False. Not in a maneuver.")
             self.teleopElevatorGrabber()
             self.teleopClaw()
             return
