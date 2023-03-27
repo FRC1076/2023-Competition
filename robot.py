@@ -682,11 +682,11 @@ class MyRobot(wpilib.TimedRobot):
                 if self.getPOVCorner(driver.getPOV()) == 'front_left':
                     self.drivetrain.execute('front_left')
                 elif self.getPOVCorner(driver.getPOV()) == 'front_right':
-                    self.drivetrain.execute('front_left')
+                    self.drivetrain.execute('front_right')
                 elif self.getPOVCorner(driver.getPOV()) == 'rear_left':
-                    self.drivetrain.execute('front_left')
+                    self.drivetrain.execute('rear_left')
                 elif self.getPOVCorner(driver.getPOV()) == 'rear_right':
-                    self.drivetrain.execute('front_left')
+                    self.drivetrain.execute('rear_right')
                 else:
                     self.drivetrain.execute('center')
             # If no joysticks are dictating movement, but we want to lock the wheels.
