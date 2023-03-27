@@ -177,10 +177,10 @@ elevatorConfig = {
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
     'GRABBER_ROTATE_SPEED': 0.1,
-    'GRABBER_KP': 0.20, #0.2, #0.12,3
-    'GRABBER_KI': 0.0008, #0.0008, #0.0008,
-    'GRABBER_KD': 0.002, #0.002,
-    'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
+    'GRABBER_KP': 0.1, #0.2, #0.12,3
+    'GRABBER_KI': 1.0, #0.0008, #0.0008,
+    'GRABBER_KD': 0.001, #0.002,
+    'MAX_POSITION': 2.5, # Roughly 0 - 5 scale, with 0 at top
     'MIN_POSITION': 0.5, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
@@ -441,12 +441,12 @@ MODULE_NAMES.VISION = 'VISION'
 
 loggingConfig = {
     MODULE_NAMES.ROBOT: True,
-    MODULE_NAMES.SWERVEDRIVE: True,
+    MODULE_NAMES.SWERVEDRIVE: False,
     MODULE_NAMES.SWERVEMODULE: False,
     MODULE_NAMES.SWERVOMETER: False,
-    MODULE_NAMES.ELEVATOR: True,
-    MODULE_NAMES.GRABBER: False,
-    MODULE_NAMES.CLAW: True,
+    MODULE_NAMES.ELEVATOR: False,
+    MODULE_NAMES.GRABBER: True,
+    MODULE_NAMES.CLAW: False,
     MODULE_NAMES.VISION: False,    
 }
 

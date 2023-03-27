@@ -22,15 +22,16 @@ class Grabber:
         self.kI = _rotate_kI
         self.kD = _rotate_kD
         self.rotate_pid_controller = PIDController(self.kP, self.kI, self.kD)
-        self.rotate_pid_controller.setTolerance(0.1, 0.1)
+        self.rotate_pid_controller.setTolerance(0.6, 0.1)
         self.rotate_motor_encoder.setPosition(10)
-        self.targetRotatePosition = self.rotate_motor_encoder.getPosition()
         self.maxRotatePosition = _max_position
         self.minRotatePosition = _min_position
+        self.targetRotatePosition = self.minRotatePosition
         
         self.rotate_speed = _rotate_speed
         #0 is lowered state, 1 is raised state
         self.state = 0
+        self.pid_buffer = 0.3
 
         self.storeGrabberBypassLimitSwitch = False
         self.grabberHasReset = False
@@ -69,7 +70,8 @@ class Grabber:
         
     #raise rotate motor
     def raise_motor(self, grabber_speed):
-        speed = -grabber_speed # Negative because "raise" is negative.
+        speed = grabber_speed * 1.0
+
         if self.getLimitSwitch() == True:
             self.log("Grabber: raiseMotor: Turning grabber off.")
             self.rotate_motor.set(0)
@@ -81,21 +83,21 @@ class Grabber:
             speed = self.limitSpeedByPosition(speed, 0)
 
             self.rotate_motor.set(speed)
-            self.setTargetRotatePosition(self.rotate_motor_encoder.getPosition())
-            self.log("Grabber: Raise Motor: top: ", self.getLimitSwitch(), " target position: ", self.targetRotatePosition)
+            self.constrainTargetPosition(self.rotate_motor_encoder.getPosition())
+            self.log("Grabber: Raise Motor: top: ", self.getLimitSwitch(), " speed: ", speed, " target position: ", self.targetRotatePosition)
             #self.log("Grabber: Final raise motor speed: ", self.rotate_motor.get())
             return False
     
     #lower rotate motor
     def lower_motor(self, grabber_speed):
-        speed = grabber_speed # Positive, because "lower" is positive. 
+        speed = grabber_speed
 
         speed = self.limitSpeedByPosition(speed, 0)
 
         self.state = 0
         self.rotate_motor.set(speed)
-        self.setTargetRotatePosition(self.rotate_motor_encoder.getPosition())
-        self.log("Grabber: Lower Motor: top: ", self.getLimitSwitch(), " target position: ", self.targetRotatePosition)
+        self.constrainTargetPosition(self.rotate_motor_encoder.getPosition())
+        self.log("Grabber: Lower Motor: top: ", self.getLimitSwitch(), " speed: ", speed, " target position: ", self.targetRotatePosition)
         return False
 
     def motor_off(self):
@@ -119,8 +121,11 @@ class Grabber:
             self.rotate_motor.set(0)
             return True
         else:
+            self.log("Grabber: Update: getPosition: ", self.rotate_motor_encoder.getPosition())
             rotate_error = self.rotate_pid_controller.calculate(self.rotate_motor_encoder.getPosition(), self.getTargetRotatePosition())
-            rotate_error = -rotate_error
+            rotate_error = self.clamp(rotate_error, 0, 0.1)
+            
+            #rotate_error = -rotate_error
         
             rotate_error = self.limitSpeedByPosition(rotate_error, self.pid_buffer)
         
@@ -129,22 +134,18 @@ class Grabber:
         return False
 
     def goToPosition(self, target):
-        self.setTargetRotatePosition(target)   
-        if self.getTargetRotatePosition() < self.minRotatePosition:
-            self.log("Grabber: goToPosition: Target position is too low: ", self.getTargetRotatePosition(), " going to ", self.minRotatePosition, " instead.")
-            self.setTargetRotatePosition(self.minRotatePosition)
-        if self.getTargetRotatePosition() > self.maxRotatePosition:
-            self.log("Grabber: goToPosition: Target position is too high: ", self.getTargetRotatePosition(), " going to ", self.maxRotatePosition, " instead.")
-            self.setTargetRotatePosition(self.maxRotatePosition)
-        rotate_error = self.rotate_pid_controller.calculate(self.rotate_motor_encoder.getPosition(), self.getTargetRotatePosition())
-        rotate_error = clamp(rotate_error, 0, 0.2)
+        self.constrainTargetPosition(target)   
         
-        rotate_error = -rotate_error
+        rotate_error = self.rotate_pid_controller.calculate(self.rotate_motor_encoder.getPosition(), self.getTargetRotatePosition())
+        rotate_error = self.clamp(rotate_error, 0, 0.1)
+        
+        #rotate_error = -rotate_error
         
         rotate_error = self.limitSpeedByPosition(rotate_error, self.pid_buffer)
          
         self.log("Grabber: goToPosition: current: ", self.rotate_motor_encoder.getPosition(), "adjustment: ", rotate_error, " target: ", self.getTargetRotatePosition())
-        self.rotate_motor.set(rotate_error)
+        #self.rotate_motor.set(rotate_error)
+        self.rotate_motor.set(0)
         self.log("Grabber: atSetPoint?", self.rotate_pid_controller.atSetpoint())
         return self.rotate_pid_controller.atSetpoint()
         
@@ -155,10 +156,10 @@ class Grabber:
         return result
 
     def limitSpeedByPosition(self, speed, buffer):
-        if (self.rotate_motor_encoder.getPosition() <= self.minRotatePosition - buffer) and speed < 0:
+        if (self.rotate_motor_encoder.getPosition() <= self.minRotatePosition - buffer) and speed > 0:
             return 0
 
-        if (self.rotate_motor_encoder.getPosition() >= self.maxRotatePosition + buffer) and speed > 0:
+        if (self.rotate_motor_encoder.getPosition() >= self.maxRotatePosition + buffer) and speed < 0:
             return 0
 
         return speed        
@@ -182,18 +183,19 @@ class Grabber:
             self.log("Grabber: grabberReset: completed task")
             self.resetEncoder()
             self.grabberHasReset = True
-            self.setTargetRotatePosition(self.rotate_motor_encoder.getPosition())
+            self.log("Grabber: grabberReset: New Position: ", self.rotate_motor_encoder.getPosition())
+            self.constrainTargetPosition(self.minRotatePosition)
             self.log("Grabber: grabberReset: Target: ", self.getTargetRotatePosition())
             return True
         else:
             self.log("Grabber: grabberReset: raising motor")
             #self.raise_motor(1.0) #goes at speed of 0.15 * 0.7 = 0.105
-            self.rotate_motor.set(-0.05)
+            self.rotate_motor.set(-0.1)
             self.log("Grabber: grabberReset: speed: ", self.rotate_motor.get())
             self.grabberHasReset = False
             return False
 
-    def clamp(num, min_value, max_value):
+    def clamp(self, num, min_value, max_value):
         if num >= 0:
             return max(min(num, max_value), min_value)
         else:

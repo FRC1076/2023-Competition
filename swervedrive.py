@@ -744,8 +744,8 @@ class SwerveDrive:
             #frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (frame_dimension_x / ratio))
         
             # Calculate the speed and angle for each wheel given the combination of the corresponding quadrant vectors
-            frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * 1)
-            rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * 0)
+            frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * 0)
+            rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * 1)
             rearLeft_speed = math.hypot(frontX, rightY)
             rearLeft_angle = math.degrees(math.atan2(frontX, rightY))
 
@@ -759,8 +759,8 @@ class SwerveDrive:
             rearRight_speed = math.hypot(rearX, rightY)
             rearRight_angle = math.degrees(math.atan2(rearX, rightY))
 
-            rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * 0)
-            leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * 1)
+            rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * 1)
+            leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * 0)
             frontRight_speed = math.hypot(rearX, leftY)
             frontRight_angle = math.degrees(math.atan2(rearX, leftY))
         else:
