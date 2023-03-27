@@ -806,8 +806,8 @@ class SwerveDrive:
             frontLeft_speed = math.hypot(frontX, leftY)
             frontLeft_angle = math.degrees(math.atan2(frontX, leftY))
 
-            rearX = self._requested_vectors['strafe'])
-            rightY = self._requested_vectors['fwd'])
+            rearX = self._requested_vectors['strafe']
+            rightY = self._requested_vectors['fwd']
             rearRight_speed = math.hypot(rearX, rightY)
             rearRight_angle = math.degrees(math.atan2(rearX, rightY))
 
