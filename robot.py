@@ -588,7 +588,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Reset the gyro in the direction bot is facing.
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
-        if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
+        if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7 and driver.getXButton()):
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
 
@@ -727,8 +727,8 @@ class MyRobot(wpilib.TimedRobot):
 
         operator_clutch = 1
         #Check for clutch
-        if(operator.getLeftTriggerAxis() > 0.7):
-            operator_clutch = 0.4
+        #if(operator.getLeftTriggerAxis() > 0.7):
+        #    operator_clutch = 0.4
         
         #Find the value the arm will move at
         elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * operator_clutch
@@ -781,13 +781,13 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.moveToPos(self.cone_elevator_human_position)
             self.log("ElevatorGrabber: Cone: X Button")
         else: #Aim for last target.
-            if (operator.getLeftTriggerAxis() > 0.7):
-                self.grabber.motor_off()
-                self.elevator.motors_off()
-            else:
-                self.grabber.update() # Grabber stay in place with PID
+            #if (operator.getLeftTriggerAxis() > 0.7):
+            #    self.grabber.motor_off()
+            #    self.elevator.motors_off()
+            #else:
+            self.grabber.update() # Grabber stay in place with PID
                 #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
-                self.elevator.moveToPos(self.elevator.getTargetPosition()) #Elevator stay in place with PID
+            self.elevator.moveToPos(self.elevator.getTargetPosition()) #Elevator stay in place with PID
             self.log("ElevatorGrabber: Exiting after maintaining position.")
         
         return

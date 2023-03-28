@@ -165,7 +165,7 @@ elevatorConfig = {
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'CONE_ELEVATOR_HUMAN_POSITION': 22.5, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 29.5, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 30, #30.25, # Assumes Elevator Down
     'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 20, # Assumes Elevator Down
     'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
     'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
@@ -184,7 +184,7 @@ grabberConfig = {
     'MIN_POSITION': 0.5, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.95, #Asssumes Elevator Down
-    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.95, # Assumes Elevator Down
+    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.85, # Assumes Elevator Down
     'CONE_GRABBER_RETRACTED_HEIGHT': 0.95,
     'CUBE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CUBE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
