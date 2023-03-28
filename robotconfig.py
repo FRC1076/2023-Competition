@@ -27,7 +27,7 @@ controllerConfig = {
 
 swervometerConfig = { # All positions measured in inches
     'TEAM_IS_RED': True, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'FIELD_START_POSITION': 'A', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -329,10 +329,11 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 91.9375, 40.15, 180],
-                        ['MOVE', 91.9375, -28.25, 180],
-                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
-                        ['BALANCE']],
+                        ['HALF_MOON_BALANCE', 50, 35, 50, 15, 180, 10]],
+                        #['MOVE', 91.9375, 40.15, 180],
+                        #['MOVE', 91.9375, -28.25, 180],
+                        #['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        #['BALANCE']],
     'TASK_RED_A_FT': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
                         ['MOVE', 91.9375, 40.15, 180],

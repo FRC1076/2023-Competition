@@ -968,12 +968,28 @@ class MyRobot(wpilib.TimedRobot):
             tolerance = autonTask[4]
             self.log("Auton: MOVE_TO_BALANCE: Target: x: ", x, " y: ", y, " bearing: ", bearing)
             if self.drivetrain.goToBalance(x, y, bearing, tolerance):
-                self.log("ENDING Auton Task MOVE_TO_BALANCE")
                 self.log("Auton: MOVE_TO_BALANCE: Reached target: x: ", x, " y: ", y, " bearing: ", bearing)
                 self.autonTaskCounter += 1 # Move on to next task.
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
                 self.log("Auton: MOVE_TO_BALANCE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
+            self.elevator.update()
+            self.grabber.update()
+        elif (autonTask[0] == 'HALF_MOON_BALANCE'):
+            self.log("RUNNING Auton Task HALF_MOON_BALANCE, autonTaskCounter: ", self.autonTaskCounter)            
+            checkpointX = autonTask[1]
+            checkpointY = autonTask[2]
+            cornerX = autonTask[3]
+            cornerY = autonTask[4]
+            bearing = autonTask[5]
+            tolerance = autonTask[6]
+            self.log("Auton: HALF_MOON_BALANCE: Checkpoint x: ", checkpointX, " y: ", checkpointY, " Corner x: ", cornerX, " y: ", cornerY, " bearing: ", bearing, " tolerance: ", tolerance)
+            if self.drivetrain.halfMoonBalance(checkpointX, checkpointY, cornerX, cornerY, bearing, tolerance):
+                self.log("Auton: HALF_MOON_BALANCE: Reached target: Checkpoint x: ", checkpointX, " y: ", checkpointY, " Corner x: ", cornerX, " y: ", cornerY, " bearing: ", bearing, " tolerance: ", tolerance)
+                self.autonTaskCounter += 1 # Move on to next task.
+            else:
+                # Leave self.autonTaskCounter unchanged. Repeat this task.
+                self.log("Auton: HALF_MOON_BALANCE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
             self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'BALANCE'):

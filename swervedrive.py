@@ -579,7 +579,52 @@ class SwerveDrive:
         self.vision.setToReflectivePipeline()
         return self.goToOffsetAndTargetSize(self.reflectiveTargetOffsetX,
                                             self.reflectiveTargetTargetSize)
+
+    def halfMoonBalance(self, checkpointX, checkpointY, cornerX, cornerY, bearing, tolerance):
+
+        # Figure out if the bot needs to rotate right or left and turning on which corner.
+        if checkpointY > cornerY:
+            rcw = -1
+            corner = 'rear_right'
+            slideY = cornerY - 20
+        else:
+            rcw = 1
+            corner = 'rear_left'
+            slideY = cornerY + 20
+
+        # Figure out where the bot needs to come back towards until it needs to balance.
+        if checkpointX > 0:
+            targetX = checkpointX + 50
+        else:
+            targetX = checkpointX - 50
+
+        # Figure out the new bearing after a 180.
+        newBearing = (bearing + 180) % 360
+
+        # Figure out if the bot is close to the right bearing.
+        bearingDifference = abs(self.getBearing() - newBearing)
+
+        # Final Stage: Balancing
+        if abs(self.getGyroBalance()) > tolerance:
+            return self.balance()
+
+        # Third Stage: If nearly rotated (don't wait for PID), move onto charge station:
+        elif bearingDifference < 5:
+            self.move(targetX, 0, 0, newBearing)
+            self.execute('center')
+            return False
+            
+        # Second Stage: Start corner pivot (don't wait for PID) with a slight Y shift
+        elif (cornerX > 0 and checkpointX < cornerX) or (cornerX < 0 and checkpointX > cornerX):
+            self.move(0, slideY, rcw, newBearing)
+            self.execute(corner)
+            return False
         
+        # First Stage: Move to a point just past the pivot corner.
+        else:
+            self.goToPose(x, y, 0, bearing)
+            return False
+       
     def goToBalance(self, x, y, bearing, tolerance):
         self.log("SWERVEDRIVE Going to balance:", x, y, bearing, tolerance)
 
