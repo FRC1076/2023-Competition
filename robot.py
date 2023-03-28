@@ -551,24 +551,24 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.bypassLimitSwitch()
             return
 
-        self.log("TeleopPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
+        #elf.log("TeleopPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
         if self.grabber.hasGrabberReset() == False:
             self.grabber.grabberReset()
             return
-        self.log("TeleopPeriodic: Grabber reset test complete")
+        #self.log("TeleopPeriodic: Grabber reset test complete")
         
-        self.log("TeleopPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
+        #self.log("TeleopPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
         if self.elevator.hasElevatorReset == False:
             self.elevator.elevatorReset()
             self.grabber.update()
             return
-        self.log("TeleopPeriodic: Elevator reset test complete")
+        #self.log("TeleopPeriodic: Elevator reset test complete")
         
         if self.teleopDrivetrain():
-            print("TeleoDrivetrain returned true. In a maneuver.")
+            self.log("TeleoDrivetrain returned true. In a maneuver.")
             return
         else:
-            print("TeleoDrivetrain returned False. Not in a maneuver.")
+            self.log("TeleoDrivetrain returned False. Not in a maneuver.")
             self.teleopElevatorGrabber()
             self.teleopClaw()
             return
@@ -594,7 +594,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Reset the gyro in the direction bot is facing.
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
-        if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
+        if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7 and driver.getXButton()):
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
 
@@ -673,30 +673,49 @@ class MyRobot(wpilib.TimedRobot):
             controller_at_180_to_bot = -1
             fwd *= controller_at_180_to_bot
             strafe *= controller_at_180_to_bot
+
+            # Need to adjust for Team:
+            fwd *= self.swervometer.getTeamMoveAdjustment()
+            strafe *= self.swervometer.getTeamMoveAdjustment()
+
             # No need to correct RCW, as clockwise is clockwise whether you are facing with or against bot.
             
             # If any joysticks are dictating movement.
             if fwd != 0 or strafe != 0 or rcw != 0:
                 self.drivetrain.move(fwd, strafe, rcw, self.drivetrain.getBearing())
-                self.drivetrain.execute()
+                
+                self.log("TeleopDriveTrain: POV: ", driver.getPOV())
+                if self.getPOVCorner(driver.getPOV()) == 'front_left':
+                    self.drivetrain.execute('front_left')
+                elif self.getPOVCorner(driver.getPOV()) == 'front_right':
+                    self.drivetrain.execute('front_right')
+                elif self.getPOVCorner(driver.getPOV()) == 'rear_left':
+                    self.drivetrain.execute('rear_left')
+                elif self.getPOVCorner(driver.getPOV()) == 'rear_right':
+                    self.drivetrain.execute('rear_right')
+                else:
+                    self.drivetrain.execute('center')
             # If no joysticks are dictating movement, but we want to lock the wheels.
             elif self.drivetrain.getWheelLock():
                 self.drivetrain.move(0, 0, 0, self.drivetrain.getBearing())
-                self.drivetrain.execute()
+                self.drivetrain.execute('center')
             # Otherwise, make sure we are explicitly doing nothing, so bot does not drift.
             else:
                 self.drivetrain.idle()
 
-        # Vectoral Button Drive
-        #if self.gamempad.getPOV() == 0:
-        #    self.drive.set_raw_fwd(-0.35)
-        #elif self.gamempad.getPOV() == 180:
-        #    self.drive.set_raw_fwd(0.35)
-        #elif self.gamempad.getPOV() == 90:
-        #    self.drive.set_raw_strafe(0.35)
-        #elif self.gamempad.getPOV() == 270:
-        #    self.drive.set_raw_strafe(-0.35)
         return False
+
+    def getPOVCorner(self, value):
+        if (value >=0 and value < 90):
+            return 'front_right'
+        elif (value >=90 and value < 180):
+            return 'rear_right'
+        elif (value >=180 and value < 270):
+            return 'rear_left'
+        elif (value >= 270 and value < 360):
+            return 'front_left'
+        else:
+            return 'center'
 
     def teleopElevatorGrabber(self):
         if (not self.elevator):
@@ -712,26 +731,28 @@ class MyRobot(wpilib.TimedRobot):
             self.log("teleopElevator: Toggling Elevator Up/Down")
             self.elevator.toggle()
 
-        clutch_factor = 1
+        operator_clutch = 1
         #Check for clutch
-        if(operator.getLeftTriggerAxis() > 0.7):
-            clutch_factor = 0.4
+        #if(operator.getLeftTriggerAxis() > 0.7):
+        #    operator_clutch = 0.4
         
         #Find the value the arm will move at
-        elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * clutch_factor
-        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone)) * clutch_factor
+        elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * operator_clutch
+        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone)) * self.grabber.getRotateSpeed()
 
         if elevator_controller_value != 0 and grabber_controller_value != 0: # Move both in direction of controller
             self.grabber.move_grabber(grabber_controller_value)
             self.elevator.move(elevator_controller_value)
             self.log("ElevatorGrabber: Move both elevator and grabber.")
         elif elevator_controller_value !=0: # Move only elevator
-            self.grabber.update() # Grabber stay in place
+            if not (operator.getLeftTriggerAxis() > 0.7):
+                self.grabber.update() # Grabber stay in place
             self.elevator.move(elevator_controller_value)
             self.log("ElevatorGrabber: Move elevator, maintain grabber.")
         elif grabber_controller_value != 0: # Move only grabber
             self.grabber.move_grabber(grabber_controller_value)
-            self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
+            if not (operator.getLeftTriggerAxis() > 0.7):
+                self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
             self.log("ElevatorGrabber: Move grabber, maintain elevator.")
         elif operator.getAButton() and operator.getLeftTriggerAxis() > 0.7: #Lowest Position - Cube
             self.grabber.goToPosition(self.cube_grabber_retracted_height)
@@ -766,9 +787,13 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.moveToPos(self.cone_elevator_human_position)
             self.log("ElevatorGrabber: Cone: X Button")
         else: #Aim for last target.
-            self.grabber.update() # Grabber stay in place
-            #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
-            self.elevator.moveToPos(self.elevator.getTargetPosition())
+            #if (operator.getLeftTriggerAxis() > 0.7):
+            #    self.grabber.motor_off()
+            #    self.elevator.motors_off()
+            #else:
+            self.grabber.update() # Grabber stay in place with PID
+                #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
+            self.elevator.moveToPos(self.elevator.getTargetPosition()) #Elevator stay in place with PID
             self.log("ElevatorGrabber: Exiting after maintaining position.")
         
         return
@@ -780,6 +805,7 @@ class MyRobot(wpilib.TimedRobot):
             self.claw.intake()
         elif (operator.getRightTriggerAxis() > 0.7):
             self.log("Claw: Release")
+            self.log("Claw: At time of release: Elevator Position: ", self.elevator.getEncoderPosition(), " Grabber Position: ", self.grabber.getEncoderPosition())
             self.claw.release()
         else:
             self.claw.off()
@@ -817,18 +843,18 @@ class MyRobot(wpilib.TimedRobot):
         if not self.autonTimer:
             return
 
-        self.log("AutonomousPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
+        #self.log("AutonomousPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
         if self.grabber.hasGrabberReset() == False:
             self.grabber.grabberReset()
             return
-        self.log("AutonomousPeriodic: Grabber reset test complete")
+        #self.log("AutonomousPeriodic: Grabber reset test complete")
         
-        self.log("AutonomousPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
+        #self.log("AutonomousPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
         if self.elevator.hasElevatorReset == False:
             self.elevator.elevatorReset()
             self.grabber.update()
             return
-        self.log("AutonomousPeriodic: Elevator reset test complete")
+        #self.log("AutonomousPeriodic: Elevator reset test complete")
         
         if self.autonTaskCounter < 0:
             return # No tasks assigned.
@@ -871,13 +897,13 @@ class MyRobot(wpilib.TimedRobot):
             self.grabber.update()
         elif (autonTask[0] == 'RAISE_GRABBER'):
             self.log("RUNNING Auton Task RAISE_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
-            if self.grabber.raise_motor(0.6):
+            if self.grabber.raise_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Auton Task RAISE_GRABBER")
                 self.autonTaskCounter += 1
             self.elevator.update()
         elif (autonTask[0] == 'LOWER_GRABBER'):
             self.log("RUNNING Auton Task LOWER_GRABBER, autonTaskCounter: ", self.autonTaskCounter)
-            if self.grabber.lower_motor(0.2):
+            if self.grabber.lower_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Auton Task LOWER_GRABBER")
                 self.autonTaskCounter += 1 
             self.elevator.update()
@@ -1027,13 +1053,13 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.update()
             self.grabber.update()
         elif (maneuverTask[0] == 'RAISE_GRABBER'):
-            if self.grabber.raise_motor(1.0):
+            if self.grabber.raise_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)
             self.elevator.update()
         elif (maneuverTask[0] == 'LOWER_GRABBER'):
-            if self.grabber.lower_motor(1.0):
+            if self.grabber.lower_motor(self.grabber.getRotateSpeed()):
                 self.log("ENDING Maneuver", maneuverTask[0])            
                 self.maneuverTaskCounter += 1
             self.log("RUNNING Maneuver", maneuverTask[0], self.maneuverTaskCounter)

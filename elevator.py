@@ -59,6 +59,8 @@ class Elevator:
         if targetSpeed > 0:
             targetSpeed *= 0.5
             
+        self.log("Elevator: Extend: getEncoderPosition: ", self.getEncoderPosition(), " targetSpeed: ", targetSpeed)
+        
         #make sure arm doesn't go past limit
         if self.getEncoderPosition() > self.upperSafety and targetSpeed < 0:
             self.right_motor.set(0)
@@ -71,6 +73,10 @@ class Elevator:
         
         self.right_motor.set(-targetSpeed)
         self.left_motor.set(-targetSpeed)
+
+    def motors_off(self):
+        self.right_motor.set(0)
+        self.left_motor.set(0)
 
     # Move elevator and reset target to where you end up.
     def move(self, targetSpeed):
@@ -95,7 +101,8 @@ class Elevator:
 
     def update(self):
         self.moveToPos(self.targetPosition)
-    
+        self.log("Elevator: Update: Left Limit: ", self.left_limit_switch.get(), " Right Limit: ", self.right_limit_switch.get())
+        
     def isElevatorDown(self):
         if self.solenoid.get() == DoubleSolenoid.Value.kForward or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             return True
@@ -137,7 +144,7 @@ class Elevator:
         self.storeElevatorBypassLimitSwitch = True
         
     def elevatorReset(self):
-        self.log("Elevator: Reseting elevator")
+        self.log("Elevator: Reseting elevator: Left Limit: ", self.left_limit_switch.get(), " Right Limit: ", self.right_limit_switch.get())
         
         if self.left_limit_switch.get() or self.right_limit_switch.get() or self.storeElevatorBypassLimitSwitch:
             self.log("Elevator: Found the limit switch")
@@ -145,8 +152,8 @@ class Elevator:
             self.elevatorHasReset = True
             return True
         else:
-            self.right_motor.set(-0.1)
-            self.left_motor.set(-0.1)
+            self.right_motor.set(0.1)
+            self.left_motor.set(0.1)
             self.elevatorHasReset = False
             return False
     

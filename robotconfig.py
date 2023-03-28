@@ -90,11 +90,11 @@ drivetrainConfig = {
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
-    'TARGET_KP': 0.005,
-    'TARGET_KI': 0.05, #0.005,
-    'TARGET_KD': 0.0001,
+    'TARGET_KP': 0.025,
+    'TARGET_KI': 0.001, #0.005,
+    'TARGET_KD': 0.00001,
     'BEARING_KP': 0.025,
-    'BEARING_KI': 0.00001,
+    'BEARING_KI': 0.01,
     'BEARING_KD': 0.0001,
     'ROBOT_INCHES_PER_ROTATION': 1.0, #1.793, # Inches per rotation of wheels
     'TELEOP_OPEN_LOOP_RAMP_RATE': 0.125, # Improves maneuverability of bot.
@@ -122,16 +122,16 @@ drivetrainConfig = {
                         ['ELEVATOR_HUMAN_EXTEND']],
     'ROTATE_CLOCKWISE': [['ROTATE', 179]], # 179, not -180 to ensure direction
     'ROTATE_COUNTERCLOCKWISE': [['ROTATE', -179]], # -179, not -180, to ensure direction
-    'X_VISION_DRIVE_KP': 0.005,
-    'X_VISION_DRIVE_KI': 0.00001,
-    'X_VISION_DRIVE_KD': 0.0005,
-    'Y_VISION_DRIVE_KP': 0.0125,
-    'Y_VISION_DRIVE_KI': 0.00001,
-    'Y_VISION_DRIVE_KD': 0.0005,
-    'REFLECTIVE_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
-    'REFLECTIVE_TARGET_OFFSET_X': -17.8, # Needs to be figured out
-    'APRIL_TARGET_TARGET_SIZE': 0.54, # 0.54% of the total field of view
-    'APRIL_TARGET_OFFSET_X': -17.8, # Needs to be figured out
+    'X_VISION_DRIVE_KP': 0.0050, # 0.005,
+    'X_VISION_DRIVE_KI': 0.001, #0.0006, #0.0045, # 0.00001,
+    'X_VISION_DRIVE_KD': 0.0, # 0.0005,
+    'Y_VISION_DRIVE_KP': 0.0052, #0.005, # 0.0125,
+    'Y_VISION_DRIVE_KI': 0.0001, #0.0006, #0.0045, #0.0, # 0.00001,
+    'Y_VISION_DRIVE_KD': 0.0, # 0.0005,
+    'REFLECTIVE_TARGET_TARGET_SIZE': 0.546, # 0.546% of the total field of view
+    'REFLECTIVE_TARGET_OFFSET_X': -17.53,
+    'APRIL_TARGET_TARGET_SIZE': 0.546, # % of the total field of view
+    'APRIL_TARGET_OFFSET_X': -17.53,
     'MAX_TARGET_OFFSET_X': 90,
     'MIN_TARGET_SIZE': 0,
 }
@@ -157,16 +157,16 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.2, #0.8, #0.3, #0.48
-    'ELEVATOR_KI': 1.0, #0.0008, #0.0008, #0.0008
-    'ELEVATOR_KD': 0, #0.25, #0.2, #0.03
+    'ELEVATOR_KP': 0.35, # 0.2, #0.8, #0.3, #0.48
+    'ELEVATOR_KI': 0, # 1.0, #0.0008, #0.0008, #0.0008
+    'ELEVATOR_KD': 0, # 0, #0.25, #0.2, #0.03
     'LOWER_SAFETY': 1,
     'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
-    'CONE_ELEVATOR_HUMAN_POSITION': 21.5, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 29.5, #30.25, # Assumes Elevator Down
-    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 19.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_HUMAN_POSITION': 22.5, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 30, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 20, # Assumes Elevator Down
     'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
     'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
     'CUBE_ELEVATOR_UPPER_SCORING_HEIGHT': 25.5, # Assumes Elevator Down
@@ -176,16 +176,16 @@ elevatorConfig = {
 
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
-    'GRABBER_ROTATE_SPEED': 0.4,
-    'GRABBER_KP': 0.20, #0.2, #0.12,3
-    'GRABBER_KI': 0.0008, #0.0008, #0.0008,
-    'GRABBER_KD': 0.002, #0.002,
-    'MAX_POSITION': 3, # Roughly 0 - 5 scale, with 0 at top
-    'MIN_POSITION': 0, # Roughly 0 - 5 scale, with 0 at top
+    'GRABBER_ROTATE_SPEED': 0.1,
+    'GRABBER_KP': 0.1, # 0.1, #0.2, #0.12,3
+    'GRABBER_KI': 0, # 1.0, #0.0008, #0.0008,
+    'GRABBER_KD': 0, # 0.001, #0.002,
+    'MAX_POSITION': 2.5, # Roughly 0 - 5 scale, with 0 at top
+    'MIN_POSITION': 0.5, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
-    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
-    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.8, # Assumes Elevator Down
-    'CONE_GRABBER_RETRACTED_HEIGHT': 1.3,
+    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.95, #Asssumes Elevator Down
+    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.85, # Assumes Elevator Down
+    'CONE_GRABBER_RETRACTED_HEIGHT': 0.95,
     'CUBE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CUBE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
     'CUBE_GRABBER_LOWER_SCORING_HEIGHT': 0.8, # Assumes Elevator Down
@@ -193,7 +193,7 @@ grabberConfig = {
 
 clawConfig = {
     'MOTOR_ID': 8,
-    'RELEASE_SPEED': 0.2, #0.125, # Go slow on release, so piece drops straight down
+    'RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
     'RELEASE_CHANGE': 3, # Encoder change before we assume element is grabbed
     'INTAKE_SPEED': 0.5, # Go fast on intake
     'INTAKE_CHANGE': 1 # Encoder change before we assume element is expelled
@@ -210,7 +210,7 @@ cliffDetectorConfig = {
 autonConfig = {
     'SCORE_EXISTING': True,
     'BALANCE_BOT': True,
-    'DO_COMMUNITY': True, # Only applies for position B
+    'DO_COMMUNITY': False, # Only applies for position B
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
     'TASK_BLU_A_TF': [['CLAW_INTAKE_AND_STOP'],
@@ -289,6 +289,8 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
+                        #['MOVE', -230.9375, -137.90, 0],
+                        #['MOVE', -230.9375, -117.90, 0],
                         ['MOVE', -91.9375, -137.90, 0],
                         ['IDLE']],
     'TASK_BLU_C_TT': [['CLAW_INTAKE_AND_STOP'],
@@ -387,6 +389,8 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
+                        #['MOVE', 200.9375, -137.90, 180],
+                        #['MOVE', 200.9375, -117.90, 180],
                         ['MOVE', 91.9375, -137.90, 180],
                         ['IDLE']],
     'TASK_RED_C_TT': [['CLAW_INTAKE_AND_STOP'],
@@ -436,14 +440,14 @@ MODULE_NAMES.VISION = 'VISION'
 
 
 loggingConfig = {
-    MODULE_NAMES.ROBOT: True,
+    MODULE_NAMES.ROBOT: False,
     MODULE_NAMES.SWERVEDRIVE: True,
-    MODULE_NAMES.SWERVEMODULE: True,
+    MODULE_NAMES.SWERVEMODULE: False,
     MODULE_NAMES.SWERVOMETER: True,
     MODULE_NAMES.ELEVATOR: False,
     MODULE_NAMES.GRABBER: False,
     MODULE_NAMES.CLAW: False,
-    MODULE_NAMES.VISION: True,    
+    MODULE_NAMES.VISION: False,    
 }
 
 dashboardConfig = {
