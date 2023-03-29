@@ -329,7 +329,7 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['HALF_MOON_BALANCE', 50, 35, 50, 15, 180, 10]],
+                        ['HALF_MOON_BALANCE', 161.875, 18, 161.875, 0, 180, 10]],
                         #['MOVE', 91.9375, 40.15, 180],
                         #['MOVE', 91.9375, -28.25, 180],
                         #['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
