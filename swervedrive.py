@@ -613,14 +613,14 @@ class SwerveDrive:
 
         # Third Stage: If nearly rotated (don't wait for PID), move onto charge station:
         elif bearingDifference < 10:
-            self.goToPose(targetX, currentY, 0, newBearing)
+            self.goToPose(targetX, currentY, newBearing)
             self.execute('center')
             self.log("Swervedrive: Half-Moon: Moving back")
             return False
             
         # Second Stage: Start corner pivot (don't wait for PID) with a slight Y shift
         elif abs(currentX) <= abs(cornerX):
-            self.goToPose(currentX, slideY, rcw, newBearing)
+            self.goToPose(currentX, slideY, newBearing)
             self.execute(corner)
             self.log("Swervedrive: Half-Moon: Rotating")
             return False
