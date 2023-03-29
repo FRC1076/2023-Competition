@@ -403,7 +403,7 @@ class SwerveDrive:
 
         self.log("Balance: Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
         self.log("Balance: pitch:", self.getGyroBalance())
-        pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
+        pitch_error = 1 * self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
         yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW)
         self.log("Balance: pitch_error:", pitch_error, ", yaw_error: ", yaw_error)
 
@@ -582,15 +582,17 @@ class SwerveDrive:
 
     def halfMoonBalance(self, checkpointX, checkpointY, cornerX, cornerY, bearing, tolerance):
 
+        currentX, currentY, currentBearing = self.swervometer.getCOF()
+
         # Figure out if the bot needs to rotate right or left and turning on which corner.
-        if checkpointY > cornerY:
-            rcw = -1
-            corner = 'rear_right'
-            slideY = cornerY - 20
-        else:
-            rcw = 1
+        if checkpointY < cornerY:
+            bearingAdjustment = 175 # Slightly less than 180 to indicate direction to turn.
             corner = 'rear_left'
             slideY = cornerY + 20
+        else:
+            bearingAdjustment = -175 # Slightly less than 180 to indicate direction to turn.
+            corner = 'rear_right'
+            slideY = cornerY - 20
 
         # Figure out where the bot needs to come back towards until it needs to balance.
         if checkpointX > 0:
@@ -598,31 +600,35 @@ class SwerveDrive:
         else:
             targetX = checkpointX - 50
 
-        # Figure out the new bearing after a 180.
-        newBearing = (bearing + 180) % 360
+        # Figure out the new bearing after a "180" (175).
+        newBearing = (bearing + bearingAdjustment) % 360
 
         # Figure out if the bot is close to the right bearing.
         bearingDifference = abs(self.getBearing() - newBearing)
 
         # Final Stage: Balancing
         if abs(self.getGyroBalance()) > tolerance:
+            self.log("Swervedrive: Half-Moon: Balancing")
             return self.balance()
 
         # Third Stage: If nearly rotated (don't wait for PID), move onto charge station:
-        elif bearingDifference < 5:
-            self.move(targetX, 0, 0, newBearing)
+        elif bearingDifference < 10:
+            self.goToPose(targetX, currentY, 0, newBearing)
             self.execute('center')
+            self.log("Swervedrive: Half-Moon: Moving back")
             return False
             
         # Second Stage: Start corner pivot (don't wait for PID) with a slight Y shift
-        elif (cornerX > 0 and checkpointX < cornerX) or (cornerX < 0 and checkpointX > cornerX):
-            self.move(0, slideY, rcw, newBearing)
+        elif abs(currentX) <= abs(cornerX):
+            self.goToPose(currentX, slideY, rcw, newBearing)
             self.execute(corner)
+            self.log("Swervedrive: Half-Moon: Rotating")
             return False
         
         # First Stage: Move to a point just past the pivot corner.
         else:
-            self.goToPose(x, y, 0, bearing)
+            self.goToPose(checkpointX, checkpointY, bearing)
+            self.log("Swervedrive: Half-Moon: Moving")
             return False
        
     def goToBalance(self, x, y, bearing, tolerance):
@@ -642,29 +648,20 @@ class SwerveDrive:
         self.pose_target_y = y
         self.pose_target_bearing = bearing
 
-        currentX, currentY, currentRCW = self.swervometer.getCOF()
+        currentX, currentY, currentBearing = self.swervometer.getCOF()
         x_error = self.target_x_pid_controller.calculate(currentX, x)
         y_error = -self.target_y_pid_controller.calculate(currentY, y)
-        #rcw_error = self.target_rcw_pid_controller.calculate(currentRCW, rcw)
+        
         #self.log("hello: x: ", self.target_x_pid_controller.getSetpoint(), " y: ", self.target_y_pid_controller.getSetpoint())
         if self.target_x_pid_controller.atSetpoint():
             self.log("X at set point")
         if self.target_y_pid_controller.atSetpoint():
             self.log("Y at set point")
-        #if self.target_rcw_pid_controller.atSetpoint():
-        #    self.log("RCW at set point")
         
-        #if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint() and self.target_rcw_pid_controller.atSetPoint(): 
         # Get current pose                    
         currentX, currentY, currentBearing = self.swervometer.getCOF()
         
-        # Debugging               
-        #if self.target_x_pid_controller.atSetpoint():
-        #    print("X at set point")
-        #if self.target_y_pid_controller.atSetpoint():
-        #    print("Y at set point")
-
-        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
+       if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
         else:

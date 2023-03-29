@@ -989,8 +989,8 @@ class MyRobot(wpilib.TimedRobot):
                 self.autonTaskCounter += 1 # Move on to next task.
             else:
                 # Leave self.autonTaskCounter unchanged. Repeat this task.
-                self.log("Auton: HALF_MOON_BALANCE: Not at target: x: ", x, " y: ", y, " bearing: ", bearing)
-            self.elevator.update()
+                self.log("Auton: HALF_MOON_BALANCE: Not at target: Checkpoint x: ", checkpointX, " y: ", checkpointY, " Corner x: ", cornerX, " y: ", cornerY, " bearing: ", bearing, " tolerance: ", tolerance)
+                self.elevator.update()
             self.grabber.update()
         elif (autonTask[0] == 'BALANCE'):
             self.log("RUNNING Auton Task BALANCE, autonTaskCounter: ", self.autonTaskCounter)            

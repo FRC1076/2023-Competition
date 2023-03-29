@@ -38,6 +38,9 @@ class Elevator:
         self.storeElevatorBypassLimitSwitch = False
         self.elevatorHasReset = False
 
+        self.allowToggle = True
+        self.cycleCounter = 0
+
     def resetElevator(self):
         self.storeElevatorBypassLimitSwitch = False
         self.elevatorHasReset = False
@@ -124,12 +127,25 @@ class Elevator:
     # contols the "lean" of the elevator
     def toggle(self):
         self.log("Elevator: In toggle().")
+
+        if (self.allowToggle == False) and (self.cycleCounter % 100 == 0):
+            self.allowToggle = True
+            self.cycleCounter = 0
+            self.log("Elevator: Toggle: Resetting cycleCOunter and allowing Toggle.")
+        if self.allowToggle == False:
+            self.log("Elevator: Toggle: Incrementing cycleCounter.")
+            self.cycleCounter += 1
+            return True
         if self.solenoid.get() == DoubleSolenoid.Value.kForward:
             self.solenoid.set(DoubleSolenoid.Value.kReverse)
             self.log("Elevator: Toggle: Set to reverse/up.")
+            self.cycleCounter = 0
+            self.allowToggle = False
         elif self.solenoid.get() == DoubleSolenoid.Value.kReverse or self.solenoid.get() == DoubleSolenoid.Value.kOff:
             self.solenoid.set(DoubleSolenoid.Value.kForward)
             self.log("Elevator: Toggle: Set forward/down.")
+            self.cycleCounter = 0
+            self.allowToggle = False
         else:
             self.log("Elevator: Toggle: How did we get here?")
         return True
