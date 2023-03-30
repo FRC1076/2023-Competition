@@ -92,7 +92,7 @@ drivetrainConfig = {
     'BALANCE_YAW_KD': 0.00001,
     'TARGET_KP': 0.025,
     'TARGET_KI': 0.001, #0.005,
-    'TARGET_KD': 0.00001,
+    'TARGET_KD': 0.001,
     'BEARING_KP': 0.025,
     'BEARING_KI': 0.01,
     'BEARING_KD': 0.0001,
@@ -158,15 +158,15 @@ elevatorConfig = {
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
     'ELEVATOR_KP': 0.35, # 0.2, #0.8, #0.3, #0.48
-    'ELEVATOR_KI': 0, # 1.0, #0.0008, #0.0008, #0.0008
-    'ELEVATOR_KD': 0, # 0, #0.25, #0.2, #0.03
+    'ELEVATOR_KI': 0.0, # 1.0, #0.0008, #0.0008, #0.0008
+    'ELEVATOR_KD': 0.0, # 0, #0.25, #0.2, #0.03
     'LOWER_SAFETY': 1,
     'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
-    'CONE_ELEVATOR_HUMAN_POSITION': 22.5, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 30, #30.25, # Assumes Elevator Down
-    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 20, # Assumes Elevator Down
+    'CONE_ELEVATOR_HUMAN_POSITION': 22, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 30.5, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 20.5, # Assumes Elevator Down
     'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
     'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
     'CUBE_ELEVATOR_UPPER_SCORING_HEIGHT': 25.5, # Assumes Elevator Down
@@ -176,15 +176,15 @@ elevatorConfig = {
 
 grabberConfig = {
     'ROTATE_MOTOR_ID': 7,
-    'GRABBER_ROTATE_SPEED': 0.1,
+    'GRABBER_ROTATE_SPEED': 0.125,
     'GRABBER_KP': 0.1, # 0.1, #0.2, #0.12,3
     'GRABBER_KI': 0, # 1.0, #0.0008, #0.0008,
     'GRABBER_KD': 0, # 0.001, #0.002,
     'MAX_POSITION': 2.5, # Roughly 0 - 5 scale, with 0 at top
-    'MIN_POSITION': 0.5, # Roughly 0 - 5 scale, with 0 at top
+    'MIN_POSITION': 0.4, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
-    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.95, #Asssumes Elevator Down
-    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.85, # Assumes Elevator Down
+    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.65, #Asssumes Elevator Down
+    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 1.0, # Assumes Elevator Down
     'CONE_GRABBER_RETRACTED_HEIGHT': 0.95,
     'CUBE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CUBE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
@@ -194,9 +194,9 @@ grabberConfig = {
 clawConfig = {
     'MOTOR_ID': 8,
     'RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
-    'RELEASE_CHANGE': 3, # Encoder change before we assume element is grabbed
+    'RELEASE_CHANGE': 3, # Encoder change before we assume element is expelled
     'INTAKE_SPEED': 0.5, # Go fast on intake
-    'INTAKE_CHANGE': 1 # Encoder change before we assume element is expelled
+    'INTAKE_CHANGE': 0.25 # Encoder change before we assume element is taken in
 }
 
 cliffDetectorConfig = {
@@ -208,8 +208,8 @@ cliffDetectorConfig = {
 }
 
 autonConfig = {
-    'SCORE_EXISTING': False,
-    'BALANCE_BOT': True,
+    'SCORE_EXISTING': True,
+    'BALANCE_BOT': False,
     'DO_COMMUNITY': False, # Only applies for position B
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
@@ -449,10 +449,10 @@ MODULE_NAMES.VISION = 'VISION'
 
 loggingConfig = {
     MODULE_NAMES.ROBOT: False,
-    MODULE_NAMES.SWERVEDRIVE: True,
+    MODULE_NAMES.SWERVEDRIVE: False,
     MODULE_NAMES.SWERVEMODULE: False,
-    MODULE_NAMES.SWERVOMETER: True,
-    MODULE_NAMES.ELEVATOR: True,
+    MODULE_NAMES.SWERVOMETER: False,
+    MODULE_NAMES.ELEVATOR: False,
     MODULE_NAMES.GRABBER: False,
     MODULE_NAMES.CLAW: False,
     MODULE_NAMES.VISION: False,    

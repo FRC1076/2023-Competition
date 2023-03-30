@@ -25,7 +25,7 @@ class Elevator:
             solenoid_forward_id, 
             solenoid_reverse_id)
         self.pid_controller = PIDController(kP, kI, kD)
-        self.pid_controller.setTolerance(0.3, 0.01)
+        self.pid_controller.setTolerance(2.0, 0.01)
         self.grabber = grabber
         self.right_motor.setOpenLoopRampRate(0.50)
         self.left_motor.setOpenLoopRampRate(0.50)
@@ -117,11 +117,11 @@ class Elevator:
         return False
 
     def elevatorUp(self):
-        self.solenoid.set(DoubleSolenoid.Value.kReverse)
+        self.solenoid.set(DoubleSolenoid.Value.kForward)
         return True
 
     def elevatorDown(self):
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
+        self.solenoid.set(DoubleSolenoid.Value.kReverse)
         return True
 
     # contols the "lean" of the elevator

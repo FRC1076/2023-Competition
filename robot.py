@@ -552,7 +552,7 @@ class MyRobot(wpilib.TimedRobot):
         #self.log("TeleopPeriodic: Grabber reset test complete")
         
         #self.log("TeleopPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
-        if self.elevator.hasElevatorReset == False:
+        if self.elevator.hasElevatorReset() == False:
             self.elevator.elevatorReset()
             self.grabber.update()
             return
@@ -837,18 +837,18 @@ class MyRobot(wpilib.TimedRobot):
         if not self.autonTimer:
             return
 
-        #self.log("AutonomousPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
+        self.log("AutonomousPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
         if self.grabber.hasGrabberReset() == False:
             self.grabber.grabberReset()
             return
-        #self.log("AutonomousPeriodic: Grabber reset test complete")
+        self.log("AutonomousPeriodic: Grabber reset test complete")
         
-        #self.log("AutonomousPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
-        if self.elevator.hasElevatorReset == False:
+        self.log("AutonomousPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
+        if self.elevator.hasElevatorReset() == False:
             self.elevator.elevatorReset()
             self.grabber.update()
             return
-        #self.log("AutonomousPeriodic: Elevator reset test complete")
+        self.log("AutonomousPeriodic: Elevator reset test complete")
         
         if self.autonTaskCounter < 0:
             return # No tasks assigned.

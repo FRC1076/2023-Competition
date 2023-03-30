@@ -661,7 +661,7 @@ class SwerveDrive:
         # Get current pose                    
         currentX, currentY, currentBearing = self.swervometer.getCOF()
         
-       if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
+        if self.target_x_pid_controller.atSetpoint() and self.target_y_pid_controller.atSetpoint(): 
             self.update_smartdash()
             return True
         else:

@@ -106,7 +106,7 @@ class Grabber:
         self.rotate_motor.set(0)
 
     def move_grabber(self, grabber_speed):
-        print("Grabber: Move_grabber: grabber_speed: ", grabber_speed, " current: ", self.rotate_motor.getOutputCurrent(), " Bus Voltage: ", self.rotate_motor.getBusVoltage(), " Applied Output: ", self.rotate_motor.getAppliedOutput())
+        self.log("Grabber: Move_grabber: grabber_speed: ", grabber_speed, " current: ", self.rotate_motor.getOutputCurrent(), " Bus Voltage: ", self.rotate_motor.getBusVoltage(), " Applied Output: ", self.rotate_motor.getAppliedOutput())
 
         if (grabber_speed > 0):
             self.lower_motor(grabber_speed)
@@ -188,7 +188,7 @@ class Grabber:
         else:
             self.log("Grabber: grabberReset: raising motor")
             #self.raise_motor(1.0) #goes at speed of 0.15 * 0.7 = 0.105
-            self.rotate_motor.set(-0.1)
+            self.rotate_motor.set(-0.125)
             self.log("Grabber: grabberReset: speed: ", self.rotate_motor.get())
             self.grabberHasReset = False
             return False
