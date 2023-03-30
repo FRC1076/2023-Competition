@@ -26,8 +26,8 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'FIELD_START_POSITION': 'C', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -165,8 +165,8 @@ elevatorConfig = {
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'CONE_ELEVATOR_HUMAN_POSITION': 22, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 26.5, #30.25, # Assumes Elevator Down
-    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 18.75, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 27.50, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 18.50, # Assumes Elevator Down
     'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
     'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
     'CUBE_ELEVATOR_UPPER_SCORING_HEIGHT': 25.5, # Assumes Elevator Down
@@ -194,9 +194,9 @@ grabberConfig = {
 clawConfig = {
     'MOTOR_ID': 8,
     'DEFAULT_RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
-    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.25,
+    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.20,
     'LOWER_SCORING_HEIGHT_RELEASE_SPEED': 0.125,
-    'RELEASE_CHANGE': 3, # Encoder change before we assume element is expelled
+    'RELEASE_CHANGE': 12, # Encoder change before we assume element is expelled
     'INTAKE_SPEED': 0.5, # Go fast on intake
     'INTAKE_CHANGE': 0.25 # Encoder change before we assume element is taken in
 }
@@ -406,13 +406,14 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_RETRACT'],
                         ['ELEVATOR_LOWER_EXTEND'],
-                        ['ELEVATOR_UPPER_EXTEND'],
+                        #['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
                         #['MOVE', 200.9375, -137.90, 180],
                         #['MOVE', 150.9375, -137.90, 180],
-                        ['MOVE', 91.9375, -137.90, 180],
+                        #['MOVE', 91.9375, -137.90, 180],
                         ['IDLE']],
     'TASK_RED_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -451,7 +452,6 @@ MODULE_NAMES = namedtuple('MODULE_NAMES', [
     'VISION'
 ])
 
-
 # using a named tuple to make sure we always use the same names
 MODULE_NAMES.ROBOT = 'ROBOT'
 MODULE_NAMES.SWERVEDRIVE = 'SWERVEDRIVE'
@@ -465,11 +465,11 @@ MODULE_NAMES.VISION = 'VISION'
 
 loggingConfig = {
     MODULE_NAMES.ROBOT: False,
-    MODULE_NAMES.SWERVEDRIVE: True,
+    MODULE_NAMES.SWERVEDRIVE: False,
     MODULE_NAMES.SWERVEMODULE: False,
-    MODULE_NAMES.SWERVOMETER: True,
-    MODULE_NAMES.ELEVATOR: False,
-    MODULE_NAMES.GRABBER: False,
+    MODULE_NAMES.SWERVOMETER: False,
+    MODULE_NAMES.ELEVATOR: True,
+    MODULE_NAMES.GRABBER: True,
     MODULE_NAMES.CLAW: False,
     MODULE_NAMES.VISION: False,    
 }

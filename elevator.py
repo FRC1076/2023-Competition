@@ -25,7 +25,7 @@ class Elevator:
             solenoid_forward_id, 
             solenoid_reverse_id)
         self.pid_controller = PIDController(kP, kI, kD)
-        self.pid_controller.setTolerance(1.0, 0.01)
+        self.pid_controller.setTolerance(0.3, 0.01)
         self.grabber = grabber
         self.right_motor.setOpenLoopRampRate(0.50)
         self.left_motor.setOpenLoopRampRate(0.50)
