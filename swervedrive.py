@@ -413,7 +413,7 @@ class SwerveDrive:
         else:
             #pitch_output = clamp(pitch_error)
             pitch_output = -pitch_error # Deliberately flipping sign
-            pitch_error *= self.swervometer.getTeamMoveAdjustment()
+            pitch_output *= self.swervometer.getTeamMoveAdjustment()
         
         if self.balance_yaw_pid_controller.atSetpoint():
             yaw_output = 0
