@@ -8,7 +8,7 @@ DASH_PREFIX = MODULE_NAMES.CLAW
 
 class Claw:
 
-    def __init__(self, motor_id, _release_speed, _release_change, _intake_speed, _intake_change):
+    def __init__(self, motor_id, _default_release_speed, _upper_scoring_height_release_speed, _lower_scoring_height_release_speed, _release_change, _intake_speed, _intake_change):
         self.logger = Logger.getLogger()
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.motor = rev.CANSparkMax(motor_id, motor_type)
@@ -18,14 +18,30 @@ class Claw:
         self.basePosition = self.encoder.getPosition()
         self.motor.set(0)
 
-        self.releaseSpeed = _release_speed
+        self.defaultReleaseSpeed = _default_release_speed
+        self.upperReleaseSpeed = _upper_scoring_height_release_speed
+        self.lowerReleaseSpeed = _lower_scoring_height_release_speed
+        
+        self.releaseSpeed = self.defaultReleaseSpeed
         self.releaseChange = _release_change
         self.intakeSpeed = _intake_speed
         self.intakeChange = _intake_change
 
         # Resets maneuver. Note that this is also reset with off(), which is called in roboty.py: disabledExit()
         self.maneuverComplete = True
-        
+
+    def setSpeedDefault(self):
+        self.releaseSpeed = self.defaultReleaseSpeed
+
+    def setSpeedUpper(self):
+        self.releaseSpeed = self.upperReleaseSpeed
+            
+    def setSpeedLower(self):
+        self.releaseSpeed = self.lowerReleaseSpeed
+
+    def getReleaseSpeed(self):
+        return self.releaseSpeed
+            
     # Expel the object by running motors to expel.
     def release(self):
         self.motor.set(self.releaseSpeed)

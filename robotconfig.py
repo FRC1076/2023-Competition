@@ -84,9 +84,9 @@ drivetrainConfig = {
     'HEADING_KP': 0.005, #0.005 - reverted to this
     'HEADING_KI': 0.00001, #0.00001 - reverted to this
     'HEADING_KD':  0.00001, #0.00001 - reverted to this
-    'BALANCE_PITCH_KP': 0.01,
-    'BALANCE_PITCH_KI': 0.00001,
-    'BALANCE_PITCH_KD':  0.0005,
+    'BALANCE_PITCH_KP': 0.02, #0.01
+    'BALANCE_PITCH_KI': 0.01, #0.00001
+    'BALANCE_PITCH_KD':  0.0001, #0.0005
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
@@ -157,16 +157,16 @@ elevatorConfig = {
     'LEFT_ID': 5,
     'SOLENOID_FORWARD_ID': 15,
     'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.35, # 0.2, #0.8, #0.3, #0.48
-    'ELEVATOR_KI': 0.0, # 1.0, #0.0008, #0.0008, #0.0008
-    'ELEVATOR_KD': 0.0, # 0, #0.25, #0.2, #0.03
+    'ELEVATOR_KP': 0.6, # 0.2, #0.8, #0.3, #0.48
+    'ELEVATOR_KI': 0, #0.15, # 1.0, #0.0008, #0.0008, #0.0008
+    'ELEVATOR_KD': 0.03, #0.01, # 0, #0.25, #0.2, #0.03
     'LOWER_SAFETY': 1,
     'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'CONE_ELEVATOR_HUMAN_POSITION': 22, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 30.5, #30.25, # Assumes Elevator Down
-    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 20.5, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 26.5, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 18.75, # Assumes Elevator Down
     'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
     'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
     'CUBE_ELEVATOR_UPPER_SCORING_HEIGHT': 25.5, # Assumes Elevator Down
@@ -181,10 +181,10 @@ grabberConfig = {
     'GRABBER_KI': 0, # 1.0, #0.0008, #0.0008,
     'GRABBER_KD': 0, # 0.001, #0.002,
     'MAX_POSITION': 2.5, # Roughly 0 - 5 scale, with 0 at top
-    'MIN_POSITION': 0.4, # Roughly 0 - 5 scale, with 0 at top
+    'MIN_POSITION': 0.3, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
-    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.65, #Asssumes Elevator Down
-    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 1.0, # Assumes Elevator Down
+    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.3, #Asssumes Elevator Down
+    'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.5, # Assumes Elevator Down
     'CONE_GRABBER_RETRACTED_HEIGHT': 0.95,
     'CUBE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
     'CUBE_GRABBER_UPPER_SCORING_HEIGHT': 0.6, #Asssumes Elevator Down
@@ -193,7 +193,9 @@ grabberConfig = {
 
 clawConfig = {
     'MOTOR_ID': 8,
-    'RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
+    'DEFAULT_RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
+    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.25,
+    'LOWER_SCORING_HEIGHT_RELEASE_SPEED': 0.125,
     'RELEASE_CHANGE': 3, # Encoder change before we assume element is expelled
     'INTAKE_SPEED': 0.5, # Go fast on intake
     'INTAKE_CHANGE': 0.25 # Encoder change before we assume element is taken in
@@ -217,6 +219,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -226,21 +229,22 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        #['MOVE', -91.9375, 40.15, 0],
-                        #['MOVE', -91.9375, -28.25, 0],
-                        #['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
-                        #['BALANCE']],
-                        ['HALF_MOON_BALANCE', -161.875, 18, -161.875, 0, 180, 10]],
+                        ['MOVE', -91.9375, 40.15, 0],
+                        ['MOVE', -91.9375, -28.25, 0],
+                        ['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', -161.875, 18, -161.875, 0, 180, 10]],
     'TASK_BLU_A_FT': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        #['MOVE', -91.9375, 40.15, 0],
-                        #['MOVE', -91.9375, -28.25, 0],
-                        #['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
-                        #['BALANCE']],
-                        ['HALF_MOON_BALANCE', -161.875, 18, -161.875, 0, 180, 10]],
+                        ['MOVE', -91.9375, 40.15, 0],
+                        ['MOVE', -91.9375, -28.25, 0],
+                        ['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', -161.875, 18, -161.875, 0, 180, 10]],
     'TASK_BLU_A_FF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
                         ['MOVE', -91.9375, 40.15, 0]],
@@ -248,6 +252,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -257,6 +262,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -267,6 +273,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -288,6 +295,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -299,28 +307,30 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        #['MOVE', -91.9375, -137.90, 0],
-                        #['MOVE', -91.9375, -28.25, 0],
-                        #['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
-                        #['BALANCE']],
-                        ['HALF_MOON_BALANCE', -161.875, -114, -161.875, -96, 180, 10]],
+                        ['MOVE', -91.9375, -137.90, 0],
+                        ['MOVE', -91.9375, -28.25, 0],
+                        ['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', -161.875, -114, -161.875, -96, 180, 10]],
     'TASK_BLU_C_FT': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        #['MOVE', -91.9375, -137.90, 0],
-                        #['MOVE', -91.9375, -28.25, 0],
-                        #['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
-                        #['BALANCE']],
-                        ['HALF_MOON_BALANCE', -161.875, -114, -161.875, -96, 180, 10]],
+                        ['MOVE', -91.9375, -137.90, 0],
+                        ['MOVE', -91.9375, -28.25, 0],
+                        ['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', -161.875, -114, -161.875, -96, 180, 10]],
     'TASK_BLU_C_FF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
                         ['MOVE', -91.9375, -137.90, 0]],
     'TASK_RED_A_TF': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
-                        ['TIMER', 5.0],
+                        ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -330,21 +340,22 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['HALF_MOON_BALANCE', 161.875, 18, 161.875, 0, 180, 10]],
-                        #['MOVE', 91.9375, 40.15, 180],
-                        #['MOVE', 91.9375, -28.25, 180],
-                        #['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
-                        #['BALANCE']],
+                        ['MOVE', 91.9375, 40.15, 180],
+                        ['MOVE', 91.9375, -28.25, 180],
+                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', 161.875, 18, 161.875, 0, 180, 10]],
     'TASK_RED_A_FT': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
                         ['MOVE', 91.9375, 40.15, 180],
                         ['MOVE', 91.9375, -28.25, 180],
-                        #['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
-                        #['BALANCE']],
-                        ['HALF_MOON_BALANCE', 161.875, 18, 161.875, 0, 180, 10]],
+                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', 161.875, 18, 161.875, 0, 180, 10]],
     'TASK_RED_A_FF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
                         ['MOVE', 91.9375, 40.15, 180]],
@@ -352,6 +363,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -361,6 +373,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -371,6 +384,7 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
@@ -392,32 +406,34 @@ autonConfig = {
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
                         #['MOVE', 200.9375, -137.90, 180],
-                        #['MOVE', 200.9375, -117.90, 180],
+                        #['MOVE', 150.9375, -137.90, 180],
                         ['MOVE', 91.9375, -137.90, 180],
                         ['IDLE']],
     'TASK_RED_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
+                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        #['MOVE', 91.9375, -137.90, 180],
-                        #['MOVE', 91.9375, -28.25, 180],
-                        #['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
-                        #['BALANCE']],
-                        ['HALF_MOON_BALANCE', 161.875, -114, 161.875, -96, 180, 10]],
+                        ['MOVE', 91.9375, -137.90, 180],
+                        ['MOVE', 91.9375, -28.25, 180],
+                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', 161.875, -114, 161.875, -96, 180, 10]],
     'TASK_RED_C_FT': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        #['MOVE', 91.9375, -137.90, 180],
-                        #['MOVE', 91.9375, -28.25, 180],
-                        #['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
-                        #['BALANCE']],
-                        ['HALF_MOON_BALANCE', 161.875, -114, 161.875, -96, 180, 10]],
+                        ['MOVE', 91.9375, -137.90, 180],
+                        ['MOVE', 91.9375, -28.25, 180],
+                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['BALANCE']],
+                        #['HALF_MOON_BALANCE', 161.875, -114, 161.875, -96, 180, 10]],
     'TASK_RED_C_FF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
                         ['MOVE', 91.9375, -137.90, 180]],
@@ -449,9 +465,9 @@ MODULE_NAMES.VISION = 'VISION'
 
 loggingConfig = {
     MODULE_NAMES.ROBOT: False,
-    MODULE_NAMES.SWERVEDRIVE: False,
+    MODULE_NAMES.SWERVEDRIVE: True,
     MODULE_NAMES.SWERVEMODULE: False,
-    MODULE_NAMES.SWERVOMETER: False,
+    MODULE_NAMES.SWERVOMETER: True,
     MODULE_NAMES.ELEVATOR: False,
     MODULE_NAMES.GRABBER: False,
     MODULE_NAMES.CLAW: False,

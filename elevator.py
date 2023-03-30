@@ -25,7 +25,7 @@ class Elevator:
             solenoid_forward_id, 
             solenoid_reverse_id)
         self.pid_controller = PIDController(kP, kI, kD)
-        self.pid_controller.setTolerance(2.0, 0.01)
+        self.pid_controller.setTolerance(1.0, 0.01)
         self.grabber = grabber
         self.right_motor.setOpenLoopRampRate(0.50)
         self.left_motor.setOpenLoopRampRate(0.50)
@@ -76,6 +76,7 @@ class Elevator:
         
         self.right_motor.set(-targetSpeed)
         self.left_motor.set(-targetSpeed)
+        #self.left_motor.set(0)
 
     def motors_off(self):
         self.right_motor.set(0)
@@ -175,7 +176,7 @@ class Elevator:
     
     # only reading the right encoder, assuming that left and right will stay about the same
     def getEncoderPosition(self):
-        return self.right_encoder.getPosition()
+        return (self.right_encoder.getPosition() + self.left_encoder.getPosition()) / 2
 
     def log(self, *dataToLog):
         self.logger.log(DASH_PREFIX, dataToLog)

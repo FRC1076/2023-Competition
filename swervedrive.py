@@ -403,7 +403,7 @@ class SwerveDrive:
 
         self.log("Balance: Yaw = ", self.getGyroYaw(), " BALANCED_YAW = ", BALANCED_YAW, " BALANCED_PITCH = ", BALANCED_PITCH)
         self.log("Balance: pitch:", self.getGyroBalance())
-        pitch_error = 1 * self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH) 
+        pitch_error = self.balance_pitch_pid_controller.calculate(self.getGyroBalance(), BALANCED_PITCH)
         yaw_error = self.balance_yaw_pid_controller.calculate(self.getGyroYaw(), BALANCED_YAW)
         self.log("Balance: pitch_error:", pitch_error, ", yaw_error: ", yaw_error)
 
@@ -413,7 +413,8 @@ class SwerveDrive:
         else:
             #pitch_output = clamp(pitch_error)
             pitch_output = -pitch_error # Deliberately flipping sign
-
+            pitch_error *= self.swervometer.getTeamMoveAdjustment()
+        
         if self.balance_yaw_pid_controller.atSetpoint():
             yaw_output = 0
         else:
