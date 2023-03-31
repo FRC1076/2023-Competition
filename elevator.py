@@ -102,7 +102,7 @@ class Elevator:
             self.log("Elevator: Moving")
             extendSpeed *= -1 # Elevator motor moves reverse direction.
             self.extend(extendSpeed * 0.1125)
-            if (self.nearSetpoint(2)):
+            if (self.nearSetpoint(3)):
                 return True
             return False
 

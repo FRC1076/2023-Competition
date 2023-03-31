@@ -33,22 +33,22 @@ swervometerConfig = { # All positions measured in inches
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_ORIGIN_Y': 0.0, # Y-Coordinate of field orgin (center of field, viewed from scoring table)
     'FIELD_RED_A_START_POSITION_X': 248.625, #159.0, # X-Coordinate of starting position A when on red team
-    'FIELD_RED_A_START_POSITION_Y': 40.15, #54.25, # Y-Coordinate of starting postion A when on red team
+    'FIELD_RED_A_START_POSITION_Y': 16.75, #40.15, #54.25, # Y-Coordinate of starting postion A when on red team
     'FIELD_RED_A_START_ANGLE': 0.0, # Heading angle of starting position A when on red team
     'FIELD_RED_B_START_POSITION_X': 248.625, # X-Coordinate of starting position B when on red team
-    'FIELD_RED_B_START_POSITION_Y': -28.25, # Y-Coordinate of starting postion B when on red team
+    'FIELD_RED_B_START_POSITION_Y': -49.25, #-28.25, # Y-Coordinate of starting postion B when on red team
     'FIELD_RED_B_START_ANGLE': 0.0, # Heading angle of starting position B when on red team
     'FIELD_RED_C_START_POSITION_X': 248.625, # X-Coordinate of starting position C when on red team
-    'FIELD_RED_C_START_POSITION_Y': -137.90, # Y-Coordinate of starting postion C when on red team
+    'FIELD_RED_C_START_POSITION_Y': -115.25, #-137.90, # Y-Coordinate of starting postion C when on red team
     'FIELD_RED_C_START_ANGLE': 0.0, # Heading angle of starting position C when on red team
     'FIELD_BLU_A_START_POSITION_X': -248.625, # X-Coordinate of starting position A when on blue team
-    'FIELD_BLU_A_START_POSITION_Y': 40.15, # Y-Coordinate of starting postion A when on blue team
+    'FIELD_BLU_A_START_POSITION_Y': 16.75, # 40.15, # Y-Coordinate of starting postion A when on blue team
     'FIELD_BLU_A_START_ANGLE': 180.0, # Heading angle of starting position A when on blue team
     'FIELD_BLU_B_START_POSITION_X': -248.625, # X-Coordinate of starting position B when on blue team
-    'FIELD_BLU_B_START_POSITION_Y': -28.25, # Y-Coordinate of starting postion B when on blue team
+    'FIELD_BLU_B_START_POSITION_Y': -49.25, #-28.25, # Y-Coordinate of starting postion B when on blue team
     'FIELD_BLU_B_START_ANGLE': 180.0, # Heading angle of starting position B when on blue team
     'FIELD_BLU_C_START_POSITION_X': -248.625, # X-Coordinate of starting position C when on blue team
-    'FIELD_BLU_C_START_POSITION_Y': -137.90, # Y-Coordinate of starting postion C when on blue team
+    'FIELD_BLU_C_START_POSITION_Y': -115.25, # -137.90, # Y-Coordinate of starting postion C when on blue team
     'FIELD_BLU_C_START_ANGLE': 180.0, # Heading angle of starting position C when on blue team
     'ROBOT_FRAME_DIMENSION_X': 34.0, # X-coordinate length of robot frame
     'ROBOT_FRAME_DIMENSION_Y': 26.0, # Y-coordinate length of robot frame
@@ -266,8 +266,8 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', -91.9375, -28.25, 0],
-                        ['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
+                        ['MOVE', -91.9375, -49.25, 0],
+                        ['MOVE_TO_BALANCE', -170, -49.25, 0, 10],
                         ['BALANCE']],
     'TASK_BLU_B_TTF': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -277,31 +277,30 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE_TO_BALANCE', -170, -28.25, 0, 10],
+                        ['MOVE_TO_BALANCE', -170, -49.25, 0, 10],
                         ['BALANCE']],
     'TASK_BLU_B_FTT': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['MOVE', -91.9375, -28.25, 0],
-                        ['MOVE', -170, -28.25, 0],
+                        ['MOVE', -91.9375, -49.25, 0],
+                        ['MOVE', -170, -49.25, 0],
                         ['BALANCE']],
     'TASK_BLU_B_FTF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['MOVE', -170, -28.25, 0],
+                        ['MOVE', -170, -49.25, 0],
                         ['BALANCE']],
     'TASK_BLU_B_FF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['MOVE', -91.9375, -28.25, 0]],
+                        ['MOVE', -91.9375, -49.25, 0]],
     'TASK_BLU_C_TF': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['ELEVATOR_LOWER_EXTEND'],
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
                         #['MOVE', -230.9375, -137.90, 0],
                         #['MOVE', -230.9375, -117.90, 0],
-                        #['MOVE', -91.9375, -137.90, 0],
+                        ['MOVE', -91.9375, -137.90, 0],
                         ['IDLE']],
     'TASK_BLU_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -334,7 +333,7 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        #['MOVE', 91.9375, 40.15, 180],
+                        ['MOVE', 91.9375, 40.15, 180],
                         ['IDLE']],
     'TASK_RED_A_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -367,7 +366,7 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 91.9375, -28.25, 180],
+                        ['MOVE', 91.9375, -49.25, 180],
                         ['IDLE']],
     'TASK_RED_B_TTT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -377,8 +376,8 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 91.9375, -28.25, 180],
-                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['MOVE', 91.9375, -49.25, 180],
+                        ['MOVE_TO_BALANCE', 170, -49.25, 180, 10],
                         ['BALANCE']],
     'TASK_RED_B_TTF': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -388,32 +387,31 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['MOVE_TO_BALANCE', 170, -49.25, 180, 10],
                         ['BALANCE']],
     'TASK_RED_B_FTT': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['MOVE', 91.9375, -28.25, 180],
-                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['MOVE', 91.9375, -49.25, 180],
+                        ['MOVE_TO_BALANCE', 170, -49.25, 180, 10],
                         ['BALANCE']],
     'TASK_RED_B_FTF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['MOVE_TO_BALANCE', 170, -28.25, 180, 10],
+                        ['MOVE_TO_BALANCE', 170, -49.25, 180, 10],
                         ['BALANCE']],
     'TASK_RED_B_FF': [['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
-                        ['MOVE', 91.9375, -28.25, 180]],
+                        ['MOVE', 91.9375, -49.25, 180]],
     'TASK_RED_C_TF': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
                         ['ELEVATOR_DOWN'],
                         ['TIMER', 2.0],
                         ['ELEVATOR_RETRACT'],
                         ['ELEVATOR_LOWER_EXTEND'],
-                        #['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
                         #['MOVE', 200.9375, -137.90, 180],
                         #['MOVE', 150.9375, -137.90, 180],
-                        #['MOVE', 91.9375, -137.90, 180],
+                        ['MOVE', 91.9375, -137.90, 180],
                         ['IDLE']],
     'TASK_RED_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -468,8 +466,8 @@ loggingConfig = {
     MODULE_NAMES.SWERVEDRIVE: False,
     MODULE_NAMES.SWERVEMODULE: False,
     MODULE_NAMES.SWERVOMETER: False,
-    MODULE_NAMES.ELEVATOR: False,
-    MODULE_NAMES.GRABBER: False,
+    MODULE_NAMES.ELEVATOR: True,
+    MODULE_NAMES.GRABBER: True,
     MODULE_NAMES.CLAW: False,
     MODULE_NAMES.VISION: False,    
 }
