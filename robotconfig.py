@@ -26,7 +26,7 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
     'FIELD_START_POSITION': 'C', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
@@ -84,9 +84,9 @@ drivetrainConfig = {
     'HEADING_KP': 0.005, #0.005 - reverted to this
     'HEADING_KI': 0.00001, #0.00001 - reverted to this
     'HEADING_KD':  0.00001, #0.00001 - reverted to this
-    'BALANCE_PITCH_KP': 0.02, #0.01
-    'BALANCE_PITCH_KI': 0.01, #0.00001
-    'BALANCE_PITCH_KD':  0.0001, #0.0005
+    'BALANCE_PITCH_KP': 0.01, #0.02, #0.01
+    'BALANCE_PITCH_KI': 0.00001, #0.01, #0.00001
+    'BALANCE_PITCH_KD':  0.0005, #0.0001, #0.0005
     'BALANCE_YAW_KP': 0.005,
     'BALANCE_YAW_KI': 0.00001,
     'BALANCE_YAW_KD': 0.00001,
@@ -159,13 +159,13 @@ elevatorConfig = {
     'SOLENOID_REVERSE_ID': 14,
     'ELEVATOR_KP': 0.6, # 0.2, #0.8, #0.3, #0.48
     'ELEVATOR_KI': 0, #0.15, # 1.0, #0.0008, #0.0008, #0.0008
-    'ELEVATOR_KD': 0.03, #0.01, # 0, #0.25, #0.2, #0.03
+    'ELEVATOR_KD': 0.05, #0.01, # 0, #0.25, #0.2, #0.03
     'LOWER_SAFETY': 1,
     'UPPER_SAFETY': 33,
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'CONE_ELEVATOR_HUMAN_POSITION': 22, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 27.50, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 28, #30.25, # Assumes Elevator Down
     'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 18.50, # Assumes Elevator Down
     'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
     'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
@@ -183,7 +183,7 @@ grabberConfig = {
     'MAX_POSITION': 2.5, # Roughly 0 - 5 scale, with 0 at top
     'MIN_POSITION': 0.3, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
-    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.3, #Asssumes Elevator Down
+    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.5, #Asssumes Elevator Down
     'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.5, # Assumes Elevator Down
     'CONE_GRABBER_RETRACTED_HEIGHT': 0.95,
     'CUBE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
@@ -194,7 +194,7 @@ grabberConfig = {
 clawConfig = {
     'MOTOR_ID': 8,
     'DEFAULT_RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
-    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.20,
+    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.19,
     'LOWER_SCORING_HEIGHT_RELEASE_SPEED': 0.125,
     'RELEASE_CHANGE': 12, # Encoder change before we assume element is expelled
     'INTAKE_SPEED': 0.5, # Go fast on intake
@@ -301,7 +301,7 @@ autonConfig = {
                         ['ELEVATOR_RETRACT'],
                         #['MOVE', -230.9375, -137.90, 0],
                         #['MOVE', -230.9375, -117.90, 0],
-                        ['MOVE', -91.9375, -137.90, 0],
+                        #['MOVE', -91.9375, -137.90, 0],
                         ['IDLE']],
     'TASK_BLU_C_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -334,7 +334,7 @@ autonConfig = {
                         ['ELEVATOR_UPPER_EXTEND'],
                         ['CLAW_RELEASE_AND_STOP'],
                         ['ELEVATOR_RETRACT'],
-                        ['MOVE', 91.9375, 40.15, 180],
+                        #['MOVE', 91.9375, 40.15, 180],
                         ['IDLE']],
     'TASK_RED_A_TT': [['CLAW_INTAKE_AND_STOP'],
                         ['POSITION_GRABBER', 2],
@@ -468,8 +468,8 @@ loggingConfig = {
     MODULE_NAMES.SWERVEDRIVE: False,
     MODULE_NAMES.SWERVEMODULE: False,
     MODULE_NAMES.SWERVOMETER: False,
-    MODULE_NAMES.ELEVATOR: True,
-    MODULE_NAMES.GRABBER: True,
+    MODULE_NAMES.ELEVATOR: False,
+    MODULE_NAMES.GRABBER: False,
     MODULE_NAMES.CLAW: False,
     MODULE_NAMES.VISION: False,    
 }

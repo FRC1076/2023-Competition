@@ -22,7 +22,7 @@ class Grabber:
         self.kI = _rotate_kI
         self.kD = _rotate_kD
         self.rotate_pid_controller = PIDController(self.kP, self.kI, self.kD)
-        self.rotate_pid_controller.setTolerance(0.6, 0.1)
+        self.rotate_pid_controller.setTolerance(0.2, 0.1)
         self.rotate_motor_encoder.setPosition(10)
         self.maxRotatePosition = _max_position
         self.minRotatePosition = _min_position

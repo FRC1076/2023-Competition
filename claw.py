@@ -22,6 +22,8 @@ class Claw:
         self.upperReleaseSpeed = _upper_scoring_height_release_speed
         self.lowerReleaseSpeed = _lower_scoring_height_release_speed
         
+        self.motor.setOpenLoopRampRate(0.0)
+        
         self.releaseSpeed = self.defaultReleaseSpeed
         self.releaseChange = _release_change
         self.intakeSpeed = _intake_speed

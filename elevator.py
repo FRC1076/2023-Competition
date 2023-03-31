@@ -94,6 +94,7 @@ class Elevator:
         extendSpeed = self.pid_controller.calculate(self.getEncoderPosition(), self.targetPosition)
         self.log("Elevator: moveToPos: ", self.pid_controller.getSetpoint(), " actual position: ", self.getEncoderPosition())
         if(self.pid_controller.atSetpoint()):
+        #if(self.nearSetpoint(2)):
             self.log("Elevator: At set point", self.getEncoderPosition())
             self.extend(0)
             return True
@@ -101,7 +102,20 @@ class Elevator:
             self.log("Elevator: Moving")
             extendSpeed *= -1 # Elevator motor moves reverse direction.
             self.extend(extendSpeed * 0.1125)
+            if (self.nearSetpoint(2)):
+                return True
             return False
+
+    def nearSetpoint(self, range):
+        currentSetpoint = abs(self.pid_controller.getSetpoint())
+        currentPosition = abs(self.getEncoderPosition())
+        diff = abs(currentPosition - currentSetpoint)
+
+        self.log("Elevator: moveToPos: SP: ", currentSetpoint, " pos: ", currentPosition, " diff: ", diff)
+        
+        if diff < range:
+            return True
+        return False 
 
     def update(self):
         self.moveToPos(self.targetPosition)
