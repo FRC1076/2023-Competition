@@ -26,8 +26,8 @@ controllerConfig = {
 }
 
 swervometerConfig = { # All positions measured in inches
-    'TEAM_IS_RED': False, # Is the robot part of the Red Team?
-    'FIELD_START_POSITION': 'C', # Which of three starting positions is selected?
+    'TEAM_IS_RED': True, # Is the robot part of the Red Team?
+    'FIELD_START_POSITION': 'B', # Which of three starting positions is selected?
     'HAS_BUMPERS_ATTACHED': True, # Does the robot currently have bumpers attached?
     'USE_COM_ADJUSTMENT': True, # Should robot compensate for CoM lever arms?
     'FIELD_ORIGIN_X': 0.0, # X-Coordinate of field orgin (center of field, viewed from scoring table)
@@ -211,7 +211,7 @@ cliffDetectorConfig = {
 
 autonConfig = {
     'SCORE_EXISTING': True,
-    'BALANCE_BOT': False,
+    'BALANCE_BOT': True,
     'DO_COMMUNITY': False, # Only applies for position B
     'AUTON_OPEN_LOOP_RAMP_RATE': 1, # Improves the quality of swervometery by avoiding slippage.
     'AUTON_CLOSED_LOOP_RAMP_RATE': 0,
@@ -466,8 +466,8 @@ loggingConfig = {
     MODULE_NAMES.SWERVEDRIVE: False,
     MODULE_NAMES.SWERVEMODULE: False,
     MODULE_NAMES.SWERVOMETER: False,
-    MODULE_NAMES.ELEVATOR: True,
-    MODULE_NAMES.GRABBER: True,
+    MODULE_NAMES.ELEVATOR: False,
+    MODULE_NAMES.GRABBER: False,
     MODULE_NAMES.CLAW: False,
     MODULE_NAMES.VISION: False,    
 }
