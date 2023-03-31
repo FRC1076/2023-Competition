@@ -165,7 +165,7 @@ elevatorConfig = {
     'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
     'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
     'CONE_ELEVATOR_HUMAN_POSITION': 22, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 28, #30.25, # Assumes Elevator Down
+    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 27.75, #30.25, # Assumes Elevator Down
     'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 18.50, # Assumes Elevator Down
     'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
     'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
@@ -183,7 +183,7 @@ grabberConfig = {
     'MAX_POSITION': 2.5, # Roughly 0 - 5 scale, with 0 at top
     'MIN_POSITION': 0.3, # Roughly 0 - 5 scale, with 0 at top
     'CONE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
-    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.5, #Asssumes Elevator Down
+    'CONE_GRABBER_UPPER_SCORING_HEIGHT': 0.4, #Asssumes Elevator Down
     'CONE_GRABBER_LOWER_SCORING_HEIGHT': 0.5, # Assumes Elevator Down
     'CONE_GRABBER_RETRACTED_HEIGHT': 0.95,
     'CUBE_GRABBER_HUMAN_POSITION': 1.3, # Assumes Elevator Down
@@ -194,7 +194,7 @@ grabberConfig = {
 clawConfig = {
     'MOTOR_ID': 8,
     'DEFAULT_RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
-    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.19,
+    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.18,
     'LOWER_SCORING_HEIGHT_RELEASE_SPEED': 0.125,
     'RELEASE_CHANGE': 12, # Encoder change before we assume element is expelled
     'INTAKE_SPEED': 0.5, # Go fast on intake
