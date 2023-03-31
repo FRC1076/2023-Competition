@@ -934,21 +934,21 @@ class MyRobot(wpilib.TimedRobot):
             self.elevator.update()
         elif (autonTask[0] == 'ELEVATOR_UPPER_EXTEND'):
             self.log("RUNNING Auton Task ELEVATOR_UPPER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.cone_elevator_upper_scoring_height) and self.grabber.goToPosition(self.cone_grabber_upper_scoring_height):
+            if self.elevator.moveToPos(self.cube_elevator_upper_scoring_height) and self.grabber.goToPosition(self.cube_grabber_upper_scoring_height):
                 self.log("ENDING Auton Task ELEVATOR_UPPER_EXTEND")
                 self.autonTaskCounter += 1
             self.claw.setSpeedUpper()
             self.log("Auton: Elevator Upper Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             self.log("RUNNING Auton Task ELEVATOR_LOWER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.cone_elevator_lower_scoring_height) and self.grabber.goToPosition(self.cone_grabber_lower_scoring_height):
+            if self.elevator.moveToPos(self.cube_elevator_lower_scoring_height) and self.grabber.goToPosition(self.cube_grabber_lower_scoring_height):
                 self.log("ENDING Auton Task ELEVATOR_LOWER_EXTEND")
                 self.autonTaskCounter += 1
             self.claw.setSpeedLower()
             self.log("Auton: Elevator Lower Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
             self.log("RUNNING Auton Task ELEVATOR_RETRACT, autonTaskCounter: ", self.autonTaskCounter)
-            if self.elevator.moveToPos(self.cone_elevator_retracted_height) and self.grabber.goToPosition(self.cone_grabber_retracted_height):
+            if self.elevator.moveToPos(self.cube_elevator_retracted_height) and self.grabber.goToPosition(self.cube_grabber_retracted_height):
                 self.log("ENDING Auton Task ELEVATOR_RETRACT")
                 self.autonTaskCounter += 1
             self.claw.setSpeedDefault()
