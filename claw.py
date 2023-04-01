@@ -8,7 +8,7 @@ DASH_PREFIX = MODULE_NAMES.CLAW
 
 class Claw:
 
-    def __init__(self, motor_id, _default_release_speed, _upper_scoring_height_release_speed, _lower_scoring_height_release_speed, _release_change, _intake_speed, _intake_change):
+    def __init__(self, motor_id, _cone_default_release_speed, _cone_upper_scoring_height_release_speed, _cone_lower_scoring_height_release_speed, _cube_default_release_speed, _cube_upper_scoring_height_release_speed, _cube_lower_scoring_height_release_speed, _release_change, _intake_speed, _intake_change):
         self.logger = Logger.getLogger()
         motor_type = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         self.motor = rev.CANSparkMax(motor_id, motor_type)
@@ -18,13 +18,16 @@ class Claw:
         self.basePosition = self.encoder.getPosition()
         self.motor.set(0)
 
-        self.defaultReleaseSpeed = _default_release_speed
-        self.upperReleaseSpeed = _upper_scoring_height_release_speed
-        self.lowerReleaseSpeed = _lower_scoring_height_release_speed
+        self.coneDefaultReleaseSpeed = _cone_default_release_speed
+        self.coneUpperReleaseSpeed = _cone_upper_scoring_height_release_speed
+        self.coneLowerReleaseSpeed = _cone_lower_scoring_height_release_speed
+        self.cubeDefaultReleaseSpeed = _cube_default_release_speed
+        self.cubeUpperReleaseSpeed = _cube_upper_scoring_height_release_speed
+        self.cubeLowerReleaseSpeed = _cube_lower_scoring_height_release_speed
         
         self.motor.setOpenLoopRampRate(0.0)
         
-        self.releaseSpeed = self.defaultReleaseSpeed
+        self.releaseSpeed = self.coneDefaultReleaseSpeed
         self.releaseChange = _release_change
         self.intakeSpeed = _intake_speed
         self.intakeChange = _intake_change
@@ -32,14 +35,23 @@ class Claw:
         # Resets maneuver. Note that this is also reset with off(), which is called in roboty.py: disabledExit()
         self.maneuverComplete = True
 
-    def setSpeedDefault(self):
-        self.releaseSpeed = self.defaultReleaseSpeed
+    def setConeSpeedDefault(self):
+        self.releaseSpeed = self.coneDefaultReleaseSpeed
 
-    def setSpeedUpper(self):
-        self.releaseSpeed = self.upperReleaseSpeed
+    def setConeSpeedUpper(self):
+        self.releaseSpeed = self.coneUpperReleaseSpeed
             
-    def setSpeedLower(self):
-        self.releaseSpeed = self.lowerReleaseSpeed
+    def setConeSpeedLower(self):
+        self.releaseSpeed = self.coneLowerReleaseSpeed
+
+    def setCubeSpeedDefault(self):
+        self.releaseSpeed = self.cubeDefaultReleaseSpeed
+
+    def setCubeSpeedUpper(self):
+        self.releaseSpeed = self.cubeUpperReleaseSpeed
+            
+    def setCubeSpeedLower(self):
+        self.releaseSpeed = self.cubeLowerReleaseSpeed
 
     def getReleaseSpeed(self):
         return self.releaseSpeed

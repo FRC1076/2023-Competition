@@ -193,9 +193,12 @@ grabberConfig = {
 
 clawConfig = {
     'MOTOR_ID': 8,
-    'DEFAULT_RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
-    'UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.18,
-    'LOWER_SCORING_HEIGHT_RELEASE_SPEED': 0.125,
+    'CONE_DEFAULT_RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
+    'CONE_UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.18,
+    'CONE_LOWER_SCORING_HEIGHT_RELEASE_SPEED': 0.125,
+    'CUBE_DEFAULT_RELEASE_SPEED': 0.125, #0.125, # Go slow on release, so piece drops straight down
+    'CUBE_UPPER_SCORING_HEIGHT_RELEASE_SPEED': 0.18,
+    'CUBE_LOWER_SCORING_HEIGHT_RELEASE_SPEED': 0.125,
     'RELEASE_CHANGE': 12, # Encoder change before we assume element is expelled
     'INTAKE_SPEED': 0.5, # Go fast on intake
     'INTAKE_CHANGE': 0.25 # Encoder change before we assume element is taken in

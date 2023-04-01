@@ -282,7 +282,7 @@ class MyRobot(wpilib.TimedRobot):
         return Grabber(config['ROTATE_MOTOR_ID'], config['GRABBER_ROTATE_SPEED'], config['GRABBER_KP'], config['GRABBER_KI'], config['GRABBER_KD'], config['MAX_POSITION'], config['MIN_POSITION'])
 
     def initClaw(self, config):
-        return Claw(config['MOTOR_ID'], config['DEFAULT_RELEASE_SPEED'], config['UPPER_SCORING_HEIGHT_RELEASE_SPEED'], config['LOWER_SCORING_HEIGHT_RELEASE_SPEED'], config['RELEASE_CHANGE'], config['INTAKE_SPEED'], config['INTAKE_CHANGE'])
+        return Claw(config['MOTOR_ID'], config['CONE_DEFAULT_RELEASE_SPEED'], config['CONE_UPPER_SCORING_HEIGHT_RELEASE_SPEED'], config['CONE_LOWER_SCORING_HEIGHT_RELEASE_SPEED'], config['CUBE_DEFAULT_RELEASE_SPEED'], config['CUBE_UPPER_SCORING_HEIGHT_RELEASE_SPEED'], config['CUBE_LOWER_SCORING_HEIGHT_RELEASE_SPEED'], config['RELEASE_CHANGE'], config['INTAKE_SPEED'], config['INTAKE_CHANGE'])
     
     def initDrivetrain(self, config):
         self.log("initDrivetrain ran")
@@ -749,42 +749,42 @@ class MyRobot(wpilib.TimedRobot):
                 self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
             self.log("ElevatorGrabber: Move grabber, maintain elevator.")
         elif operator.getAButton() and operator.getLeftTriggerAxis() > 0.7: #Lowest Position - Cube
-            self.claw.setSpeedDefault()
+            self.claw.setCubeSpeedDefault()
             self.grabber.goToPosition(self.cube_grabber_retracted_height)
             self.elevator.moveToPos(self.cube_elevator_retracted_height)
             self.log("ElevatorGrabber: Cube: A Button")
         elif operator.getAButton(): #Lowest Position - Cone
-            self.claw.setSpeedDefault()
+            self.claw.setConeSpeedDefault()
             self.grabber.goToPosition(self.cone_grabber_retracted_height)
             self.elevator.moveToPos(self.cone_elevator_retracted_height)
             self.log("ElevatorGrabber: Cone: A Button")
         elif operator.getYButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Highest Position
-            self.claw.setSpeedUpper()
+            self.claw.setCubeSpeedUpper()
             self.grabber.goToPosition(self.cube_grabber_upper_scoring_height)
             self.elevator.moveToPos(self.cube_elevator_upper_scoring_height)
             self.log("ElevatorGrabber: Cube: Y Button")
         elif operator.getYButton(): # and self.elevator.isElevatorDown(): #Highest Position
-            self.claw.setSpeedUpper()
+            self.claw.setConeSpeedUpper()
             self.grabber.goToPosition(self.cone_grabber_upper_scoring_height)
             self.elevator.moveToPos(self.cone_elevator_upper_scoring_height)
             self.log("ElevatorGrabber: Cone: Y Button")
         elif operator.getBButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Medium Position
-            self.claw.setSpeedLower()
+            self.claw.setCubeSpeedLower()
             self.grabber.goToPosition(self.cube_grabber_lower_scoring_height)
             self.elevator.moveToPos(self.cube_elevator_lower_scoring_height)
             self.log("ElevatorGrabber: Cube: B Button")
         elif operator.getBButton(): # and self.elevator.isElevatorDown(): #Medium Position
-            self.claw.setSpeedLower()
+            self.claw.setConeSpeedLower()
             self.grabber.goToPosition(self.cone_grabber_lower_scoring_height)
             self.elevator.moveToPos(self.cone_elevator_lower_scoring_height)
             self.log("ElevatorGrabber: Cone: B Button")
         elif operator.getXButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Human Position
-            self.claw.setSpeedDefault()
+            self.claw.setCubeSpeedDefault()
             self.grabber.goToPosition(self.cube_grabber_human_position)
             self.elevator.moveToPos(self.cube_elevator_human_position)
             self.log("ElevatorGrabber: Cube: X Button")
         elif operator.getXButton(): # and self.elevator.isElevatorDown(): #Human Position
-            self.claw.setSpeedDefault()
+            self.claw.setConeSpeedDefault()
             self.grabber.goToPosition(self.cone_grabber_human_position)
             self.elevator.moveToPos(self.cone_elevator_human_position)
             self.log("ElevatorGrabber: Cone: X Button")
@@ -938,7 +938,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.log("ENDING Auton Task ELEVATOR_UPPER_EXTEND")
                 self.autonTaskCounter += 1
             self.grabber.goToPosition(self.cube_grabber_upper_scoring_height)
-            self.claw.setSpeedUpper()
+            self.claw.setCubeSpeedUpper()
             self.log("Auton: Elevator Upper Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_LOWER_EXTEND'):
             self.log("RUNNING Auton Task ELEVATOR_LOWER_EXTEND, autonTaskCounter: ", self.autonTaskCounter)
@@ -946,7 +946,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.log("ENDING Auton Task ELEVATOR_LOWER_EXTEND")
                 self.autonTaskCounter += 1
             self.grabber.goToPosition(self.cube_grabber_lower_scoring_height)
-            self.claw.setSpeedLower()
+            self.claw.setCubeSpeedLower()
             self.log("Auton: Elevator Lower Extend: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'ELEVATOR_RETRACT'):
             self.log("RUNNING Auton Task ELEVATOR_RETRACT, autonTaskCounter: ", self.autonTaskCounter)
@@ -954,7 +954,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.log("ENDING Auton Task ELEVATOR_RETRACT")
                 self.autonTaskCounter += 1
             self.grabber.goToPosition(self.cube_grabber_retracted_height)
-            self.claw.setSpeedDefault()
+            self.claw.setCubeSpeedDefault()
             self.log("Auton: Elevator Retract: ", self.elevator.getEncoderPosition())
         elif (autonTask[0] == 'MOVE'):
             x = autonTask[1]
