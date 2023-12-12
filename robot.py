@@ -60,7 +60,7 @@ class MyRobot(wpilib.TimedRobot):
         self.cliffDetector = None
         self.auton = None
         self.vision = None
-        self.elevator = None
+        self.elevator = Elevator(robotconfig["ELEVATOR"])
         self.grabber = None
         self.claw = None
 
@@ -89,8 +89,6 @@ class MyRobot(wpilib.TimedRobot):
                 self.vision = self.initVision(config)
             if key == 'SWERVOMETER':
                 self.swervometer = self.initSwervometer(config)
-            if key == 'ELEVATOR':
-                self.elevator = self.initElevator(config)
             if key == 'GRABBER':
                 self.grabber = self.initGrabber(config)
             if key == 'DRIVETRAIN':
@@ -107,7 +105,7 @@ class MyRobot(wpilib.TimedRobot):
             self.drivetrain.resetGyro()
             self.drivetrain.printGyro()
 
-        self.elevator_has_reset = False
+        #self.elevator_has_reset = False
 
     def disabledExit(self):
         self.log("no longer disabled")
@@ -123,7 +121,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.grabber.resetGrabber()
 
-        self.elevator.resetElevator()
+        ##self.elevator.resetElevator()
 
     def initLogger(self, dir):
         return Logger.getLogger(dir)
@@ -536,36 +534,12 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
 
         operator = self.operator.xboxController
-
-        # Use only if limit switches BOTH break.
-        if (operator.getLeftBumper() and operator.getRightBumper()):
-            print("Elevator: Bypassing Elevator Lower Limit Switches")
-            self.elevator.bypassLimitSwitch()
-            print("Grabber: Bypassing Grabber Upper Limit Switches")
-            self.grabber.bypassLimitSwitch()
-            return
-
-        #elf.log("TeleopPeriodic: hasGrabberReset: ", self.grabber.hasGrabberReset())
-        if self.grabber.hasGrabberReset() == False:
-            self.grabber.grabberReset()
-            return
-        #self.log("TeleopPeriodic: Grabber reset test complete")
-        
-        #self.log("TeleopPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
-        if self.elevator.hasElevatorReset == False:
-            self.elevator.elevatorReset()
-            self.grabber.update()
-            return
         #self.log("TeleopPeriodic: Elevator reset test complete")
         
         if self.teleopDrivetrain():
             print("TeleoDrivetrain returned true. In a maneuver.")
             return
-        else:
-            print("TeleoDrivetrain returned False. Not in a maneuver.")
-            self.teleopElevatorGrabber()
-            self.teleopClaw()
-            return
+        self.teleopElevatorGrabber()
 
     def teleopDrivetrain(self):
         if (not self.drivetrain):
@@ -698,84 +672,29 @@ class MyRobot(wpilib.TimedRobot):
         return False
 
     def teleopElevatorGrabber(self):
-        if (not self.elevator):
-            return
-        if (not self.grabber):
-            return
+        y = self.operator.xboxController.getLeftY()
+        adjustedY = self.deadzoneCorrection(y, self.operator.deadzone)
+        # decrease the value to have a slower reponse
+        slowingFactor = 0.2
+        slowedY = adjustedY * slowingFactor
+        self.elevator.extend(slowedY)
         
-        operator = self.operator.xboxController
+        if self.operator.xboxController.getAButton():
+            self.elevator.moveToHeight("A")
+        elif self.operator.xboxController.getBButton():
+            self.elevator.moveToHeight("B")
+        elif self.operator.xboxController.getXButton():
+            self.elevator.moveToHeight("C")
+        elif self.operator.xboxController.getYButton():
+            self.elevator.moveToHeight("D")
 
-        self.log("teleopElevatorGrabber: In teleopElevatorGrabber()")
-
-        if (operator.getLeftBumper() and not operator.getRightBumper()):
-            self.log("teleopElevator: Toggling Elevator Up/Down")
-            self.elevator.toggle()
-
-        operator_clutch = 1
-        #Check for clutch
-        if(operator.getLeftTriggerAxis() > 0.7):
-            operator_clutch = 0.4
-        
-        #Find the value the arm will move at
-        elevator_controller_value = (self.deadzoneCorrection(operator.getLeftY(), self.operator.deadzone) / 5) * operator_clutch
-        grabber_controller_value = (self.deadzoneCorrection(operator.getRightY(), self.operator.deadzone)) * operator_clutch
-
-        if elevator_controller_value != 0 and grabber_controller_value != 0: # Move both in direction of controller
-            self.grabber.move_grabber(grabber_controller_value)
-            self.elevator.move(elevator_controller_value)
-            self.log("ElevatorGrabber: Move both elevator and grabber.")
-        elif elevator_controller_value !=0: # Move only elevator
-            if not (operator.getLeftTriggerAxis() > 0.7):
-                self.grabber.update() # Grabber stay in place
-            self.elevator.move(elevator_controller_value)
-            self.log("ElevatorGrabber: Move elevator, maintain grabber.")
-        elif grabber_controller_value != 0: # Move only grabber
-            self.grabber.move_grabber(grabber_controller_value)
-            if not (operator.getLeftTriggerAxis() > 0.7):
-                self.elevator.moveToPos(self.elevator.getTargetPosition()) # Elevator stay in place
-            self.log("ElevatorGrabber: Move grabber, maintain elevator.")
-        elif operator.getAButton() and operator.getLeftTriggerAxis() > 0.7: #Lowest Position - Cube
-            self.grabber.goToPosition(self.cube_grabber_retracted_height)
-            self.elevator.moveToPos(self.cube_elevator_retracted_height)
-            self.log("ElevatorGrabber: Cube: A Button")
-        elif operator.getAButton(): #Lowest Position - Cone
-            self.grabber.goToPosition(self.cone_grabber_retracted_height)
-            self.elevator.moveToPos(self.cone_elevator_retracted_height)
-            self.log("ElevatorGrabber: Cone: A Button")
-        elif operator.getYButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Highest Position
-            self.grabber.goToPosition(self.cube_grabber_upper_scoring_height)
-            self.elevator.moveToPos(self.cube_elevator_upper_scoring_height)
-            self.log("ElevatorGrabber: Cube: Y Button")
-        elif operator.getYButton(): # and self.elevator.isElevatorDown(): #Highest Position
-            self.grabber.goToPosition(self.cone_grabber_upper_scoring_height)
-            self.elevator.moveToPos(self.cone_elevator_upper_scoring_height)
-            self.log("ElevatorGrabber: Cone: Y Button")
-        elif operator.getBButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Medium Position
-            self.grabber.goToPosition(self.cube_grabber_lower_scoring_height)
-            self.elevator.moveToPos(self.cube_elevator_lower_scoring_height)
-            self.log("ElevatorGrabber: Cube: B Button")
-        elif operator.getBButton(): # and self.elevator.isElevatorDown(): #Medium Position
-            self.grabber.goToPosition(self.cone_grabber_lower_scoring_height)
-            self.elevator.moveToPos(self.cone_elevator_lower_scoring_height)
-            self.log("ElevatorGrabber: Cone: B Button")
-        elif operator.getXButton() and operator.getLeftTriggerAxis() > 0.7: # and self.elevator.isElevatorDown(): #Human Position
-            self.grabber.goToPosition(self.cube_grabber_human_position)
-            self.elevator.moveToPos(self.cube_elevator_human_position)
-            self.log("ElevatorGrabber: Cube: X Button")
-        elif operator.getXButton(): # and self.elevator.isElevatorDown(): #Human Position
-            self.grabber.goToPosition(self.cone_grabber_human_position)
-            self.elevator.moveToPos(self.cone_elevator_human_position)
-            self.log("ElevatorGrabber: Cone: X Button")
-        else: #Aim for last target.
-            if (operator.getLeftTriggerAxis() > 0.7):
-                self.grabber.motor_off()
-                self.elevator.motors_off()
-            else:
-                self.grabber.update() # Grabber stay in place with PID
-                #self.grabber.goToPosition(self.grabber.getTargetRotatePosition())
-                self.elevator.moveToPos(self.elevator.getTargetPosition()) #Elevator stay in place with PID
-            self.log("ElevatorGrabber: Exiting after maintaining position.")
-        
+        if self.operator.xboxController.getLeftBumperPressed():
+            self.elevator.intake(1)
+        elif self.operator.xboxController.getRightBumperPressed():
+            self.elevator.eject(0.5)
+        else:
+            self.elevator.intake(0)
+            
         return
 
     def teleopClaw(self):
@@ -785,7 +704,7 @@ class MyRobot(wpilib.TimedRobot):
             self.claw.intake()
         elif (operator.getRightTriggerAxis() > 0.7):
             self.log("Claw: Release")
-            self.log("Claw: At time of release: Elevator Position: ", self.elevator.getEncoderPosition(), " Grabber Position: ", self.grabber.getEncoderPosition())
+            #self.log("Claw: At time of release: Elevator Position: ", self.elevator.getEncoderPosition(), " Grabber Position: ", self.grabber.getEncoderPosition())
             self.claw.release()
         else:
             self.claw.off()
@@ -812,7 +731,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Reset the task counter
         self.autonTaskCounter = 0
-
+    """
     def autonomousPeriodic(self):
         if not self.auton:
             return
@@ -830,9 +749,9 @@ class MyRobot(wpilib.TimedRobot):
         #self.log("AutonomousPeriodic: Grabber reset test complete")
         
         #self.log("AutonomousPeriodic: hasElevatorReset: ", self.elevator.hasElevatorReset())
-        if self.elevator.hasElevatorReset == False:
-            self.elevator.elevatorReset()
-            self.grabber.update()
+        #if self.elevator.hasElevatorReset == False:
+            #self.elevator.elevatorReset()
+            #self.grabber.update()
             return
         #self.log("AutonomousPeriodic: Elevator reset test complete")
         
@@ -993,7 +912,8 @@ class MyRobot(wpilib.TimedRobot):
             self.autonTaskCounter += 1   
 
         return
-
+    """
+    """
     def teleopManeuver(self):
         if not self.drivetrain:
             return
@@ -1180,7 +1100,7 @@ class MyRobot(wpilib.TimedRobot):
             self.log("RUNNING Maneuver: ERROR: Unknown Task", self.maneuverTaskCounter, maneuverTask[0])
             self.maneuverTaskCounter += 1   
         return
-
+    """
     def deadzoneCorrection(self, val, deadzone):
         """
         Given the deadzone value x, the deadzone both eliminates all

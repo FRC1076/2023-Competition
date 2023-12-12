@@ -7,6 +7,8 @@ ARCADE = 1
 TANK = 2
 SWERVE = 3
 
+TICKS_PER_INCH = 2
+
 ##########################
 ###  ROBOT COMPONENTS  ###
 ##########################
@@ -153,29 +155,23 @@ visionConfig = {
 }
 
 elevatorConfig = {
-    'RIGHT_ID': 6,
-    'LEFT_ID': 5,
-    'SOLENOID_FORWARD_ID': 15,
-    'SOLENOID_REVERSE_ID': 14,
-    'ELEVATOR_KP': 0.2, #0.8, #0.3, #0.48
-    'ELEVATOR_KI': 1.0, #0.0008, #0.0008, #0.0008
-    'ELEVATOR_KD': 0, #0.25, #0.2, #0.03
-    'LOWER_SAFETY': 1,
-    'UPPER_SAFETY': 33,
-    'LEFT_LIMIT_SWITCH': 3, # Failsafe, hopefully one of them triggers
-    'RIGHT_LIMIT_SWITCH': 4, # Failsafe, hopefully one of them triggers
-    'CONE_ELEVATOR_HUMAN_POSITION': 21.5, # Assumes Elevator Down
-    'CONE_ELEVATOR_UPPER_SCORING_HEIGHT': 29.5, #30.25, # Assumes Elevator Down
-    'CONE_ELEVATOR_LOWER_SCORING_HEIGHT': 19.25, # Assumes Elevator Down
-    'CONE_ELEVATOR_RETRACTED_HEIGHT': 7,
-    'CUBE_ELEVATOR_HUMAN_POSITION': 21.0, # Assumes Elevator Down
-    'CUBE_ELEVATOR_UPPER_SCORING_HEIGHT': 25.5, # Assumes Elevator Down
-    'CUBE_ELEVATOR_LOWER_SCORING_HEIGHT': 15.25, # Assumes Elevator Down
-    'CUBE_ELEVATOR_RETRACTED_HEIGHT': 7,
+    "LEFT_MOTOR_ID" : 5,
+    "RIGHT_MOTOR_ID": 6,
+    "GRABBER_MOTOR_ID": 8,
+    "SHELF_HEIGHT_A": 4/TICKS_PER_INCH,
+    "SHELF_HEIGHT_B": 18/TICKS_PER_INCH,
+    "SHELF_HEIGHT_C": 32/TICKS_PER_INCH,
+    "SHELF_HEIGHT_D": 46/TICKS_PER_INCH,
+    "MARGIN": 1/TICKS_PER_INCH,
+    "LOWER_SAFETY": 1,
+    "UPPER_SAFETY": 33,
+    "kP": 0.1,
+    "kI": 0.01,
+    "kD": 0.005,
 }
 
 grabberConfig = {
-    'ROTATE_MOTOR_ID': 7,
+    'ROTATE_MOTOR_ID': 99,
     'GRABBER_ROTATE_SPEED': 0.4,
     'GRABBER_KP': 0.20, #0.2, #0.12,3
     'GRABBER_KI': 0.0008, #0.0008, #0.0008,
@@ -192,7 +188,7 @@ grabberConfig = {
     'CUBE_GRABBER_RETRACTED_HEIGHT': 1.3,}
 
 clawConfig = {
-    'MOTOR_ID': 8,
+    'MOTOR_ID': 98,
     'RELEASE_SPEED': 0.2, #0.125, # Go slow on release, so piece drops straight down
     'RELEASE_CHANGE': 3, # Encoder change before we assume element is grabbed
     'INTAKE_SPEED': 0.5, # Go fast on intake
@@ -480,8 +476,8 @@ showbot = {
     'SWERVOMETER': swervometerConfig, # Must be BEFORE drivetrain
     'VISION': visionConfig, # Must be BEFORE drivetrain
     'DRIVETRAIN': drivetrainConfig,
-    'CLAW': clawConfig,
-    'GRABBER': grabberConfig, #MUST BE BEFORE ELEVATOR
+    'CLAW': clawConfig, 
+    'GRABBER': grabberConfig,#MUST BE BEFORE ELEVATOR
     'ELEVATOR': elevatorConfig,
     'AUTON': autonConfig,
     'LOGGING': loggingConfig,
