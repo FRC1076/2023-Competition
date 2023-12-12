@@ -165,9 +165,9 @@ elevatorConfig = {
     "MARGIN": 1/TICKS_PER_INCH,
     "LOWER_SAFETY": 1,
     "UPPER_SAFETY": 33,
-    "kP": 0.1,
-    "kI": 0.01,
-    "kD": 0.005,
+    "kP": 0.04,
+    "kI": 0.008,
+    "kD": 0.0001,
 }
 
 grabberConfig = {
