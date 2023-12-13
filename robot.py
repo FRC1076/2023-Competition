@@ -103,7 +103,7 @@ class MyRobot(wpilib.TimedRobot):
 
         if self.drivetrain:
             self.drivetrain.resetGyro()
-            self.drivetrain.printGyro()
+            #self.drivetrain.printGyro()
 
         #self.elevator_has_reset = False
 
@@ -537,7 +537,7 @@ class MyRobot(wpilib.TimedRobot):
         #self.log("TeleopPeriodic: Elevator reset test complete")
         
         if self.teleopDrivetrain():
-            print("TeleoDrivetrain returned true. In a maneuver.")
+            #print("TeleoDrivetrain returned true. In a maneuver.")
             return
         self.teleopElevatorGrabber()
 
@@ -564,7 +564,7 @@ class MyRobot(wpilib.TimedRobot):
         # Note this is a bad idea in competition, since it's reset automatically in robotInit.
         if (driver.getLeftTriggerAxis() > 0.7 and driver.getRightTriggerAxis() > 0.7):
             self.drivetrain.resetGyro()
-            self.drivetrain.printGyro()
+            #self.drivetrain.printGyro()
 
         # Determine if Wheel Lock is needed.
         if (driver.getLeftTriggerAxis() > 0.7 and not driver.getRightTriggerAxis() > 0.7):
@@ -609,7 +609,7 @@ class MyRobot(wpilib.TimedRobot):
         #    return True
         elif (driver.getRightTriggerAxis() > 0.7 and rcw > 0):
             if(self.startingManeuver == True):
-                print("180 Clockwise Flip - Starting Maneuver")
+                #print("180 Clockwise Flip - Starting Maneuver")
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
@@ -618,7 +618,7 @@ class MyRobot(wpilib.TimedRobot):
             return True
         elif (driver.getRightTriggerAxis() > 0.7 and rcw < 0):
             if(self.startingManeuver == True):
-                print("180 Counterclockwise Flip - Starting Maneuver")
+                #print("180 Counterclockwise Flip - Starting Maneuver")
                 self.startingManeuver = False
                 self.maneuverComplete = False
                 self.maneuverTaskCounter = 0
@@ -680,21 +680,21 @@ class MyRobot(wpilib.TimedRobot):
         if slowedY != 0:
             self.elevator.extend(slowedY)
             self.elevator.updateTargetHeight()
-        elif self.operator.xboxController.getAButtonReleased():
-            self.elevator.moveToHeight("A")
-        elif self.operator.xboxController.getBButtonReleased():
-            self.elevator.moveToHeight("B")
-        elif self.operator.xboxController.getXButtonReleased():
-            self.elevator.moveToHeight("C")
-        elif self.operator.xboxController.getYButtonReleased():
-            self.elevator.moveToHeight("D")
-        if slowedY == 0:
+        else:
+            if self.operator.xboxController.getAButtonReleased():
+                self.elevator.moveToHeight("A")
+            elif self.operator.xboxController.getBButtonReleased():
+                self.elevator.moveToHeight("B")
+            elif self.operator.xboxController.getXButtonReleased():
+                self.elevator.moveToHeight("C")
+            elif self.operator.xboxController.getYButtonReleased():
+                self.elevator.moveToHeight("D")
             self.elevator.execute()
 
-        if self.operator.xboxController.getLeftBumperPressed():
-            self.elevator.intake(1)
-        elif self.operator.xboxController.getRightBumperPressed():
-            self.elevator.eject(0.5)
+        if self.operator.xboxController.getLeftBumper():
+            self.elevator.intake(0.5)
+        elif self.operator.xboxController.getRightBumper():
+            self.elevator.eject(0.25)
         else:
             self.elevator.intake(0)
             

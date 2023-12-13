@@ -56,7 +56,7 @@ class Elevator:
             #return
 
         # the motors are running backwards, invert targetSpeed.
-        print("Speed:", targetSpeed) # "targetHeight", targetHeight)
+        #print("Speed:", targetSpeed) # "targetHeight", targetHeight)
         self.rightMotor.set(-targetSpeed) #test it
         self.leftMotor.set(-targetSpeed)
 
@@ -86,11 +86,11 @@ class Elevator:
         return self.rightEncoder.getPosition()
     
     def intake(self, speed):
-        print("intake")
+        #print("intake")
         self.grabberMotor.set(-speed)
 
     def eject(self, speed):
-        print("eject")
+        #print("eject")
         self.grabberMotor.set(speed)
 
     #only called when manual movement is used, used to update target height to current height so that elevator won't fall
@@ -101,8 +101,11 @@ class Elevator:
 
     def execute(self):
         extendSpeed = self.pidController.calculate(self.getEncoderPosition(), self.targetHeight) # speed at which elevator has to move according to PID
-        print("encoder position",self.getEncoderPosition(), "targetHeight", self.targetHeight)
+        #print("encoder position",self.getEncoderPosition(), "targetHeight", self.targetHeight)
         slowedExtendSpeed = extendSpeed # original number: 0.1125 (speed of elevator reduced to become a decimal number)
-        print("Elevator: moveToPos: ", self.pidController.getSetpoint(), " actual position: ", self.getEncoderPosition(),"Extend speed:", slowedExtendSpeed)
-        
+        #print("Elevator: moveToPos: ", self.pidController.getSetpoint(), " actual position: ", self.getEncoderPosition(),"Extend speed:", slowedExtendSpeed)
+        #put a cap on max speed
+        cap = 0.8
+        if abs(slowedExtendSpeed) > cap:
+            slowedExtendSpeed = (slowedExtendSpeed / abs(slowedExtendSpeed)) * cap
         self.extend(-slowedExtendSpeed)
