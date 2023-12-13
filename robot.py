@@ -677,16 +677,19 @@ class MyRobot(wpilib.TimedRobot):
         # decrease the value to have a slower reponse
         slowingFactor = 0.2
         slowedY = adjustedY * slowingFactor
-        self.elevator.extend(slowedY)
-        
-        if self.operator.xboxController.getAButton():
+        if slowedY != 0:
+            self.elevator.extend(slowedY)
+            self.elevator.updateTargetHeight()
+        elif self.operator.xboxController.getAButtonReleased():
             self.elevator.moveToHeight("A")
-        elif self.operator.xboxController.getBButton():
+        elif self.operator.xboxController.getBButtonReleased():
             self.elevator.moveToHeight("B")
-        elif self.operator.xboxController.getXButton():
+        elif self.operator.xboxController.getXButtonReleased():
             self.elevator.moveToHeight("C")
-        elif self.operator.xboxController.getYButton():
+        elif self.operator.xboxController.getYButtonReleased():
             self.elevator.moveToHeight("D")
+        if slowedY == 0:
+            self.elevator.execute()
 
         if self.operator.xboxController.getLeftBumperPressed():
             self.elevator.intake(1)

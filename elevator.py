@@ -37,6 +37,8 @@ class Elevator:
         self.rightEncoder.setPosition(0)
         self.leftEncoder.setPosition(0)
 
+        self.targetHeight = 0
+
     def extend(self, targetSpeed):  # controls length of the elevator   
         if targetSpeed > 1:
             targetSpeed = 1
@@ -61,26 +63,19 @@ class Elevator:
         return
     
     def moveToHeight(self, shelfLabel):
-        targetHeight = 0
         if shelfLabel == "A":
-            targetHeight = self.shelfHeightA
+            self.targetHeight = self.shelfHeightA
             #print(f"shelf-A [{targetHeight}]","Current Height:",self.getEncoderPosition())
         elif shelfLabel == "B":
-             targetHeight = self.shelfHeightB
+             self.targetHeight = self.shelfHeightB
              #print(f"shelf-B [{targetHeight}]")
         elif shelfLabel == "C":
-             targetHeight = self.shelfHeightC
+             self.targetHeight = self.shelfHeightC
              #print(f"shelf-C [{targetHeight}]")
-        else:
-            targetHeight = self.shelfHeightD  
+        elif shelfLabel == "D":
+            self.targetHeight = self.shelfHeightD  
             #print(f"shelf-D [{targetHeight}]")
 
-        extendSpeed = self.pidController.calculate(self.getEncoderPosition(), targetHeight) # speed at which elevator has to move according to PID
-        print("encoder position",self.getEncoderPosition(), "targetHeight",targetHeight)
-        slowedExtendSpeed = extendSpeed # original number: 0.1125 (speed of elevator reduced to become a decimal number)
-        print("Elevator: moveToPos: ", self.pidController.getSetpoint(), " actual position: ", self.getEncoderPosition(),"Extend speed:", slowedExtendSpeed)
-        
-        self.extend(-slowedExtendSpeed)
     
     def resetEncoders(self):
         self.leftEncoder.setPosition(0)
@@ -98,5 +93,16 @@ class Elevator:
         print("eject")
         self.grabberMotor.set(speed)
 
+    #only called when manual movement is used, used to update target height to current height so that elevator won't fall
+    def updateTargetHeight(self):
+        self.targetHeight = self.getEncoderPosition()
      #def log(self, *dataToLog):
         #self.logger.log(DASH_PREFIX, dataToLog)
+
+    def execute(self):
+        extendSpeed = self.pidController.calculate(self.getEncoderPosition(), self.targetHeight) # speed at which elevator has to move according to PID
+        print("encoder position",self.getEncoderPosition(), "targetHeight", self.targetHeight)
+        slowedExtendSpeed = extendSpeed # original number: 0.1125 (speed of elevator reduced to become a decimal number)
+        print("Elevator: moveToPos: ", self.pidController.getSetpoint(), " actual position: ", self.getEncoderPosition(),"Extend speed:", slowedExtendSpeed)
+        
+        self.extend(-slowedExtendSpeed)
