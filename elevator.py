@@ -111,5 +111,4 @@ class Elevator:
             slowedExtendSpeed = maxCap
         if slowedExtendSpeed < minCap:
             slowedExtendSpeed = minCap
-
         self.extend(-slowedExtendSpeed)

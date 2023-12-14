@@ -677,9 +677,9 @@ class MyRobot(wpilib.TimedRobot):
         # decrease the value to have a slower reponse
         slowingFactor = 0.2
         slowedY = adjustedY * slowingFactor
-        if slowedY != 0:
-            self.elevator.extend(slowedY)
+        if abs(slowedY) > 0.05: #additional deadzone correction, doing slowedY != 0 was not good enough
             self.elevator.updateTargetHeight()
+            self.elevator.extend(slowedY)
         else:
             if self.operator.xboxController.getAButtonReleased():
                 self.elevator.moveToHeight("A")
