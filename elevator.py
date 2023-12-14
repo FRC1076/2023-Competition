@@ -103,9 +103,13 @@ class Elevator:
         extendSpeed = self.pidController.calculate(self.getEncoderPosition(), self.targetHeight) # speed at which elevator has to move according to PID
         #print("encoder position",self.getEncoderPosition(), "targetHeight", self.targetHeight)
         slowedExtendSpeed = extendSpeed # original number: 0.1125 (speed of elevator reduced to become a decimal number)
-        #print("Elevator: moveToPos: ", self.pidController.getSetpoint(), " actual position: ", self.getEncoderPosition(),"Extend speed:", slowedExtendSpeed)
+        print("Elevator: moveToPos: ", self.pidController.getSetpoint(), " actual position: ", self.getEncoderPosition(),"Extend speed:", slowedExtendSpeed)
         #put a cap on max speed
-        cap = 0.2
-        if abs(slowedExtendSpeed) > cap:
-            slowedExtendSpeed = (slowedExtendSpeed / abs(slowedExtendSpeed)) * cap
+        maxCap = 0.2
+        minCap = -0.1
+        if slowedExtendSpeed > maxCap:
+            slowedExtendSpeed = maxCap
+        if slowedExtendSpeed < minCap:
+            slowedExtendSpeed = minCap
+
         self.extend(-slowedExtendSpeed)
