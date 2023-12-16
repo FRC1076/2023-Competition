@@ -734,7 +734,17 @@ class MyRobot(wpilib.TimedRobot):
 
         # Reset the task counter
         self.autonTaskCounter = 0
+
+    def autonomousPeriodic(self):
+        if(self.autonTimer.get() < 1.85):
+            self.drivetrain.move(-1, 0, 0, self.drivetrain.getBearing())
+            self.drivetrain.execute()
+        else:
+            self.drivetrain.move(0, 0, 0, self.drivetrain.getBearing())
+            self.drivetrain.execute()
+
     """
+
     def autonomousPeriodic(self):
         if not self.auton:
             return
